@@ -1,0 +1,38 @@
+#+TITLE: DOER document
+
+* Description
+
+
+
+* Objectives
+** Primary objectives
+1. How to represent the lobsters as a graph. Which parts are the vertices, what do the distances between the vertices mean and do we look at the angles between vertices.
+   - How complex or simple
+   - Too many vertices makes the problem too complex (from computational complexity)
+   - Evaluation from matching on lobsters to see which graph structures may be better suited
+
+2. Assuming given two graphs, can we find the difference
+   - Using existing software, create graphs of lobsters and do the comparison
+   - if similar lobsters give small matching distance
+   - what happens if some vertices or errors exist
+
+3. Automatically detect interest points from the images
+   - evaluate different algorithms
+   - How the matching would change due to errors from creating the graph from computer vision
+
+4. Evaluate against given dataset
+   - Evaluate against last project (as a baseline)
+
+
+** Secondary objectives
+- Extending existing or coming up with new algorithm for creating graphs from images, knowing what we've learned so far
+- Try on more complex images such as natural lobsters in environment 
+- See if this could more for video/real time instead of images
+
+** Any extra objectives
+
+
+* Ethics
+
+
+* Resources
