@@ -1,38 +1,48 @@
-#+TITLE: DOER document
+#+TITLE: Graph matching with lobsters DOER document
+#+AUTHOR: Sizhe Yuen (140011146)
+#+LATEX_HEADER: \hypersetup{colorlinks=true, linkcolor=\textcolor}
+#+LATEX_HEADER: \newcommand{\n}[0]{\\[\baselineskip]}
+
+#+LATEX: \newpage
 
 * Description
-
-
+*Title:* Graph matching with lobsters
+#+LATEX:\n
+This project aims to represent images of lobsters as graphs and use graph matching techniques to compare between them. We aim to use these techniques to discover properties of the lobster, for example its age, gender and health. The effectiveness of these techniques will be evaluated against the existing dataset to discover if graph matching is a suitable method for lobster recognition and charactiersation. Extensions to this project would be to develop a new algorithm for create graphs rather than using existing ones and to try the same techniques on more complex images with lobsters in their natural environment. 
 
 * Objectives
 ** Primary objectives
-1. How to represent the lobsters as a graph. Which parts are the vertices, what do the distances between the vertices mean and do we look at the angles between vertices.
-   - How complex or simple
-   - Too many vertices makes the problem too complex (from computational complexity)
-   - Evaluation from matching on lobsters to see which graph structures may be better suited
 
-2. Assuming given two graphs, can we find the difference
-   - Using existing software, create graphs of lobsters and do the comparison
-   - if similar lobsters give small matching distance
-   - what happens if some vertices or errors exist
+*** How to represent the lobsters as a graph. 
+#+LATEX:\n
+Because there could be many different configurations for a graph of a lobster, this first objective aims to construct multiple different graphs, varying the number of vertices, lengths between each vertex and the connectivity. Having too many vertices may make the problem too complex in terms of computational complexity but too little vertices may not be enough to describe the properties of the lobster.
+#+LATEX:\n
+*Deliverable:* Multiple sample graph configurations for a lobster and an evaluation on which graph structure may be better suited
 
-3. Automatically detect interest points from the images
-   - evaluate different algorithms
-   - How the matching would change due to errors from creating the graph from computer vision
 
-4. Evaluate against given dataset
-   - Evaluate against last project (as a baseline)
+*** Given two graphs of a lobster, find the difference between the graphs.
+#+LATEX:\n
+Using existing software, first create graphs of lobsters based on a configuration from objective 1. Then compare two graphs of different lobsters or graph from two images of the same lobster. We want to see if similar lobsters or the same lobster would give a small matching distance and also see what happens if some vertices are missing or errors exist and how these errors affect the comparison.
+
+*** Automatically detect interest points from images
+#+LATEX:\n
+With computer vision and different algorithms, we now want to be able to automatically create lobster graphs and compare them by feeding images as input, as opposed to having to create the graphs by hand. We can also see how the matching would change due to errors from creating the graph using computer vision (rather than by hand).
+#+LATEX:\n
+*Deliverable:* Software artefact to take images of lobsters as input and output a graph representation.
+
+*** Evaluate this method of graph matching on lobsters against the existing dataset. 
+The existing dataset has a simple method of getting lobster properties and after all the work on this project's graph matching techniques, the results should be evaluated against the existing method to see if graph matching is suitable, appropriate or even more effective. 
 
 
 ** Secondary objectives
-- Extending existing or coming up with new algorithm for creating graphs from images, knowing what we've learned so far
-- Try on more complex images such as natural lobsters in environment 
-- See if this could more for video/real time instead of images
-
-** Any extra objectives
+- Extending existing or coming up with new algorithm for creating graphs from images, knowing what we've learned so far.
+- Try this technique on more complex images such as natural lobsters in their environment.
+- Try this technique for video/real time instead of images to give real time properties and information on the lobster.
 
 
 * Ethics
-
+There are no ethical considerations for this project as we will be working with images of the lobsters and not the live animals.
 
 * Resources
+This project can be completed using standard school equipment and therefore does not require any special resources.
+
