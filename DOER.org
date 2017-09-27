@@ -8,19 +8,21 @@
 * Description
 *Title:* Graph matching with lobsters
 #+LATEX:\n
-This project aims to represent images of lobsters as graphs and use graph matching techniques to compare between them. We aim to use these techniques to discover properties of the lobster, for example its age, gender and health. The effectiveness of these techniques will be evaluated against the existing dataset to discover if graph matching is a suitable method for lobster recognition and charactiersation. Extensions to this project would be to develop a new algorithm for create graphs rather than using existing ones and to try the same techniques on more complex images with lobsters in their natural environment. 
+The ability to measure lobsters is important to be able to monitor the size and health of the creatures. By being able to do this task with images and automatically with software, we can aid scientists in this field accomplish their work more quickly. There is currently an existing dataset of images where efforts have been made to determine the size and sex of the lobsters using global features such as total length. 
+#+LATEX:\n
+This project aims extend that work by representing images of lobsters as graphs and use graph matching techniques to compare between them. We aim to use these techniques to discover properties of the lobster, for example its age, gender and health. The effectiveness of these techniques will be evaluated against the existing dataset to discover if graph matching is a suitable method for lobster recognition and characterisation. Extensions to this project would be to develop a new algorithm for create graphs rather than using existing ones and to try the same techniques on more complex images with lobsters in their natural environment. 
 
 * Objectives
 ** Primary objectives
 
-*** How to represent the lobsters as a graph. 
+*** Explore and create suitable graph representations for lobsters
 #+LATEX:\n
 Because there could be many different configurations for a graph of a lobster, this first objective aims to construct multiple different graphs, varying the number of vertices, lengths between each vertex and the connectivity. Having too many vertices may make the problem too complex in terms of computational complexity but too little vertices may not be enough to describe the properties of the lobster.
 #+LATEX:\n
 *Deliverable:* Multiple sample graph configurations for a lobster and an evaluation on which graph structure may be better suited
 
 
-*** Given two graphs of a lobster, find the difference between the graphs.
+*** Measure similarity of lobster graphs with existing software
 #+LATEX:\n
 Using existing software, first create graphs of lobsters based on a configuration from objective 1. Then compare two graphs of different lobsters or graph from two images of the same lobster. We want to see if similar lobsters or the same lobster would give a small matching distance and also see what happens if some vertices are missing or errors exist and how these errors affect the comparison.
 
@@ -30,14 +32,14 @@ With computer vision and different algorithms, we now want to be able to automat
 #+LATEX:\n
 *Deliverable:* Software artefact to take images of lobsters as input and output a graph representation.
 
-*** Evaluate this method of graph matching on lobsters against the existing dataset. 
+*** Evaluate this method of graph matching on lobsters against the existing dataset
 The existing dataset has a simple method of getting lobster properties and after all the work on this project's graph matching techniques, the results should be evaluated against the existing method to see if graph matching is suitable, appropriate or even more effective. 
 
 
 ** Secondary objectives
 - Extending existing or coming up with new algorithm for creating graphs from images, knowing what we've learned so far.
-- Try this technique on more complex images such as natural lobsters in their environment.
-- Try this technique for video/real time instead of images to give real time properties and information on the lobster.
+- Apply this technique on more complex images such as natural lobsters in their environment.
+- Apply this technique for video/real time instead of images to give real time properties and information on the lobster.
 
 
 * Ethics
