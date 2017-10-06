@@ -1,0 +1,26 @@
+** Week 3 - 06/10/17
+
+*** Look at edit distance based metric
+- weighted edited so that adding/removing weight from an edge counts as an edit in the distance metric
+- Removing nodes/edges also counts to edit distance
+- https://link.springer.com/content/pdf/10.1007%2Fs10044-008-0141-y.pdf
+
+*** Transform graph to metric space
+- Gromov–Hausdorff
+- Similar graphs give similar values
+- Each node with edges it is connected to and their weights
+
+*** Lobster graph as undirected tree
+- Undirected tree is a tree where root is not known
+- An undirected graph with no cycles is an undirected tree
+- An find less computationally complex algorithm for undirected tree distance rather than graph distance
+
+*** GUI tool to draw graphs and export to .dot files
+- d3.js 
+- networkx
+
+*** Human pose graph matching papers
+- Good ideas that have been tried or bad ones to avoid
+- 
+
+** 
