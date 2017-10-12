@@ -1,5 +1,5 @@
-** Week 3 - 06/10/17
-
+* Week 3
+** 06/10/17
 *** Look at edit distance based metric
 - weighted edited so that adding/removing weight from an edge counts as an edit in the distance metric
 - Removing nodes/edges also counts to edit distance
@@ -23,4 +23,15 @@
 - Good ideas that have been tried or bad ones to avoid
 - 
 
-** 
+* Week 4
+** Before meetings
+*** Human pose graph matching http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.592.4170&rep=rep1&type=pdf
+- Graph matching algorithm used: Algorithm for error-tolerant subgraph isomorphism detection http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=682179
+- Store database of model graphs. Graph matching algorithm could return multiple matches from database because it only looks at topology
+- Decision trees used to further filter matches. Example graphs are created for decision to learn. 
+
+*** Graph creation software
+- Gephi to draw graphs, it can export drawn graphs into a number of data formats. 
+
+** 12/10/17
+
