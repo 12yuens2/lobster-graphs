@@ -23,4 +23,28 @@
 - Good ideas that have been tried or bad ones to avoid
 - 
 
-** 
+** Week 4
+
+*** Create graphs from lobsters to try matching
+- Have some sample graphs to be able to run through nauty and try the matching
+- augment hand made graphs by adding mistakes (wrong labels or vertices)
+- try to match mistake graphs with correct ones
+- generate the mistake graphs and try to match them all to see which of the generated ones may match at all
+
+*** software 
+- graphgrep
+- nauty
+- see how fast it will take to match
+
+*** From list of vertices
+-> generate possible configurations
+-> match with database annotated graphs
+-> best matching ones go to 2nd step of matching (i.e, decision tree)
+
+*** From this look into training decision tree
+
+*** Start form subgraphs
+- Instead of creating entire lobsters initially
+- start with smaller subgraphs and match those 
+- create the larger graph from subgraphs that are already matched and labelled
+- more reliable to detect subgraph rather than entire lobster at once
