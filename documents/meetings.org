@@ -59,3 +59,41 @@
 - create the larger graph from subgraphs that are already matched and labelled
 - more reliable to detect subgraph rather than entire lobster at once
 
+
+* Week 5
+
+** 27/10/17
+
+*** other algorithm
+- APPAGTO
+- nauty
+
+*** Graphgrep
+- try very large dataset to see time taken
+- say around 1000 in database
+- combinations of all subgraphs
+- see if theres any scaling issues
+- subgraphs add into the larger lobster graph
+- try subgraphs in database with larger query
+
+contrast different approaches
+
+
+Changes needed from fuse of subgraph to match to larger graph
+- 
+
+know that we can find a number of subgraphs in the images
+- we will know that subgraphs are valid because matched
+
+next week - define cost fucntion
+- different cost functions
+- how many nodes found
+- angles and distances of edges
+
+** APPAGATO
+*** Approximate network querying
+- Find query occurances among all possible with the maximum combined similarity.
+- Similarity here means both the similarity between nodes and cost measuring of the differences between nodes and edges
+
+1. Try the APPAGTO algorithm
+2. see subgraph matching in graphgrep or nauty -> gives list of matched subgraphs -> cost function

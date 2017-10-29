@@ -1,14 +1,14 @@
 import sys
+import os
 
 print("args: " + str(sys.argv))
-
 
 
 output = open("output.lne", "w")
 
 i = 0
-for input in sys.argv[1:]:
-    input_file = open("graphs/" + str(input))
+for f in os.listdir(sys.argv[1]):
+    input_file = open(sys.argv[1] + f)
 
     lines = input_file.read().splitlines()[1:]
 
@@ -39,5 +39,3 @@ for input in sys.argv[1:]:
     
 print(nodes)
 print(edges)
-
-
