@@ -1,0 +1,6 @@
+/cs/home/sy35/Documents/cs4099/appagato/build/CMakeFiles/rebuild_cache.dir
+/cs/home/sy35/Documents/cs4099/appagato/build/CMakeFiles/edit_cache.dir
+/cs/home/sy35/Documents/cs4099/appagato/build/CMakeFiles/clean-all.dir
+/cs/home/sy35/Documents/cs4099/appagato/build/CMakeFiles/Converter.dir
+/cs/home/sy35/Documents/cs4099/appagato/build/CMakeFiles/SeqAppagato_rel.dir
+/cs/home/sy35/Documents/cs4099/appagato/build/CMakeFiles/SeqAppagato_info.dir
