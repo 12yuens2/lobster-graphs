@@ -4,7 +4,7 @@ import os
 print("args: " + str(sys.argv))
 
 
-output = open("output.lne", "w")
+output = open("output.gfu", "w")
 
 i = 0
 for f in os.listdir(sys.argv[1]):
@@ -16,14 +16,20 @@ for f in os.listdir(sys.argv[1]):
     edges = []
 
     is_node = True
+    first = True
+    first_value = 0
     for line in lines:
         a = line.split(",")
         if "edge" in line:
             is_node = False
         elif is_node:
-            nodes.append(int(a[0]))
+            if first:
+                first = False
+                first_value = int(a[0])
+                
+            nodes.append(int(a[0]) - first_value)
         else:
-            edges.append((int(a[0]), int(a[1])))
+            edges.append((int(a[0]) - first_value, int(a[1]) - first_value))
 
     output.write("#graph" + str(i) + "\n")
     output.write(str(len(nodes)) + "\n")
