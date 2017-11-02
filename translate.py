@@ -40,7 +40,6 @@ for f in os.listdir(sys.argv[1]):
     output.write(str(len(edges)) + "\n")
     for e in edges:
         output.write(str(e[0]) + " " + str(e[1]) + "\n")
-    output.write("\n")
     i += 1
     
 print(nodes)
