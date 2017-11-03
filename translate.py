@@ -33,8 +33,9 @@ for f in os.listdir(sys.argv[1]):
             else:
                 edges.append((int(a[0]) - first_value, int(a[1]) - first_value))
 
-            j += 1
 
+        j += len(nodes)
+                
         output.write("#graph" + str(i) + "\n")
         output.write(str(len(nodes)) + "\n")
         for n in nodes:
