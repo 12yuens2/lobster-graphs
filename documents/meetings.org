@@ -78,9 +78,7 @@
 
 contrast different approaches
 
-
 Changes needed from fuse of subgraph to match to larger graph
-- 
 
 know that we can find a number of subgraphs in the images
 - we will know that subgraphs are valid because matched
@@ -97,3 +95,26 @@ next week - define cost fucntion
 
 1. Try the APPAGTO algorithm
 2. see subgraph matching in graphgrep or nauty -> gives list of matched subgraphs -> cost function
+
+* Week 6
+
+** 03/11/17
+
+*** Matching with errors
+- Match subgraphs with errors or variations
+- Include filter with probabilities with nodes and edges fitting
+
+*** Add ranking with the probabilities from query
+- For each classification of node have an associated probability
+- Match all in database
+- Naive bayes classifier -> cost of matching (probability the labelling is correct)
+    - Probability of each feature and multiply them together
+    - When matched the node probabilities will be the same, but combination of nodes/edges and angles will give different probabilities.
+    - Gaussian for length matching
+- Pick strongest nodes/subgraph from probabilities.
+
+
+
+Go back after getting subgraph to get graph properties like edge length and angles.
+
+With list of matched and labelled subgraphs -> building together into whole lobster.
