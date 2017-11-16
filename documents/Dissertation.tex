@@ -1,0 +1,72 @@
+\documentclass{article}
+\usepackage{color}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{syntax}
+\usepackage{csquotes}
+\usepackage{wasysym}
+%\usepackage[backend=biber]{biblatex}
+%\addbibresource{references.bib}
+
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+
+\lstset{frame=tb,
+  numbers=left,
+  stepnumber=1,
+  language=C,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numberstyle=\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2,
+  moredelim=**[is][\color{red}]{@}{@},
+}
+
+\setlength{\grammarindent}{12em}
+
+%\renewcommand{\lstlistingname}{Algorithm}
+%\newcommand{\tablerow}[4]{ #1 & #2 & #3 & #4\\}
+\newcommand{\n}[0]{\\[\baselineskip]}
+%\newcommand{\qa}[2]{\textbf{Q:} #1 \\ \textbf{A:} #2}
+%\newcommand{\argument}[4]{\textbf{#1:} #2 \\ \textbf{#3:} #4}
+
+\title{Graph matching with lobsters}
+\author{140011146}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+The ability to measure lobsters is important to be able to monitor the size and health of the creatures. By being able to do this task with images and automatically with software, we can aid scientists in this field accomplish their work more quickly. There is currently an existing dataset of images where efforts have been made to determine the size and sex of the lobsters using global features such as total length.
+\n
+This project aims extend that work by representing images of lobsters as graphs and use graph matching techniques to compare between them. We aim to use these techniques to discover properties of the lobster, for example its age, gender and health. The effectiveness of these techniques will be evaluated against the existing dataset to discover if graph matching is a suitable method for lobster recognition and characterisation. Extensions to this project would be to develop a new algorithm for create graphs rather than using existing ones and to try the same techniques on more complex images with lobsters in their natural environment.
+
+
+\section{Graph representation of lobsters}
+
+\section{Graph matching algorithms}
+
+\section{Interest point detection from images}
+
+
+
+\end{document}
