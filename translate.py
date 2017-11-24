@@ -1,5 +1,6 @@
 import sys
 import os
+import numpy as np
 from probability import *
 
 output = open("output.gfu", "w")
@@ -66,4 +67,9 @@ for f in os.listdir(sys.argv[1]):
 # create db for edge distributions
 edge_db = {}
 for edge in all_edges:
-    
+    if not edge in edge_db:
+        edge_db[edge] = Distribution((edge.n1, edge.n2), np.random.normal(5, 2, 10).tolist())
+
+
+for ps in g1.permutations(edge_db):
+    print(ps)

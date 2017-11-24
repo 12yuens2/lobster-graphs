@@ -5,7 +5,7 @@ class PossibleGraph():
         self.possible_nodes = possible_nodes
         self.edges = edges
 
-    def permutations(self):
+    def permutations(self, edge_db):
 
         # Use itertools on possible_nodes to get all combinations of node labels
         permutations = list(itertools.product(*[possible_node.combinations() for possible_node in self.possible_nodes]))
@@ -17,6 +17,9 @@ class PossibleGraph():
                 probability_assignment *= node.probability
 
             edges = self.get_new_edges(permutation)
+            for edge in edges:
+                if edge in edge_db:
+                    probability_assignment *= edge_db[edge][edge.length]
 
             permutation_graphs.append(Graph(list(permutation), edges, probability_assignment))
 
@@ -60,6 +63,19 @@ class Node():
     def __repr__(self):
         return str(self.node_id) + ": (" + str(self.label) + ", " + str(self.probability) + ")"
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.label == other.label
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
+    def __hash__(self):
+        return self.label.__hash__()
+
 
 class Edge():
     def __init__(self, node1, node2, length):
@@ -69,6 +85,20 @@ class Edge():
 
     def __repr__(self):
         return str(self.n1) + "--" + str(self.n2) + ", " + str(self.length)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return (self.n1 == other.n1 and self.n2 == other.n2) or (self.n1 == other.n2 and self.n2 == other.n2)
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
+    def __hash__(self):
+        return self.n1.__hash__() + self.n2.__hash__()
+
         
 class Graph():
     def __init__(self, nodes, edges, probability_assignment):
@@ -119,7 +149,7 @@ class Distribution():
         if item in self.dictionary:
             return self.dictionary[item]
         else:
-            return 0.0
+            return 1.0
 
 
 n1 = PossibleNode(0, {"claw": 0.8, "arm": 0.2})
