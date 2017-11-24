@@ -16,9 +16,31 @@ class PossibleGraph():
             for node in permutation:
                 probability_assignment *= node.probability
 
-            permutation_graphs.append(Graph(list(permutation), self.edges, probability_assignment))
+            edges = self.get_new_edges(permutation)
+
+            permutation_graphs.append(Graph(list(permutation), edges, probability_assignment))
 
         return permutation_graphs
+
+    def get_new_edges(self, node_permutations):
+        
+        new_edges = []
+        for edge in self.edges:
+            node1 = 0
+            node2 = 0
+            for node in node_permutations:
+                if node.node_id == edge.n1:
+                    node1 = node
+
+            for node in node_permutations:
+                if node.node_id == edge.n2:
+                    node2 = node
+
+            new_edges.append(Edge(node1, node2, edge.length))
+
+        return new_edges
+            
+            
 
 class PossibleNode():
     def __init__(self, node_id, labels):
@@ -44,6 +66,9 @@ class Edge():
         self.n1 = node1
         self.n2 = node2
         self.length = length
+
+    def __repr__(self):
+        return str(self.n1) + "--" + str(self.n2) + ", " + str(self.length)
         
 class Graph():
     def __init__(self, nodes, edges, probability_assignment):
@@ -55,6 +80,19 @@ class Graph():
     def __repr__(self):
         return str(self.nodes) + " | " + str(self.edges) + " : " + str(self.prob_a)
 
+    def export(self, filename):
+        f = open(filename, "w")
+        f.write("#graph0\n")
+
+        f.write(str(len(self.nodes)) + "\n")
+        for node in self.nodes:
+            f.write(node.label + "\n")
+
+        f.write(str(len(self.edges)) + "\n")
+        for edge in self.edges:
+            f.write(str(edge.n1) + " " + str(edge.n2) + "\n")
+
+        f.close()
 
 
 class Distribution():
@@ -84,31 +122,23 @@ class Distribution():
             return 0.0
 
 
-pn1 = PossibleNode(0, {"a": 0.2, "b": 0.4})
-pn2 = PossibleNode(1, {"s": 0.4, "a": 0.8})
-pn3 = PossibleNode(2, {"b": 0.5, "c": 0.5, "g": 0.6})
-e1 = Edge(0, 1, 5)
-e2 = Edge(1, 2, 5)
-pg1 = PossibleGraph([pn1, pn2, pn3], [e1, e2])
+n1 = PossibleNode(0, {"claw": 0.8, "arm": 0.2})
+n2 = PossibleNode(1, {"arm": 0.7, "body": 0.3})
+n3 = PossibleNode(2, {"body": 0.6, "head": 0.2, "tail": 0.2})
 
-'''
-n1 = PossibleNode(0, {"claw": 0.8, "tail": 0.2})
-n2 = PossibleNode(1, {"body": 0.7, "claw": 0.3})
-n3 = PossibleNode(2, {"claw": 0.6, "head": 0.2, "body": 0.2})
+# Possible edges
+e1 = Edge(n1.node_id, n2.node_id, 5)
+e2 = Edge(n2.node_id, n3.node_id, 5)
 
-e1 = Edge(n1, n2, 5)
-e2 = Edge(n2, n3, 5)
-
-e3 = Edge(n1, n3, 8)
-e4 = Edge(n1, n2, 3)
+e3 = Edge(n1.node_id, n3.node_id, 8)
+e4 = Edge(n1.node_id, n2.node_id, 3)
 
 g1 = PossibleGraph([n1, n2, n3], [e1, e2])
 g2 = PossibleGraph([n1, n2, n3], [e3, e4])
 
+'''
 distributions = []
 distributions.append(Distribution(("claw", "body"), [3,4,3,3,5,4,2]))
 distributions.append(Distribution(("tail", "body"), [6,7,5,7,7]))
 distributions.append(Distribution(("claw", "head"), [5,4,5,3,3,4,3,4,5]))
-
-
 '''
