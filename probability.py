@@ -17,9 +17,11 @@ class PossibleGraph():
                 probability_assignment *= node.probability
 
             edges = self.get_new_edges(permutation)
+            '''
             for edge in edges:
                 if edge in edge_db:
                     probability_assignment *= edge_db[edge][edge.length]
+            '''
 
             permutation_graphs.append(Graph(list(permutation), edges, probability_assignment))
 
@@ -61,7 +63,8 @@ class Node():
         self.probability = probability
 
     def __repr__(self):
-        return str(self.node_id) + ": (" + str(self.label) + ", " + str(self.probability) + ")"
+        return str(self.node_id)
+        #return str(self.node_id) + ": (" + str(self.label) + ", " + str(self.probability) + ")"
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -84,7 +87,8 @@ class Edge():
         self.length = length
 
     def __repr__(self):
-        return str(self.n1) + "--" + str(self.n2) + ", " + str(self.length)
+        return str(int(self.n1.node_id) - 1) + " " + str(int(self.n2.node_id) - 1)
+        #return str(self.n1) + "--" + str(self.n2) + ", " + str(self.length)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -110,17 +114,24 @@ class Graph():
     def __repr__(self):
         return str(self.nodes) + " | " + str(self.edges) + " : " + str(self.prob_a)
 
-    def export(self, filename):
-        f = open(filename, "w")
-        f.write("#graph0\n")
+    
+    def write_to(self, file, id):
+        file.write("#graph" + str(id) + "\n")
 
-        f.write(str(len(self.nodes)) + "\n")
+        file.write(str(len(self.nodes)) + "\n")
         for node in self.nodes:
-            f.write(node.label + "\n")
+            file.write(node.label + "\n")
 
-        f.write(str(len(self.edges)) + "\n")
+        file.write(str(len(self.edges)) + "\n")
         for edge in self.edges:
-            f.write(str(edge.n1) + " " + str(edge.n2) + "\n")
+            file.write(str(edge) + "\n")
+
+
+
+    def export(self, filename, id):
+        f = open(filename, "w")
+
+        self.write_to(f, id)
 
         f.close()
 
@@ -152,19 +163,21 @@ class Distribution():
             return 1.0
 
 
-n1 = PossibleNode(0, {"claw": 0.8, "arm": 0.2})
-n2 = PossibleNode(1, {"arm": 0.7, "body": 0.3})
-n3 = PossibleNode(2, {"body": 0.6, "head": 0.2, "tail": 0.2})
+n1 = PossibleNode(1, {"claw": 0.8, "arm": 0.2})
+n2 = PossibleNode(2, {"arm": 0.7, "body": 0.3})
+n3 = PossibleNode(3, {"body": 0.6, "head": 0.25, "tail": 0.15})
 
 # Possible edges
 e1 = Edge(n1.node_id, n2.node_id, 5)
-e2 = Edge(n2.node_id, n3.node_id, 5)
+e2 = Edge(n2.node_id, n3.node_id, 4)
 
 e3 = Edge(n1.node_id, n3.node_id, 8)
 e4 = Edge(n1.node_id, n2.node_id, 3)
 
 g1 = PossibleGraph([n1, n2, n3], [e1, e2])
 g2 = PossibleGraph([n1, n2, n3], [e3, e4])
+
+
 
 '''
 distributions = []
