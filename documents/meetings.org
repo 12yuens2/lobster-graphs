@@ -133,3 +133,18 @@ With list of matched and labelled subgraphs -> building together into whole lobs
   - Is the configuration with the best score the assignment we expect?
 
 - Check how changing assignment probabilities change affect of matching with distance
+
+
+
+** 24/11/17
+*** Function to introduce errors
+- Systematically try different variations when changing probability or edge lenth values
+
+- pick better scores for overlapping nodes -> until entire graph is complete
+- higher heiarchicial subgraphs matching like with nodes
+- Combining to complete lobster
+
+- try random sample of triplets for high subgraph matching from ranked list of triplets
+-> look at ransac 
+
+- look into subset of all triplet assignments and how they could fit into whole lobster
