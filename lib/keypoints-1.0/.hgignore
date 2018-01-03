@@ -1,0 +1,13 @@
+syntax: glob
+*.bmp
+*.png
+*.pgm
+*.ppm
+.*swp
+*~
+*.o
+.hgignore
+CMakeFiles
+CMakeFiles/*
+CMakeCache.txt
+doc
