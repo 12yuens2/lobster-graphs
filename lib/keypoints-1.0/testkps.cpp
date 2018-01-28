@@ -5,9 +5,9 @@ using namespace bimp;
 
 int main( int argc, char **argv )
 {
-    if(argc < 2)
+    if(argc < 5)
     {
-        std::cerr << "Usage: testkps <filename>" << std::endl;
+        std::cerr << "Usage: testkps <filename> <start> <end> <scale>" << std::endl;
         return -1;
     }
 
@@ -16,11 +16,25 @@ int main( int argc, char **argv )
     Mat outimg; 
     img = imread(argv[1],0);
 
+    int width = img.cols;
+    int height = img.rows;
+
+    std::cout << "Image width: " << width << std::endl;
+    std::cout << "Image height: " << height << std::endl;
+
     // Select the scales we want to use (logarithmic spacing)
-    std::vector<KeyPoint> points;
-    vector<Type> lambdas = makeLambdasLog(8, 64, 2);
+    //Type lambda_start = atof(argv[2]);
+    //Type lambda_end = atof(argv[3]);
+    int num_scales = atoi(argv[4]);
+    //std::vector<Type> lambdas = makeLambdasLog(lambda_start, lambda_end, num_scales);
+
+    // Scale with size of image
+    Type dimensions = width * height;
+    Type lambda_start = dimensions/pow(2,16);
+    std::vector<Type> lambdas = makeLambdasLog(lambda_start, lambda_start*1.2, num_scales);
 
     // Extract keypoints at selected scales, 8 orientations
+    std::vector<KeyPoint> points;
     std::vector<KPData> datas;
     points = keypoints(img,lambdas,datas,8,true);
 
