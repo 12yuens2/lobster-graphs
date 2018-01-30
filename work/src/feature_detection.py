@@ -37,10 +37,32 @@ sift_image = cv2.drawKeypoints(sift_gray, keypoints, sift_image, flags=cv2.DRAW_
 keypoints, descriptors = sift.compute(sift_gray, keypoints)
 
 
+# SURF
+surf = cv2.xfeatures2d.SURF_create(300)
+surf_gray = image.copy() 
+surf_kps, surf_des = surf.detectAndCompute(surf_gray, None)
+
+surf_image = image.copy()
+surf_image = cv2.drawKeypoints(surf_gray, surf_kps, None, (255,0,0), 4)
+
+
+# BRIEF
+brief_image = image.copy()
+
+brief = cv2.xfeatures2d.BriefDescriptorExtractor_create()
+
+brief_kps = sift.detect(brief_image, None)
+brief_kps, brief_des = brief.compute(brief_image, brief_kps)
+
+#print(brief.getInt("bytes"))
+print(brief_des.shape)
+
+
 # Show images
 cv2.imshow("Harris", harris_img)
 cv2.imshow("Shi-Tomasi", shi_tomasi_img)
 cv2.imshow("SIFT", sift_image)
+cv2.imshow("SURF", surf_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
