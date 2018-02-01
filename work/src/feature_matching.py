@@ -21,8 +21,8 @@ def flann_matcher():
 
     return cv2.FlannBasedMatcher(index_params, search_params)
 
-query_image = cv2.imread("imgs/close_lobster.JPG")
-train_image = preprocess(cv2.imread("imgs/IMG_1388.JPG"), 0.2, gray=False)
+query_image = cv2.imread("imgs/head.JPG")
+train_image = preprocess(cv2.imread("imgs/IMG_1388.JPG"), 1, gray=False)
 
 #orb = cv2.ORB_create()
 orb = cv2.xfeatures2d.SIFT_create()
@@ -47,17 +47,17 @@ print("Matches found " + str(len(matches)))
 
 good_matches = []
 for m,n in matches:
-    if m.distance < 0.8*n.distance:
+    if m.distance < 0.95*n.distance:
         good_matches.append(m)
 
 
 print("Good matches found: " + str(len(good_matches)))
 
-if len(good_matches) > 10:
+if len(good_matches) > 1:
     src_pts = np.float32([kp1[m.queryIdx].pt for m in good_matches]).reshape(-1,1,2)
     dst_pts = np.float32([kp2[m.trainIdx].pt for m in good_matches]).reshape(-1,1,2)
 
-    M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 10.0)
+    M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
     matchesMask = mask.ravel().tolist()
 
     h,w = query_image.shape[:2]
