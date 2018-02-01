@@ -2,7 +2,9 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-image = cv2.imread("resized_lobster.JPG")
+image = cv2.imread("imgs/IMG_5432.JPG")
+h, w = image.shape[:2]
+image = cv2.resize(image, (int(0.3*w), int(0.3*h)), interpolation=cv2.INTER_CUBIC)
 
 gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 gray_image = np.float32(gray_image)
@@ -38,7 +40,7 @@ keypoints, descriptors = sift.compute(sift_gray, keypoints)
 
 
 # SURF
-surf = cv2.xfeatures2d.SURF_create(300)
+surf = cv2.xfeatures2d.SURF_create(10000)
 surf_gray = image.copy() 
 surf_kps, surf_des = surf.detectAndCompute(surf_gray, None)
 
