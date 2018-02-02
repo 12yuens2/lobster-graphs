@@ -179,3 +179,12 @@ Recognising and detecting:
 ** Week 1
 *** Questions:
 - For vision, using detectors seem to be create descriptor from machine learning (eg HOG+SVM) to be able to classify image. However, we want to identify features of the lobster rather than classify the image as a lobster to be able to create a graph?
+
+
+- Use size of keypoints to filter and labelling from expected size
+- Save the points and sizes remaining
+- Hand label
+- Try and match based on labelling
+- Size and distance of points from each other
+- Compare and evaluate between different images to show all points are consistently similar so we can
+- Get pose of lobster
