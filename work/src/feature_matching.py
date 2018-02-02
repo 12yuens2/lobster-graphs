@@ -67,9 +67,9 @@ if len(good_matches) > 1:
     train_image = cv2.polylines(train_image, [np.int32(dst)], True, 255, 3, cv2.LINE_AA)
 
 draw_params = dict(matchColor = (0, 255, 0),
-                   singlePointColor = None,
+                   singlePointColor = (0,0,255),
                    matchesMask = matchesMask,
-                   flags = 2)
+                   flags = 0)
 
 img3 = cv2.drawMatches(query_image, kp1, train_image, kp2, good_matches, None, **draw_params)
 
