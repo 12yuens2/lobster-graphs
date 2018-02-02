@@ -156,6 +156,25 @@ With list of matched and labelled subgraphs -> building together into whole lobs
 * Semester 2 - Interim demo
 - Brief summary of everything that has been done.
 
+Feature detection:
+- *Harris*: corners
+- *SIFT*: blobs
+- *SURF*: blobs
+- *FAST*: corners
+- *BRIEF*: blobs
+- *ORB*: fast and rotated BRIEF
+
+Matching:
+- Brute force matching
+- FLANN based matching
+  - Different index algorithms: LinearIndex, KTreeIndex, KMeansIndex, CompositeIndex, AutotuneIndex
+
+Spatial verification with homography
+
+Recognising and detecting:
+- Histogram of Oriented Gradients
+- Image pyramids
+- Sliding windows
 
 ** Week 1
 *** Questions:

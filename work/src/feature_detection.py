@@ -2,7 +2,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-image = cv2.imread("imgs/IMG_5432.JPG")
+image = cv2.imread("imgs/IMG_4720.JPG")
 h, w = image.shape[:2]
 image = cv2.resize(image, (int(0.3*w), int(0.3*h)), interpolation=cv2.INTER_CUBIC)
 
@@ -40,13 +40,21 @@ keypoints, descriptors = sift.compute(sift_gray, keypoints)
 
 
 # SURF
-surf = cv2.xfeatures2d.SURF_create(10000)
+surf = cv2.xfeatures2d.SURF_create(15000)
 surf_gray = image.copy() 
 surf_kps, surf_des = surf.detectAndCompute(surf_gray, None)
 
-surf_image = image.copy()
-surf_image = cv2.drawKeypoints(surf_gray, surf_kps, None, (255,0,0), 4)
+# Sort by highest response in keypoints
+surf_kps.sort(key = lambda x: x.response, reverse=True)
 
+surf_image = image.copy()
+surf_image = cv2.drawKeypoints(surf_gray, surf_kps[:10], None, (255,0,0), 4)
+
+print("SURF keypoints: " + str(len(surf_kps)))
+for kp in surf_kps[:10]:
+    print(str(kp.response))
+
+print(type(surf_des[0]))
 
 # BRIEF
 brief_image = image.copy()
@@ -61,6 +69,7 @@ print(brief_des.shape)
 
 
 # Show images
+cv2.namedWindow("SURF", cv2.WINDOW_NORMAL)
 cv2.imshow("Harris", harris_img)
 cv2.imshow("Shi-Tomasi", shi_tomasi_img)
 cv2.imshow("SIFT", sift_image)

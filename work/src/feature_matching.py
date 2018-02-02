@@ -21,7 +21,7 @@ def flann_matcher():
 
     return cv2.FlannBasedMatcher(index_params, search_params)
 
-query_image = cv2.imread("imgs/head.JPG")
+query_image = cv2.imread("imgs/claw.JPG")
 train_image = preprocess(cv2.imread("imgs/IMG_1388.JPG"), 1, gray=False)
 
 #orb = cv2.ORB_create()
@@ -67,12 +67,13 @@ if len(good_matches) > 1:
     train_image = cv2.polylines(train_image, [np.int32(dst)], True, 255, 3, cv2.LINE_AA)
 
 draw_params = dict(matchColor = (0, 255, 0),
-                   singlePointColor = None,
+                   singlePointColor = (0,0,255),
                    matchesMask = matchesMask,
-                   flags = 2)
+                   flags = 0)
 
 img3 = cv2.drawMatches(query_image, kp1, train_image, kp2, good_matches, None, **draw_params)
 
+cv2.namedWindow("Matches", cv2.WINDOW_NORMAL)
 cv2.imshow("Matches", img3)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
