@@ -1,74 +1,76 @@
-* Week 3
-** 06/10/17
-*** Look at edit distance based metric
+* Semester 1
+
+** Week 3
+*** 06/10/17
+**** Look at edit distance based metric
 - weighted edited so that adding/removing weight from an edge counts as an edit in the distance metric
 - Removing nodes/edges also counts to edit distance
 - https://link.springer.com/content/pdf/10.1007%2Fs10044-008-0141-y.pdf
 
-*** Transform graph to metric space
+**** Transform graph to metric space
 - Gromov–Hausdorff
 - Similar graphs give similar values
 - Each node with edges it is connected to and their weights
 
-*** Lobster graph as undirected tree
+**** Lobster graph as undirected tree
 - Undirected tree is a tree where root is not known
 - An undirected graph with no cycles is an undirected tree
 - An find less computationally complex algorithm for undirected tree distance rather than graph distance
 
-*** GUI tool to draw graphs and export to .dot files
+**** GUI tool to draw graphs and export to .dot files
 - d3.js 
 - networkx
 
-*** Human pose graph matching papers
+**** Human pose graph matching papers
 - Good ideas that have been tried or bad ones to avoid
 - 
 
-* Week 4
+** Week 4
 
-** Before meetings
-*** Human pose graph matching http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.592.4170&rep=rep1&type=pdf
+*** Before meetings
+**** Human pose graph matching http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.592.4170&rep=rep1&type=pdf
 - Graph matching algorithm used: Algorithm for error-tolerant subgraph isomorphism detection http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=682179
 - Store database of model graphs. Graph matching algorithm could return multiple matches from database because it only looks at topology
 - Decision trees used to further filter matches. Example graphs are created for decision to learn. 
 
-*** Graph creation software
+**** Graph creation software
 - Gephi to draw graphs, it can export drawn graphs into a number of data formats. 
 
-** 12/10/17
-*** Create graphs from lobsters to try matching
+*** 12/10/17
+**** Create graphs from lobsters to try matching
 - Have some sample graphs to be able to run through nauty and try the matching
 - augment hand made graphs by adding mistakes (wrong labels or vertices)
 - try to match mistake graphs with correct ones
 - generate the mistake graphs and try to match them all to see which of the generated ones may match at all
 
-*** software 
+**** software 
 - graphgrep
 - nauty
 - see how fast it will take to match
 
-*** From list of vertices
+**** From list of vertices
 -> generate possible configurations
 -> match with database annotated graphs
 -> best matching ones go to 2nd step of matching (i.e, decision tree)
 
-*** From this look into training decision tree
+**** From this look into training decision tree
 
-*** Start form subgraphs
+**** Start form subgraphs
 - Instead of creating entire lobsters initially
 - start with smaller subgraphs and match those 
 - create the larger graph from subgraphs that are already matched and labelled
 - more reliable to detect subgraph rather than entire lobster at once
 
 
-* Week 5
+** Week 5
 
-** 27/10/17
+*** 27/10/17
 
-*** other algorithm
+**** other algorithm
 - APPAGTO
 - nauty
 
-*** Graphgrep
+**** Graphgrep
 - try very large dataset to see time taken
 - say around 1000 in database
 - combinations of all subgraphs
@@ -88,23 +90,23 @@ next week - define cost fucntion
 - how many nodes found
 - angles and distances of edges
 
-** APPAGATO
-*** Approximate network querying
+*** APPAGATO
+**** Approximate network querying
 - Find query occurances among all possible with the maximum combined similarity.
 - Similarity here means both the similarity between nodes and cost measuring of the differences between nodes and edges
 
 1. Try the APPAGTO algorithm
 2. see subgraph matching in graphgrep or nauty -> gives list of matched subgraphs -> cost function
 
-* Week 6
+** Week 6
 
-** 03/11/17
+*** 03/11/17
 
-*** Matching with errors
+**** Matching with errors
 - Match subgraphs with errors or variations
 - Include filter with probabilities with nodes and edges fitting
 
-*** Add ranking with the probabilities from query
+**** Add ranking with the probabilities from query
 - For each classification of node have an associated probability
 - Match all in database
 - Naive bayes classifier -> cost of matching (probability the labelling is correct)
@@ -120,11 +122,11 @@ Go back after getting subgraph to get graph properties like edge length and angl
 With list of matched and labelled subgraphs -> building together into whole lobster.
 
 
-* Week 7
+** Week 7
 
-** 10/11/17
+*** 10/11/17
 
-*** Probability model from dataset
+**** Probability model from dataset
 - Create probability model from dataset
   - For example create a distribution from distances of labelled nodes
   - If the distances are close between query and database, the probability is greater
@@ -136,8 +138,9 @@ With list of matched and labelled subgraphs -> building together into whole lobs
 
 
 
-** 24/11/17
-*** Function to introduce errors
+** Week 9
+*** 24/11/17
+**** Function to introduce errors
 - Systematically try different variations when changing probability or edge lenth values
 
 - pick better scores for overlapping nodes -> until entire graph is complete
@@ -148,3 +151,12 @@ With list of matched and labelled subgraphs -> building together into whole lobs
 -> look at ransac 
 
 - look into subset of all triplet assignments and how they could fit into whole lobster
+
+
+* Semester 2 - Interim demo
+- Brief summary of everything that has been done.
+
+
+** Week 1
+*** Questions:
+- For vision, using detectors seem to be create descriptor from machine learning (eg HOG+SVM) to be able to classify image. However, we want to identify features of the lobster rather than classify the image as a lobster to be able to create a graph?
