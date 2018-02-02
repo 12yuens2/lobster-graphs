@@ -36,9 +36,11 @@ int main( int argc, char **argv )
     // Extract keypoints at selected scales, 8 orientations
     std::vector<KeyPoint> points;
     std::vector<KPData> datas;
-    points = keypoints(img,lambdas,datas,8,true);
+    points = keypoints(img,lambdas,datas,16,true);
 
     std::cout << std::endl << "Found " << points.size() << " points" << std::endl;
+
+
     
     // Draw the keypoints and save the image
     drawKeypoints(img, points, outimg, Scalar::all(255), 4);
