@@ -1,10 +1,8 @@
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
 
-image = cv2.imread("imgs/IMG_4720.JPG")
+image = cv2.imread("imgs/lobsters/IMG_4720.JPG")
 h, w = image.shape[:2]
-image = cv2.resize(image, (int(0.3*w), int(0.3*h)), interpolation=cv2.INTER_CUBIC)
 
 gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 gray_image = np.float32(gray_image)
@@ -29,18 +27,25 @@ for i in corners:
 
     
 # SIFT
+
+image = cv2.resize(image, (int(0.1*w), int(0.1*h)), interpolation=cv2.INTER_CUBIC)
 sift_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 sift = cv2.xfeatures2d.SIFT_create()
-keypoints = sift.detect(sift_gray, None)
+sift_kps = sift.detect(sift_gray, None)
+
+good_kps = []
+for kp in sift_kps:
+    if kp.size > 1:
+        good_kps.append(kp)
 
 sift_image = image.copy()
-sift_image = cv2.drawKeypoints(sift_gray, keypoints, sift_image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+sift_image = cv2.drawKeypoints(sift_gray, good_kps, sift_image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-keypoints, descriptors = sift.compute(sift_gray, keypoints)
+keypoints, descriptors = sift.compute(sift_gray, good_kps)
 
 
 # SURF
-surf = cv2.xfeatures2d.SURF_create(15000)
+surf = cv2.xfeatures2d.SURF_create(10000)
 surf_gray = image.copy() 
 surf_kps, surf_des = surf.detectAndCompute(surf_gray, None)
 
@@ -69,11 +74,11 @@ print(brief_des.shape)
 
 
 # Show images
-cv2.namedWindow("SURF", cv2.WINDOW_NORMAL)
-cv2.imshow("Harris", harris_img)
-cv2.imshow("Shi-Tomasi", shi_tomasi_img)
+cv2.namedWindow("SIFT", cv2.WINDOW_NORMAL)
+#cv2.imshow("Harris", harris_img)
+#cv2.imshow("Shi-Tomasi", shi_tomasi_img)
 cv2.imshow("SIFT", sift_image)
-cv2.imshow("SURF", surf_image)
+#cv2.imshow("SURF", surf_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
