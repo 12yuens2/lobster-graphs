@@ -28,7 +28,7 @@ for i in corners:
     
 # SIFT
 
-image = cv2.resize(image, (int(0.1*w), int(0.1*h)), interpolation=cv2.INTER_CUBIC)
+image = cv2.resize(image, (int(0.4*w), int(0.4*h)), interpolation=cv2.INTER_CUBIC)
 sift_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 sift = cv2.xfeatures2d.SIFT_create()
 sift_kps = sift.detect(sift_gray, None)
@@ -69,6 +69,7 @@ brief = cv2.xfeatures2d.BriefDescriptorExtractor_create()
 brief_kps = sift.detect(brief_image, None)
 brief_kps, brief_des = brief.compute(brief_image, brief_kps)
 
+brief_image = cv2.drawKeypoints(brief_image, brief_kps, brief_image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 #print(brief.getInt("bytes"))
 print(brief_des.shape)
 
@@ -79,6 +80,8 @@ cv2.namedWindow("SIFT", cv2.WINDOW_NORMAL)
 #cv2.imshow("Shi-Tomasi", shi_tomasi_img)
 cv2.imshow("SIFT", sift_image)
 #cv2.imshow("SURF", surf_image)
+cv2.namedWindow("BRIEF", cv2.WINDOW_NORMAL)
+cv2.imshow("BRIEF", brief_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
