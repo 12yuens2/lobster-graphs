@@ -42,39 +42,50 @@ def midpoint(kp1, kp2):
     pt1 = get_point_tuple(kp1)
     pt2 = get_point_tuple(kp2)
 
-    print("pt1: " + str(pt1))
-    print("pt2: " + str(pt2))
-    
     return (int((pt1[0] + pt2[0]) / 2), int((pt1[1] + pt2[1]) / 2)) 
 
+
+def write_to_gdf(kps, filename):
+    f = open("graphs/" + filename, "w")
+
+    # Node header definition
+    f.write("nodedef> name VARCHAR,label VARCHAR,width DOUBLE,height DOUBLE,x DOUBLE,y DOUBLE,color VARCHAR\n")
+
+    # Print keypoints
+    i = 1
+    px,py = (0,0)
+    for kp in kps:
+        (x,y) = get_point_tuple(kp)
+        radius = kp.size/2
+
+        # Do not write duplicate keypoints
+        if not (x,y) == (px,py):
+            f.write(str(i)+",\"\"," +
+                    str(radius)+"," +
+                    str(radius)+"," +
+                    str(x) + "," + str(y) +
+                    ",'153,153,153'\n")
+            i += 1
+
+        (px,py) = (x,y)
+        f.flush()
+    f.close()
+        
 
 images_path = "imgs/lobsters/"
 images = []
 
+kernel = np.ones((5,5), np.uint8)
+sift = cv2.xfeatures2d.SIFT_create()
+
+j = 0
 for image_file in os.listdir(images_path):
     image = cv2.imread(images_path + image_file)
+    image = cv2.erode(image, kernel, iterations=1)
     
     #h, w = image.shape[:2]
     #image = cv2.resize(image, (int(0.3*w), int(0.3*h)), interpolation=cv2.INTER_CUBIC)
     
-    #resize?
-    print(image_file)
-    images.append(image)
-
-'''
-image = cv2.imread(images_path + "IMG_1380.JPG")
-h, w = image.shape[:2]
-for i in range(1,9):
-    scale = i * 1.0 / 10
-    images.append(cv2.resize(image, (int(scale*w), int(scale*h)), interpolation=cv2.INTER_CUBIC))
-'''
-
-sift = cv2.xfeatures2d.SIFT_create()
-#sift = cv2.ORB_create()
-
-j = 0
-body_kp = 0
-for image in images:
     sift_kps = sift.detect(image, None)
     sift_image = image.copy()
 
@@ -92,6 +103,7 @@ for image in images:
             kps.append(kp)
     kps.sort(key = lambda x: x.response, reverse=True)
 
+    write_to_gdf(kps,str(image_file)+".gdf")
 
     # Draw keypoints
     sift_image = cv2.drawKeypoints(image, kps, sift_image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)

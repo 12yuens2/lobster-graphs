@@ -1,5 +1,14 @@
 import itertools
 
+# Check if actual_value is within 20% of target value
+def within_value(target_value, actual_value):
+    percentage = 0.2
+    error_allowed = percentage * v1
+    high = v1 + error_allowed
+    low = v1 - error_allowed
+
+    return low <= v2 <= high
+
 class PossibleGraph():
     def __init__(self, possible_nodes, edges):
         self.possible_nodes = possible_nodes
@@ -28,7 +37,6 @@ class PossibleGraph():
         return permutation_graphs
 
     def get_new_edges(self, node_permutations):
-        
         new_edges = []
         for edge in self.edges:
             node1 = 0
@@ -46,7 +54,7 @@ class PossibleGraph():
         return new_edges
             
             
-
+# Node with probabilities
 class PossibleNode():
     def __init__(self, node_id, labels):
         self.node_id = node_id
@@ -57,9 +65,10 @@ class PossibleNode():
 
 
 class Node():
-    def __init__(self, node_id, label, probability):
+    def __init__(self, node_id, label, size, probability):
         self.node_id = node_id
         self.label = label
+        self.size = size
         self.probability = probability
 
     def __repr__(self):
@@ -68,7 +77,9 @@ class Node():
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self.label == other.label
+            return (self.label == other.label and
+                    (within_value(self.size, other.size) or
+                     within_value(other.size, self.size)))
         else:
             return False
 
@@ -85,6 +96,7 @@ class Edge():
         self.n1 = node1
         self.n2 = node2
         self.length = length
+        #ratio
 
     def __repr__(self):
         return str(int(self.n1.node_id) - 1) + " " + str(int(self.n2.node_id) - 1)
@@ -92,7 +104,12 @@ class Edge():
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return (self.n1 == other.n1 and self.n2 == other.n2) or (self.n1 == other.n2 and self.n2 == other.n2)
+            # Both node labels are the same and length is similar values
+            return (((self.n1 == other.n1 and self.n2 == other.n2) or
+                    (self.n1 == other.n2 and self.n2 == other.n2)) and
+                    (within_value(self.length, other.length) or
+                     within_value(other.length, self.length)))
+                    
         else:
             return False
 
@@ -114,7 +131,8 @@ class Graph():
     def __repr__(self):
         return str(self.nodes) + " | " + str(self.edges) + " : " + str(self.prob_a)
 
-    
+
+    # Write graph to query for graphgrep
     def write_to(self, file, id):
         file.write("#graph" + str(id) + "\n")
 
@@ -125,7 +143,6 @@ class Graph():
         file.write(str(len(self.edges)) + "\n")
         for edge in self.edges:
             file.write(str(edge) + "\n")
-
 
 
     def export(self, filename, id):
@@ -162,7 +179,7 @@ class Distribution():
         else:
             return 1.0
 
-
+'''
 n1 = PossibleNode(1, {"claw": 0.8, "arm": 0.2})
 n2 = PossibleNode(2, {"arm": 0.7, "body": 0.3})
 n3 = PossibleNode(3, {"body": 0.6, "head": 0.25, "tail": 0.15})
@@ -176,7 +193,7 @@ e4 = Edge(n1.node_id, n2.node_id, 3)
 
 g1 = PossibleGraph([n1, n2, n3], [e1, e2])
 g2 = PossibleGraph([n1, n2, n3], [e3, e4])
-
+'''
 
 
 '''
