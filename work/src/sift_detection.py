@@ -70,87 +70,73 @@ def write_to_gdf(kps, filename):
         (px,py) = (x,y)
         f.flush()
     f.close()
-        
+
+
+def filter_keypoints_octave(kps):
+    filtered_kps = []
+
+    for kp in kps:
+        octave = kp.octave & 0xFF #Fix for OpenCV SIFT octaves
+        if 3 < octave < 8:
+            filtered_kps.append(kp)
+
+    return filtered_kps
+
+def filter_keypoints_size(kps):
+    filtered_kps = []
+
+    for kp in kps:
+        if kp.size > 80:
+            filtered_kps.append(kp)
+
+    return filtered_kps
+
+    
+def get_keypoints(image_filename):
+    sift = cv2.xfeatures2d.SIFT_create()
+    image = cv2.imread(image_filename)
+
+    # Detect keypoints
+    sift_kps = sift.detect(image, None)
+    sift_image = image.copy()
+
+    # Compute keypoint descriptors
+    keys, des = sift.compute(sift_image, sift_kps)
+    keys_dict = dict(zip(keys, des))
+
+    # Filter keypoints
+    kps = filter_keypoints_octave(keys)
+
+    return kps
+    
 
 images_path = "imgs/lobsters/"
 images = []
 
-kernel = np.ones((5,5), np.uint8)
-sift = cv2.xfeatures2d.SIFT_create()
-
 j = 0
 for image_file in os.listdir(images_path):
-    image = cv2.imread(images_path + image_file)
-    image = cv2.erode(image, kernel, iterations=1)
-    
-    #h, w = image.shape[:2]
-    #image = cv2.resize(image, (int(0.3*w), int(0.3*h)), interpolation=cv2.INTER_CUBIC)
-    
-    sift_kps = sift.detect(image, None)
-    sift_image = image.copy()
+    image_filename = images_path + image_file
+    image = cv2.imread(image_filename)
+    kps = get_keypoints(image_filename)
 
-    keys, des = sift.compute(sift_image, sift_kps)
-    key_dict = dict(zip(keys, des))
-    kps = []
-
-    # Best body keypoint
-    #kps.append(best_body_kp(key_dict))
-
-    # Filter keypoints
-    for kp in sift_kps:
-        octave = kp.octave & 0xFF
-        if octave > 3 and octave < 8:
-            kps.append(kp)
+    # Sort keypoints by attributes
     kps.sort(key = lambda x: x.response, reverse=True)
 
+    # Write to graph file format
     write_to_gdf(kps,str(image_file)+".gdf")
 
     # Draw keypoints
-    sift_image = cv2.drawKeypoints(image, kps, sift_image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    sift_image = cv2.drawKeypoints(image, kps, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
     # Draw keypoint information
-    c1 = (0,0)
-    index = 0
-    for kp in kps:
-        c2 = get_point_tuple(kp)
-        #cv2.line(sift_image, c1, c2, (0,255,0), 5)
+    for i in range(len(kps)):
+        kp = kps[i]
+        point = get_point_tuple(kp)
+        cv2.putText(sift_image, str(int(kp.size))+": "+str(i), point, 1, 1, (0,0,255), 2, cv2.LINE_AA)
 
-        cv2.putText(sift_image, str(int(kp.size))+": "+str(index), c2, 1, 1, (0,0,255), 2, cv2.LINE_AA)
-        c1 = c2
-        index += 1
-
-    
-
-    cv2.line(sift_image, get_point_tuple(kps[12]), get_point_tuple(kps[6]), (0,0,255), thickness=4)
-
-    text = str(get_distance(kps[12], kps[6]))
-    point = midpoint(kps[12], kps[6])
-    print(point)
-    cv2.putText(sift_image, text, point, 1, 1, (0,0,255), 2, cv2.LINE_AA)
- 
-        
     cv2.namedWindow("Image " + str(j), cv2.WINDOW_NORMAL)
     cv2.imshow("Image " + str(j), sift_image)
     j += 1
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-
-'''
-image = cv2.imread("imgs/lobsters/IMG_1388.JPG")
-h, w  = image.shape[:2]
-image = cv2.resize(image, (int(0.4*w), int(0.4*h)), interpolation=cv2.INTER_CUBIC)
-
-
-sift = cv2.xfeatures2d.SIFT_create()
-kps = sift.detect(image, None)
-
-sift_image = image.copy()
-sift_image = cv2.drawKeypoints(image, kps, sift_image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-cv2.namedWindow("SIFT", cv2.WINDOW_NORMAL)
-cv2.imshow("SIFT", sift_image)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
-'''
