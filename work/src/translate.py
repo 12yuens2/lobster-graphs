@@ -27,7 +27,8 @@ def get_graph(lines):
 
             # Create node with Node(id, label, probablility)
             n = Node(a[0], str(a[1]).replace("\"", ""), 0)
-            if (a[1] == ""):
+      
+      if (a[1] == ""):
                 print("Node " + a[0] + " missing label.")
                 sys.exit()
             nodes.append(n)
@@ -61,19 +62,7 @@ for f in os.listdir(sys.argv[1]):
     graph.write_to(output, i)
     
     i += 1
-
-    '''
-    output.write("#graph" + str(i) + "\n")
-    output.write(str(len(nodes)) + "\n")
-    for n in nodes:
-        output.write(str(n.label) + "\n")
-
-
-    output.write(str(len(edges)) + "\n")
-    for e in edges:
-        output.write(str(int(e.n1.node_id) - 1) + " " + str(int(e.n2.node_id) - 1) + "\n")
-    '''
-    
+   
 # create db for edge distributions
 edge_db = {}
 for edge in all_edges:

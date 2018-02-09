@@ -117,13 +117,18 @@ j = 0
 for image_file in os.listdir(images_path):
     image_filename = images_path + image_file
     image = cv2.imread(image_filename)
+
+    print("Read image " + image_file)
+    
     kps = get_keypoints(image_filename)
 
+    print("Got keypoints")
+    
     # Sort keypoints by attributes
-    kps.sort(key = lambda x: x.response, reverse=True)
+    #kps.sort(key = lambda x: x.response, reverse=True)
 
     # Write to graph file format
-    write_to_gdf(kps,str(image_file)+".gdf")
+    #write_to_gdf(kps,str(image_file)+".gdf")
 
     # Draw keypoints
     sift_image = cv2.drawKeypoints(image, kps, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
@@ -134,9 +139,12 @@ for image_file in os.listdir(images_path):
         point = get_point_tuple(kp)
         cv2.putText(sift_image, str(int(kp.size))+": "+str(i), point, 1, 1, (0,0,255), 2, cv2.LINE_AA)
 
-    cv2.namedWindow("Image " + str(j), cv2.WINDOW_NORMAL)
-    cv2.imshow("Image " + str(j), sift_image)
+    cv2.imwrite("imgs/keypoints/"+image_file, sift_image)
+    print("Wrote " + image_file)
+        
+    #cv2.namedWindow("Image " + str(j), cv2.WINDOW_NORMAL)
+    #cv2.imshow("Image " + str(j), sift_image)
     j += 1
 
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+#cv2.waitKey(0)
+#cv2.destroyAllWindows()
