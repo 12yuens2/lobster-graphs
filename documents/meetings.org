@@ -152,7 +152,7 @@ With list of matched and labelled subgraphs -> building together into whole lobs
 
 - look into subset of all triplet assignments and how they could fit into whole lobster
 
-  
+
 * Semester 2 - Interim demo
 - Brief summary of everything that has been done.
 
@@ -186,21 +186,11 @@ Recognising and detecting:
 - Hand label
 - Try and match based on labelling
 - Size and distance of points from each other
-- Compare and evaluate between different images to show all points are consistently similar so we can
+- Compare and evaluate between different images to show all points are consistently similar so we can graph match
 - Get pose of lobster
-  
-  
+
+
 ** Week 2
-*** Work:
-1. Extract all filtered keypoints
-2. Build .gdf file with filtered keypoints (width, height, x, y)
-3. Build combinations of node connections for graph matching
-
-Build hand annotated graphs and run all keypoints into graph matching
-
-Steps:
-1. Get keypoints with opencv and filter as much as possible
-2. Get combinations of triplet keypoints and make them node/edges with all combinations of possible labels
-3a, Filter by removing combinations with incompatible sizes/edge lengths
-3b, Filter by removing combinations with incompatible labels
-
+- dithering(imagemagic) -> color histogram to filter out wrong colours
+- visual similarity check on keypoints
+- probabilities after initial filtering
