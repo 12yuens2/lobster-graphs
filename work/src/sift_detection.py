@@ -2,6 +2,7 @@ import sys
 import os
 import cv2
 import math
+import matplotlib.pyplot as plt
 import numpy as np
 
 def closest_kp(keys, des, descriptor):
@@ -91,6 +92,18 @@ def filter_keypoints_size(kps):
 
     return filtered_kps
 
+def filter_keypoints_histogram(image, histogram, kps, method=cv2.HISTCMP_CORREL):
+    filtered_kps = []
+
+    for kp in kps:
+        hist2 = cv2.calcHist([image], [0,1,2], mask_image(image, kp), [256,256,256], [0,256,0,256,0,256])
+        diff = cv2.compareHist(histogram, hist2, method)
+        if diff > 0.1:
+            filtered_kps.append(kp)
+
+    return filtered_kps
+
+
     
 def get_keypoints(image_filename):
     sift = cv2.xfeatures2d.SIFT_create()
@@ -98,9 +111,7 @@ def get_keypoints(image_filename):
 
     # Detect keypoints
     sift_kps = sift.detect(image, None)
-    sift_image = image.copy()
-
-    # Compute keypoint descriptors
+    sift_image = image.copy()# Compute keypoint descriptors
     keys, des = sift.compute(sift_image, sift_kps)
     keys_dict = dict(zip(keys, des))
 
@@ -110,7 +121,25 @@ def get_keypoints(image_filename):
     return kps
     
 
-images_path = "imgs/lobsters/"
+def mask_image(image, keypoint):
+    h,w = sift_image.shape[:2]
+    circle = np.zeros((h,w), np.uint8)
+
+    pos = get_point_tuple(keypoint)
+    size = int(keypoint.size/2)    
+    
+    cv2.circle(circle, pos, size, 1, thickness=-1)
+    return circle
+
+def cv2window(window_name, image):
+    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+    cv2.imshow(window_name, image)
+
+def drawKeypoints(image, keypoints):
+    return cv2.drawKeypoints(image, keypoints, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+    
+images_path = "imgs/dither/"
 images = []
 
 j = 0
@@ -131,20 +160,34 @@ for image_file in os.listdir(images_path):
     #write_to_gdf(kps,str(image_file)+".gdf")
 
     # Draw keypoints
-    sift_image = cv2.drawKeypoints(image, kps, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    sift_image = image.copy()
 
     # Draw keypoint information
+    hist = np.load("lobster.hist.npy")
+    hist.reshape(256,256,256)
+    print(hist.shape)
+
     for i in range(len(kps)):
         kp = kps[i]
-        point = get_point_tuple(kp)
-        cv2.putText(sift_image, str(int(kp.size))+": "+str(i), point, 1, 1, (0,0,255), 2, cv2.LINE_AA)
+        pos = get_point_tuple(kp)
+        cv2.putText(sift_image, str(int(kp.size))+": "+str(i), pos, 1, 1, (0,0,255), 2, cv2.LINE_AA)
+            
+            
+    sift_image = cv2.drawKeypoints(sift_image, kps, sift_image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
     cv2.imwrite("imgs/keypoints/"+image_file, sift_image)
     print("Wrote " + image_file)
-        
-    #cv2.namedWindow("Image " + str(j), cv2.WINDOW_NORMAL)
-    #cv2.imshow("Image " + str(j), sift_image)
+     
+    cv2.namedWindow("Unfiltered" + str(j), cv2.WINDOW_NORMAL)
+    cv2.imshow("Unfiltered" + str(j), sift_image)
+
+
+    print(hist.shape)
+
+    correl_kps = filter_keypoints_histogram(sift_image, hist, kps, method=cv2.HISTCMP_CORREL)
+
+    cv2window("Filtered correl" + str(j), drawKeypoints(image.copy(), correl_kps))
     j += 1
 
-#cv2.waitKey(0)
-#cv2.destroyAllWindows()
+cv2.waitKey(0)
+cv2.destroyAllWindows()

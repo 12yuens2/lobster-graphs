@@ -12,10 +12,10 @@ class Node():
 
 
 
-def possible_node_labels(size):
+#def possible_node_labels(size):
     
 
-def graph_permutations(nodes):
+#def graph_permutations(nodes):
     
     
 test = [i for i in range(30)]
