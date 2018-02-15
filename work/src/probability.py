@@ -1,7 +1,7 @@
 import itertools
 
 # Check if actual_value is within 20% of target value
-def within_value(target_value, actual_value):
+def within_value(v1, v2):
     percentage = 0.2
     error_allowed = percentage * v1
     high = v1 + error_allowed

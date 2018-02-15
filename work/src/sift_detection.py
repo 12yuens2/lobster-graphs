@@ -99,7 +99,7 @@ def filter_keypoints_histogram(image, histogram, kps, method=cv2.HISTCMP_CORREL)
         hist2 = cv2.calcHist([image], [0,1,2], mask_image(image, kp), [256,256,256], [0,256,0,256,0,256])
         diff = cv2.compareHist(histogram, hist2, method)
         if diff > 0.1:
-            filtered_kps.append(kp)
+            filtered_kps.append((kp,diff))
 
     return filtered_kps
 
@@ -122,7 +122,7 @@ def get_keypoints(image_filename):
     
 
 def mask_image(image, keypoint):
-    h,w = sift_image.shape[:2]
+    h,w = image.shape[:2]
     circle = np.zeros((h,w), np.uint8)
 
     pos = get_point_tuple(keypoint)
@@ -138,7 +138,21 @@ def cv2window(window_name, image):
 def drawKeypoints(image, keypoints):
     return cv2.drawKeypoints(image, keypoints, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-    
+
+
+def get_image_kps(image_file):
+   image = cv2.imread(image_file)
+   kps = get_keypoints(image_file)
+
+   hist = np.load("lobster.hist.npy")
+   hist.reshape(256,256,256)
+
+   kps_diff = filter_keypoints_histogram(image, hist, kps, method=cv2.HISTCMP_CORREL)
+
+   return [kp for kp,diff in kps_diff]
+
+
+''' 
 images_path = "imgs/dither/"
 images = []
 
@@ -147,14 +161,11 @@ for image_file in os.listdir(images_path):
     image_filename = images_path + image_file
     image = cv2.imread(image_filename)
 
-    print("Read image " + image_file)
+    #print("Read image " + image_file)
     
     kps = get_keypoints(image_filename)
 
-    print("Got keypoints")
-    
-    # Sort keypoints by attributes
-    #kps.sort(key = lambda x: x.response, reverse=True)
+    #print("Got keypoints")
 
     # Write to graph file format
     #write_to_gdf(kps,str(image_file)+".gdf")
@@ -165,29 +176,29 @@ for image_file in os.listdir(images_path):
     # Draw keypoint information
     hist = np.load("lobster.hist.npy")
     hist.reshape(256,256,256)
-    print(hist.shape)
 
-    for i in range(len(kps)):
-        kp = kps[i]
-        pos = get_point_tuple(kp)
-        cv2.putText(sift_image, str(int(kp.size))+": "+str(i), pos, 1, 1, (0,0,255), 2, cv2.LINE_AA)
-            
             
     sift_image = cv2.drawKeypoints(sift_image, kps, sift_image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-    cv2.imwrite("imgs/keypoints/"+image_file, sift_image)
-    print("Wrote " + image_file)
      
-    cv2.namedWindow("Unfiltered" + str(j), cv2.WINDOW_NORMAL)
-    cv2.imshow("Unfiltered" + str(j), sift_image)
+    #cv2.namedWindow("Unfiltered" + str(j), cv2.WINDOW_NORMAL)
+    #cv2.imshow("Unfiltered" + str(j), sift_image)
 
-
-    print(hist.shape)
 
     correl_kps = filter_keypoints_histogram(sift_image, hist, kps, method=cv2.HISTCMP_CORREL)
+    filtered_image = drawKeypoints(image.copy(), [kp for kp,diff in correl_kps])
+    #cv2window("Filtered correl" + str(j), filtered_image)
+    
+    for kp,diff in correl_kps:
+        pos = get_point_tuple(kp)
+        cv2.putText(filtered_image, str(int(kp.size))+": "+str(diff), pos, 1, 1, (0,0,255), 2, cv2.LINE_AA)
 
-    cv2window("Filtered correl" + str(j), drawKeypoints(image.copy(), correl_kps))
+    cv2.imwrite("imgs/keypoints/"+image_file, filtered_image)
+    print("Wrote " + image_file)
+
     j += 1
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+'''
