@@ -57,21 +57,22 @@ def get_permutations(combinations, length):
     permutations = list(filter(lambda x: x[0][0] != x[1][0], permutations))
     return permutations
 
-def write_as_query(permutation, index):
-    f = open("../queries/query" + str(index) + ".querygfu", "w")
+def write_as_query(permutations):
+    for i in range(len(permutations)):
+        f = open("../queries/query" + str(i) + ".querygfu", "w")
 
-    # Graph header
-    f.write("#graph" + str(index) + "\n")
+        # Graph header
+        f.write("#graph" + str(i) + "\n")
 
-    f.write(str(len(permutation)) + "\n")
+        f.write(str(len(permutation)) + "\n")
 
-    for node in permutation:
-        label = node[1]
-        f.write(label + "\n")
+        for node in permutation:
+            label = node[1]
+            f.write(label + "\n")
 
-    f.write("2\n0 1\n1 2\n")
-    f.flush()
-    f.close()
+        f.write("2\n0 1\n1 2\n")
+        f.flush()
+        f.close()
     
 
 
@@ -100,35 +101,19 @@ permutations = get_permutations(combinations,3)
 
 print("Permutations:")
 print(str(len(permutations)))
-'''
-possible_permutations = []
-for permutation in permutations:
-    # Write permutation to graph format to query db
-    write_as_query(permutation)
 
-    # Query db
-    process = subprocess.run(["../ggsxe", "-f", "-gfu", "../db.gfu", "--dir", "../queries/"], stdout=FNULL)
-
-    # Check output from query
-    matches = os.stat("matches").st_size
-    if matches > 0:
-        print("Add possible permutation: " + str(permutation))
-        possible_permutations.append(permutation)
-
-print(len(possible_permutations))
-'''
 print("Writing graphs to file...")
 
-for i in range(len(permutations)):
-    write_as_query(permutations[i], i)
+write_as_query(permutations)
 
 
 print("Start initial matching...")
 
 
-process = subprocess.run(["../ggsxe", "-f", "-gfu", "../db.gfu", "--dir", "../queries/"], stdout=FNULL)
+subprocess.run(["../ggsxe", "-f", "-gfu", "../db.gfu", "--dir", "../queries/"], stdout=FNULL)
 
 print("Finish initial matching...")
+
 
 good_permutations = []
 with open("matches", "r") as match_file:
@@ -142,3 +127,9 @@ with open("matches", "r") as match_file:
 
 print(len(good_permutations))
 
+
+
+def get_matches():
+    with open("matches", "r") as match_file:
+        for line in match_file:
+            
