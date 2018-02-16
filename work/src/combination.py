@@ -41,7 +41,8 @@ def get_combinations(kps, label_params):
     kp_labels = []
     for kp in kps:
         labels = possible_node_labels(kp.size, label_params)
-        kp_labels.append((kp,labels))
+        if len(labels) > 0:
+            kp_labels.append((kp,labels))
 
     combinations = []
     for kp,labels in kp_labels:
@@ -56,11 +57,11 @@ def get_permutations(combinations, length):
     permutations = list(filter(lambda x: x[0][0] != x[1][0], permutations))
     return permutations
 
-def write_as_query(permutation):
-    f = open("../queries/query0.querygfu", "w")
+def write_as_query(permutation, index):
+    f = open("../queries/query" + str(index) + ".querygfu", "w")
 
     # Graph header
-    f.write("#graph0\n")
+    f.write("#graph" + str(index) + "\n")
 
     f.write(str(len(permutation)) + "\n")
 
@@ -68,10 +69,7 @@ def write_as_query(permutation):
         label = node[1]
         f.write(label + "\n")
 
-    f.write("2\n")
-    f.write("0 1\n")
-    f.write("1 2\n")
-
+    f.write("2\n0 1\n1 2\n")
     f.flush()
     f.close()
     
@@ -91,6 +89,8 @@ label_params = [
 
 kps = get_image_kps("imgs/dither/IMG_1380.JPG")
 
+print("Got " + str(len(kps)) + " keypoints.")
+
 combinations = get_combinations(kps, label_params)
 
 print("Combinations:")
@@ -100,7 +100,7 @@ permutations = get_permutations(combinations,3)
 
 print("Permutations:")
 print(str(len(permutations)))
-
+'''
 possible_permutations = []
 for permutation in permutations:
     # Write permutation to graph format to query db
@@ -116,19 +116,29 @@ for permutation in permutations:
         possible_permutations.append(permutation)
 
 print(len(possible_permutations))
-
-
 '''
-nodes = []
-for lc in label_combinations:
-    nodes.append(Node(lc[0], lc[1]))
+print("Writing graphs to file...")
 
-print(str(nodes[1].id) + ": " + nodes[1].label)
+for i in range(len(permutations)):
+    write_as_query(permutations[i], i)
 
-permutations = list(itertools.permutations(nodes, 3))
-filtered = list(filter(lambda x: x[0].id != x[1].id, permutations))
 
-print(len(permutations))
-print(len(filtered))
-'''
+print("Start initial matching...")
+
+
+process = subprocess.run(["../ggsxe", "-f", "-gfu", "../db.gfu", "--dir", "../queries/"], stdout=FNULL)
+
+print("Finish initial matching...")
+
+good_permutations = []
+with open("matches", "r") as match_file:
+    current_id = -1
+    for line in match_file:
+        graph_id = int(line.split(":")[0])
+
+        if not graph_id == current_id:
+            good_permutations.append(permutations[graph_id])
+            current_id = graph_id
+
+print(len(good_permutations))
 
