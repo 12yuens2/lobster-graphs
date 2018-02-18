@@ -194,7 +194,16 @@ Recognising and detecting:
 - visual similarity check on keypoints
 - probabilities after initial filtering
 
+
+
 ** Week 3
+- Look into compare against previous work for carapace length
+- Especially for images that didn't work before
+- Robustness against noise and scale
+- Work for different scales/sizes
+
+If matching works, can use any other technique to find keypoints
+
 *** Labelling notes
 *Body* > 300
 80 < *Claw* < 300
