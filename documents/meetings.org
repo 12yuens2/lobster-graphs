@@ -194,3 +194,14 @@ Recognising and detecting:
 - dithering(imagemagic) -> color histogram to filter out wrong colours
 - visual similarity check on keypoints
 - probabilities after initial filtering
+
+
+
+
+** Week 3
+- Look into compare against previous work for carapace length
+- Especially for images that didn't work before
+- Robustness against noise and scale
+- Work for different scales/sizes
+
+If matching works, can use any other technique to find keypoints
