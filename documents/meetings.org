@@ -189,8 +189,47 @@ Recognising and detecting:
 - Compare and evaluate between different images to show all points are consistently similar so we can graph match
 - Get pose of lobster
 
-
 ** Week 2
 - dithering(imagemagic) -> color histogram to filter out wrong colours
 - visual similarity check on keypoints
 - probabilities after initial filtering
+
+** Week 3
+*** Labelling notes
+*Body* > 300
+80 < *Claw* < 300
+*Tail* > 300 (smaller than body)
+80 < *Head* < 200
+
+*** Matching algorithm notes
+*Matches*: [Query graph]:[DB graph]{(query_node1, db_node1), (query_node2, db_node2), ...}
+
+#+BEGIN_SRC pseudocode
+for each match in matches
+    query_graph = permutations[match.query_id]
+    db_graph = get_db_graph(match.db_id)
+
+    if match_nodes() and match_edges()
+        good_matches.add(match)
+
+func get_db_graph(id)
+    open(id+".gdf") as graph_file
+        return Graph(graph_file)
+
+func match_nodes(node_match_tuples)
+    for query_node,target_node in node_match_tuples
+        if query_node != target_node
+            return false
+    return true
+
+func match_edges()
+    query_edges = []
+    target_edges = []
+
+    for each edge in query_edges
+        if query_edge[i] != target_edge[i]
+            return false
+
+    return true
+#+END_SRC
+
