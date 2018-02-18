@@ -25,10 +25,10 @@ def get_graph(lines):
                 first = False
                 first_value = int(a[0])
 
-            # Create node with Node(id, label, probablility)
-            n = Node(a[0], str(a[1]).replace("\"", ""), 0)
+            # Create node with Node(id, label, size)
+            n = Node(a[0], str(a[1]).replace("\"", ""), a[2])
       
-      if (a[1] == ""):
+            if (a[1] == ""):
                 print("Node " + a[0] + " missing label.")
                 sys.exit()
             nodes.append(n)
@@ -49,6 +49,7 @@ def get_graph(lines):
 
     return Graph(nodes, edges, 1)
 
+'''
 output = open("output.gfu", "w")
 
 all_graphs = []
@@ -76,3 +77,4 @@ for ps in g1.permutations(edge_db):
     print(ps)
     ps.export(filename, 0)
     n += 1
+'''

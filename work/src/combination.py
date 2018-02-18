@@ -1,9 +1,10 @@
 import itertools
 import subprocess
 import os
+import ast
+from translate import *
 from probability import *
-from sift_detection import *
-
+from sift_detection import * 
 
 FNULL = open(os.devnull, "w")
 
@@ -59,6 +60,7 @@ def get_permutations(combinations, length):
 
 def write_as_query(permutations):
     for i in range(len(permutations)):
+        permutation = permutations[i]
         f = open("../queries/query" + str(i) + ".querygfu", "w")
 
         # Graph header
@@ -68,13 +70,56 @@ def write_as_query(permutations):
 
         for node in permutation:
             label = node[1]
-            f.write(label + "\n")
+            f.write(str(label) + "\n")
 
         f.write("2\n0 1\n1 2\n")
         f.flush()
         f.close()
-    
 
+
+
+
+def node_matches(query_graph, db_graph, matches):
+    return 0
+
+def edge_matches(query_graph, db_graph):
+    return 1
+
+        
+def get_matches(permutations):
+    good_matches = []
+    with open("matches", "r") as match_file:
+        for line in match_file:
+            data = line.strip().split(":")
+            query_id = int(data[0])
+            db_id = int(data[1])
+
+            print(data[2])
+            matches = list(ast.literal_eval(data[2][1:-1]))
+
+            query_graph = graph_from_permutation(permutations[query_id])
+            db_graph = get_db_graph(db_id)
+
+
+            print("Query graph")
+            print(query_graph)
+
+            print("Database graph")
+            print(db_graph)
+
+            node_matches(query_graph, db_graph, matches)
+            edge_matches(query_graph, db_graph, matches)
+
+            return
+
+    return good_matches
+            
+def get_db_graph(graph_id):
+    path = "../graphs/"
+    with open(path+str(graph_id)+".gdf") as graph_file:
+        lines = graph_file.read().splitlines()[1:]
+        return get_graph(lines)
+        
 
 label_params = [
     Label("body", 700),
@@ -87,31 +132,22 @@ label_params = [
 # 1. All node permutations
 
 # 2. All node label combinations
-
 kps = get_image_kps("imgs/dither/IMG_1380.JPG")
 
-print("Got " + str(len(kps)) + " keypoints.")
 
 combinations = get_combinations(kps, label_params)
-
-print("Combinations:")
-print(combinations)
-
 permutations = get_permutations(combinations,3)
 
-print("Permutations:")
-print(str(len(permutations)))
+
+print("Got " + str(len(kps)) + " keypoints.")
+print(str(len(permutations)) + " permutations of size 3")
 
 print("Writing graphs to file...")
-
 write_as_query(permutations)
 
 
 print("Start initial matching...")
-
-
 subprocess.run(["../ggsxe", "-f", "-gfu", "../db.gfu", "--dir", "../queries/"], stdout=FNULL)
-
 print("Finish initial matching...")
 
 
@@ -127,9 +163,6 @@ with open("matches", "r") as match_file:
 
 print(len(good_permutations))
 
+get_matches(good_permutations)
 
 
-def get_matches():
-    with open("matches", "r") as match_file:
-        for line in match_file:
-            

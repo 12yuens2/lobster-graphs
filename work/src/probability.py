@@ -1,4 +1,5 @@
 import itertools
+import math
 
 # Check if actual_value is within 20% of target value
 def within_value(v1, v2):
@@ -9,10 +10,12 @@ def within_value(v1, v2):
 
     return low <= v2 <= high
 
+
 class PossibleGraph():
     def __init__(self, possible_nodes, edges):
         self.possible_nodes = possible_nodes
         self.edges = edges
+
 
     def permutations(self, edge_db):
 
@@ -65,11 +68,12 @@ class PossibleNode():
 
 
 class Node():
-    def __init__(self, node_id, label, size, probability):
+    def __init__(self, node_id, label, size, kp=None): #probability):
         self.node_id = node_id
         self.label = label
         self.size = size
-        self.probability = probability
+        self.kp = kp
+        #self.probability = probability
 
     def __repr__(self):
         return str(self.node_id)
@@ -179,6 +183,29 @@ class Distribution():
         else:
             return 1.0
 
+
+
+def get_distance(kp1, kp2):
+    pt1 = kp1.pt
+    pt2 = kp2.pt
+    return math.hypot(pt2[0] - pt1[0], pt2[1] - pt1[1])   
+
+
+def graph_from_permutation(permutation):
+    nodes = []
+    for i in range(len(permutation)):
+        nodes.append(Node(i, permutation[i][1], permutation[i][0].size, kp=permutation[i][0]))
+
+    edges = []
+    for n1,n2 in zip(nodes[:-1], nodes[1:]):
+        edges.append(Edge(n1, n2, get_distance(n1.kp, n2.kp)))
+
+    return Graph(nodes, edges, 0)
+
+
+        
+
+    
 '''
 n1 = PossibleNode(1, {"claw": 0.8, "arm": 0.2})
 n2 = PossibleNode(2, {"arm": 0.7, "body": 0.3})
