@@ -1,16 +1,6 @@
 import itertools
 import math
 
-# Check if actual_value is within 20% of target value
-def within_value(v1, v2):
-    percentage = 0.2
-    error_allowed = percentage * v1
-    high = v1 + error_allowed
-    low = v1 - error_allowed
-
-    return low <= v2 <= high
-
-
 class PossibleGraph():
     def __init__(self, possible_nodes, edges):
         self.possible_nodes = possible_nodes
@@ -67,95 +57,6 @@ class PossibleNode():
         return [Node(self.node_id, label, probability) for (label, probability) in self.labels.items()]
 
 
-class Node():
-    def __init__(self, node_id, label, size, kp=None): #probability):
-        self.node_id = node_id
-        self.label = label
-        self.size = size
-        self.kp = kp
-        #self.probability = probability
-
-    def __repr__(self):
-        return str(self.node_id)
-        #return str(self.node_id) + ": (" + str(self.label) + ", " + str(self.probability) + ")"
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return (self.label == other.label and
-                    (within_value(self.size, other.size) or
-                     within_value(other.size, self.size)))
-        else:
-            return False
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-
-    def __hash__(self):
-        return self.label.__hash__()
-
-
-class Edge():
-    def __init__(self, node1, node2, length):
-        self.n1 = node1
-        self.n2 = node2
-        self.length = length
-        #ratio
-
-    def __repr__(self):
-        return str(int(self.n1.node_id) - 1) + " " + str(int(self.n2.node_id) - 1)
-        #return str(self.n1) + "--" + str(self.n2) + ", " + str(self.length)
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            # Both node labels are the same and length is similar values
-            return (((self.n1 == other.n1 and self.n2 == other.n2) or
-                    (self.n1 == other.n2 and self.n2 == other.n2)) and
-                    (within_value(self.length, other.length) or
-                     within_value(other.length, self.length)))
-                    
-        else:
-            return False
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-
-    def __hash__(self):
-        return self.n1.__hash__() + self.n2.__hash__()
-
-        
-class Graph():
-    def __init__(self, nodes, edges, probability_assignment):
-        self.nodes = nodes
-        self.edges = edges
-
-        self.prob_a = probability_assignment
-
-    def __repr__(self):
-        return str(self.nodes) + " | " + str(self.edges) + " : " + str(self.prob_a)
-
-
-    # Write graph to query for graphgrep
-    def write_to(self, file, id):
-        file.write("#graph" + str(id) + "\n")
-
-        file.write(str(len(self.nodes)) + "\n")
-        for node in self.nodes:
-            file.write(node.label + "\n")
-
-        file.write(str(len(self.edges)) + "\n")
-        for edge in self.edges:
-            file.write(str(edge) + "\n")
-
-
-    def export(self, filename, id):
-        f = open(filename, "w")
-
-        self.write_to(f, id)
-
-        f.close()
-
 
 class Distribution():
     def __init__(self, label_tuple, data):
@@ -183,27 +84,6 @@ class Distribution():
         else:
             return 1.0
 
-
-
-def get_distance(kp1, kp2):
-    pt1 = kp1.pt
-    pt2 = kp2.pt
-    return math.hypot(pt2[0] - pt1[0], pt2[1] - pt1[1])   
-
-
-def graph_from_permutation(permutation):
-    nodes = []
-    for i in range(len(permutation)):
-        nodes.append(Node(i, permutation[i][1], permutation[i][0].size, kp=permutation[i][0]))
-
-    edges = []
-    for n1,n2 in zip(nodes[:-1], nodes[1:]):
-        edges.append(Edge(n1, n2, get_distance(n1.kp, n2.kp)))
-
-    return Graph(nodes, edges, 0)
-
-
-        
 
     
 '''
