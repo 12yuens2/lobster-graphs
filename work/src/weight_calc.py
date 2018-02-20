@@ -1,5 +1,5 @@
 import os
-from common_cv import *
+import math
 from common_graph import *
 
 path = "graphs/annotated/"
@@ -10,4 +10,8 @@ for graph_file in os.listdir(path):
     lines = f.read().splitlines()[1:]
     graph = translate_graph(lines)
     
-    if "edgedef" in line:
+    graph_to_gdf(graph, "graphs/complete/" + graph_file)
+
+
+
+

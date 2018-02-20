@@ -3,11 +3,12 @@ import math
 import common_cv
 
 class Node():
-    def __init__(self, node_id, label, size, kp=None): #probability):
+    def __init__(self, node_id, label, size, kp=None, pos=None): #probability):
         self.node_id = int(node_id)
         self.label = label
         self.size = size
         self.kp = kp
+        self.pos = pos
         #self.probability = probability
 
     def __repr__(self):
@@ -120,6 +121,11 @@ def graph_from_permutation(permutation):
 
     return Graph(nodes, edges, 0)
 
+
+
+def distance(pt1, pt2):
+    return math.hypot(pt2[0] - pt1[0], pt2[1] - pt1[1])
+
 def translate_graph(lines):
     """ Translate graph from gdf to graphgrep query format """
     nodes = []
@@ -141,7 +147,7 @@ def translate_graph(lines):
                 first_value = int(a[0])
 
             # Create node with Node(id, label, size)
-            n = Node(a[0], str(a[1]).replace("\"", ""), float(a[2]))
+            n = Node(a[0], str(a[1]).replace("\"", ""), float(a[2]), pos=(float(a[4]),float(a[5])))
 
             if (a[1] == ""):
                 print("Node " + a[0] + " missing label.")
@@ -156,7 +162,7 @@ def translate_graph(lines):
             for node in nodes:
                 if node.node_id == int(a[1]):
                     n2 = node
-            e = Edge(n1, n2, a[3])
+            e = Edge(n1, n2, distance(n1.pos,n2.pos))
             edges.append(e)
             #all_edges.append(e)
             #edges.append((int(a[0]) - first_value, int(a[1]) - first_value))
@@ -164,10 +170,9 @@ def translate_graph(lines):
 
     return Graph(nodes, edges, 1)
 
-
 def graph_to_gdf(graph, filename):
     """ Write internal graph to gdf file, requires graph nodes have keypoints """
-    f = open("graphs/" + filename, "w")
+    f = open(filename, "w")
 
     # Node header definition
     f.write("nodedef> name VARCHAR,label VARCHAR,width DOUBLE,height DOUBLE,x DOUBLE,y DOUBLE,color VARCHAR\n")
@@ -175,14 +180,15 @@ def graph_to_gdf(graph, filename):
     # Write nodes
     i = 1
     px,py = (0,0)
-    kps = [node.kp for node in graph.nodes]
-    for kp in kps:
-        (x,y) = get_point_tuple(kp)
-        radius = kp.size/2
+    #kps = [node.kp for node in graph.nodes]
+    for node in graph.nodes:
+        (x,y) = node.pos
+        radius = node.size/2
 
         # Do not write duplicate keypoints
         if not (x,y) == (px,py):
-            f.write(str(i)+",\"\"," +
+            f.write(str(i)+"," +
+                    "\"" + str(node.label) + "\"," + 
                     str(radius)+"," +
                     str(radius)+"," +
                     str(x) + "," + str(y) +
@@ -193,9 +199,16 @@ def graph_to_gdf(graph, filename):
         f.flush()
 
     # Edge header definition
-    f.write("edgedef> node1,node2,weight DOUBLE,directed BOOLEAN,color VARCHAR")
+    f.write("edgedef> node1,node2,weight DOUBLE,directed BOOLEAN,color VARCHAR\n")
+
+    for edge in graph.edges:
+        node1 = edge.n1
+        node2 = edge.n2
+
+        f.write(str(node1.node_id) + "," + str(node2.node_id) + ",")
+
+        d = distance(node1.pos, node2.pos)
+        f.write(str(d) + "," + "false,'128,128,128'\n")
     
+    f.flush()
     f.close()
-
-
-

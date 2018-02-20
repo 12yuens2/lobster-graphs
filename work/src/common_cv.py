@@ -207,9 +207,6 @@ def write_to_gdf(kps, filename):
 
         (px,py) = (x,y)
         f.flush()
-
-    # Edge header definition
-    f.write("edgedef> node1,node2,weight DOUBLE,directed BOOLEAN,color VARCHAR")
     
     f.close()
 
