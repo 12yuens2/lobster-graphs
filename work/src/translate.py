@@ -20,6 +20,7 @@ for f in os.listdir(sys.argv[1]):
     i += 1
    
 # create db for edge distributions
+'''
 edge_db = {}
 for edge in all_edges:
     if not edge in edge_db:
@@ -32,3 +33,6 @@ for ps in g1.permutations(edge_db):
     print(ps)
     ps.export(filename, 0)
     n += 1
+'''
+
+
