@@ -10,8 +10,9 @@ output = open("output.gfu", "w")
 all_graphs = []
 
 i = 0
-for f in os.listdir(sys.argv[1]):
+for f in sorted(os.listdir(sys.argv[1])):
     input_file = open(sys.argv[1] + f)
+    print(f)
     lines = input_file.read().splitlines()[1:]
 
     graph = translate_graph(lines)

@@ -48,10 +48,10 @@ def get_permutations(combinations, length):
 
 
 
-def write_as_query(permutations):
+def write_as_query(permutations, filepath):
     for i in range(len(permutations)):
         permutation = permutations[i]
-        f = open("../queries/query" + str(i) + ".querygfu", "w")
+        f = open(filepath + str(i) + ".querygfu", "w")
 
         # Graph header
         f.write("#graph" + str(i) + "\n")
@@ -70,7 +70,7 @@ def write_as_query(permutations):
 def node_matches(query_graph, db_graph, matches):
     for query,target in matches:
         query_node = query_graph.get_node(query)
-        target_node = db_graph.get_node(target)
+        target_node = db_graph.get_node(target + 1)
 
         if query_node != target_node:
             return False
@@ -81,7 +81,7 @@ def edge_matches(query_graph, db_graph, matches):
     return 1
 
         
-def get_matches(permutations):
+def get_matches(permutations, db_path):
     good_matches = []
     with open("matches", "r") as match_file:
         for line in match_file:
@@ -93,7 +93,7 @@ def get_matches(permutations):
 
             print(query_id)
             query_graph = graph_from_permutation(permutations[query_id])
-            db_graph = get_db_graph(db_id)
+            db_graph = get_db_graph(db_id, db_path)
 
             print(node_matches(query_graph, db_graph, matches))
             edge_matches(query_graph, db_graph, matches)
@@ -101,9 +101,8 @@ def get_matches(permutations):
 
     return good_matches
             
-def get_db_graph(graph_id):
-    path = "../graphs/"
-    with open(path+str(graph_id)+".gdf") as graph_file:
+def get_db_graph(graph_id, graphs_path):
+    with open(graphs_path+str(graph_id)+".gdf") as graph_file:
         lines = graph_file.read().splitlines()[1:]
         db_graph = translate_graph(lines)
 

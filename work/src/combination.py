@@ -27,11 +27,11 @@ print("Got " + str(len(kps)) + " keypoints.")
 print(str(len(permutations)) + " permutations of size 3")
 
 print("Writing graphs to file...")
-write_as_query(permutations)
+write_as_query(permutations, "../queries/query")
 
 
 print("Start initial matching...")
-subprocess.run(["../ggsxe", "-f", "-gfu", "../db.gfu", "--dir", "../queries/"], stdout=FNULL)
+subprocess.run(["../ggsxe", "-f", "-gfu", "../new.gfu", "--dir", "../queries/"], stdout=FNULL)
 print("Finish initial matching...")
 
 
@@ -46,6 +46,6 @@ with open("matches", "r") as match_file:
             current_id = graph_id
 
 print("get matches")
-get_matches(permutations)
+get_matches(permutations, "graphs/complete/")
 
 
