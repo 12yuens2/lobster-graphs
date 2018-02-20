@@ -165,5 +165,37 @@ def translate_graph(lines):
     return Graph(nodes, edges, 1)
 
 
+def graph_to_gdf(graph, filename):
+    """ Write internal graph to gdf file, requires graph nodes have keypoints """
+    f = open("graphs/" + filename, "w")
+
+    # Node header definition
+    f.write("nodedef> name VARCHAR,label VARCHAR,width DOUBLE,height DOUBLE,x DOUBLE,y DOUBLE,color VARCHAR\n")
+
+    # Write nodes
+    i = 1
+    px,py = (0,0)
+    kps = [node.kp for node in graph.nodes]
+    for kp in kps:
+        (x,y) = get_point_tuple(kp)
+        radius = kp.size/2
+
+        # Do not write duplicate keypoints
+        if not (x,y) == (px,py):
+            f.write(str(i)+",\"\"," +
+                    str(radius)+"," +
+                    str(radius)+"," +
+                    str(x) + "," + str(y) +
+                    ",'153,153,153'\n")
+            i += 1
+
+        (px,py) = (x,y)
+        f.flush()
+
+    # Edge header definition
+    f.write("edgedef> node1,node2,weight DOUBLE,directed BOOLEAN,color VARCHAR")
+    
+    f.close()
+
 
 

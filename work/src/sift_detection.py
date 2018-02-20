@@ -1,5 +1,6 @@
 import sys
 import os
+import cv2
 from common_cv import *
 
 """ sift_detection.py: Draw keypoints on top of the lobster image and write keypoints to gdf graph format """
@@ -19,7 +20,13 @@ for image_file in os.listdir(images_path):
     write_to_gdf(kps, str(image_file) + ".gdf")
 
     print("Write image with keypoints")
-    write_image(image, "imgs/keypoints/" + str(image_file))
+    annotated_image = image.copy()
+    for i in range(len(kps)):
+        kp = kps[i]
+        pos = get_point_tuple(kp)
+        cv2.putText(annotated_image, str(i) + ": " + str(int(kp.size)), pos, 1, 1, (0,0,255), 2, cv2.LINE_AA)
+        
+    write_image(annotated_image, "imgs/keypoints/" + str(image_file))
 
 
 

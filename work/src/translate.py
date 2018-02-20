@@ -14,7 +14,7 @@ for f in os.listdir(sys.argv[1]):
     input_file = open(sys.argv[1] + f)
     lines = input_file.read().splitlines()[1:]
 
-    graph = get_graph(lines)
+    graph = translate_graph(lines)
     graph.write_to(output, i)
     
     i += 1

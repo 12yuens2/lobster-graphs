@@ -189,7 +189,7 @@ def write_to_gdf(kps, filename):
     # Node header definition
     f.write("nodedef> name VARCHAR,label VARCHAR,width DOUBLE,height DOUBLE,x DOUBLE,y DOUBLE,color VARCHAR\n")
 
-    # Print keypoints
+    # Write nodes
     i = 1
     px,py = (0,0)
     for kp in kps:
@@ -207,4 +207,9 @@ def write_to_gdf(kps, filename):
 
         (px,py) = (x,y)
         f.flush()
+
+    # Edge header definition
+    f.write("edgedef> node1,node2,weight DOUBLE,directed BOOLEAN,color VARCHAR")
+    
     f.close()
+
