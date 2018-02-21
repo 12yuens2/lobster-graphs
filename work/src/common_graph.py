@@ -12,7 +12,8 @@ class Node():
         #self.probability = probability
 
     def __repr__(self):
-        return str(self.node_id)
+        #return str(self.node_id)
+        return str(self.label) + ": " + str(self.size)
         #return str(self.node_id) + ": (" + str(self.label) + ", " + str(self.probability) + ")"
 
     def __eq__(self, other):
@@ -39,14 +40,15 @@ class Edge():
         #ratio
 
     def __repr__(self):
-        return str(int(self.n1.node_id) - 1) + " " + str(int(self.n2.node_id) - 1)
+        return str(self.n1.label) + " " + str(self.n2.label) + ": " + str(self.length)
+        #return str(int(self.n1.node_id) - 1) + " " + str(int(self.n2.node_id) - 1)
         #return str(self.n1) + "--" + str(self.n2) + ", " + str(self.length)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             # Both node labels are the same and length is similar values
-            return (((self.n1 == other.n1 and self.n2 == other.n2) or
-                    (self.n1 == other.n2 and self.n2 == other.n2)) and
+            return (((self.n1.label == other.n1.label and self.n2.label == other.n2.label) or
+                    (self.n1.label == other.n2.label and self.n2.label == other.n1.label)) and
                     (within_value(self.length, other.length) or
                      within_value(other.length, self.length)))
                     
@@ -76,6 +78,12 @@ class Graph():
         for node in self.nodes:
             if node.node_id == node_id:
                 return node
+
+    def get_edge(self, id1, id2):
+        for edge in self.edges:
+            if ((id1 == edge.n1.node_id and id2 == edge.n2.node_id) or
+                (id1 == edge.n2.node_id and id2 == edge.n1.node_id)):
+               return edge
 
     def write_to(self, file, id):
         """ Write graph for graphgrep query format """
@@ -183,14 +191,13 @@ def graph_to_gdf(graph, filename):
     #kps = [node.kp for node in graph.nodes]
     for node in graph.nodes:
         (x,y) = node.pos
-        radius = node.size/2
 
         # Do not write duplicate keypoints
         if not (x,y) == (px,py):
             f.write(str(i)+"," +
                     "\"" + str(node.label) + "\"," + 
-                    str(radius)+"," +
-                    str(radius)+"," +
+                    str(node.size)+"," +
+                    str(node.size)+"," +
                     str(x) + "," + str(y) +
                     ",'153,153,153'\n")
             i += 1

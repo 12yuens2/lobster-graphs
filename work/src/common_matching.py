@@ -12,7 +12,7 @@ class Label():
         self.size = size
 
     def __repr__(self):
-        return str(name)
+        return str(self.name)
 
 
 def possible_node_labels(actual_size, labels):
@@ -51,7 +51,7 @@ def get_permutations(combinations, length):
 def write_as_query(permutations, filepath):
     for i in range(len(permutations)):
         permutation = permutations[i]
-        f = open(filepath + str(i) + ".querygfu", "w")
+        f = open(filepath + str(i).zfill(4) + ".querygfu", "w")
 
         # Graph header
         f.write("#graph" + str(i) + "\n")
@@ -70,7 +70,10 @@ def write_as_query(permutations, filepath):
 def node_matches(query_graph, db_graph, matches):
     for query,target in matches:
         query_node = query_graph.get_node(query)
-        target_node = db_graph.get_node(target + 1)
+        target_node = db_graph.get_node(target)
+
+        #print(str(query_node))
+        #print(str(target_node))
 
         if query_node != target_node:
             return False
@@ -78,7 +81,14 @@ def node_matches(query_graph, db_graph, matches):
     return True
 
 def edge_matches(query_graph, db_graph, matches):
-    return 1
+    for t1,t2 in zip(matches[:-1], matches[1:]):
+        query_edge = query_graph.get_edge(t1[0], t2[0])
+        target_edge = db_graph.get_edge(t1[1], t2[1])
+
+        if query_edge != target_edge:
+            return False
+        
+    return True
 
         
 def get_matches(permutations, db_path):
@@ -91,12 +101,13 @@ def get_matches(permutations, db_path):
 
             matches = list(ast.literal_eval(data[2][1:-1]))
 
-            print(query_id)
             query_graph = graph_from_permutation(permutations[query_id])
             db_graph = get_db_graph(db_id, db_path)
 
-            print(node_matches(query_graph, db_graph, matches))
-            edge_matches(query_graph, db_graph, matches)
+            #if node_matches(query_graph, db_graph, matches):
+                #good_matches.append(matches)
+            if edge_matches(query_graph, db_graph, matches):
+                good_matches.append(permutations[query_id])
 
 
     return good_matches
