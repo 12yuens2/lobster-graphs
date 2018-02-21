@@ -9,12 +9,12 @@ FNULL = open(os.devnull, "w")
        
 
 label_params = [
-    Label("body", 700),
-    Label("arm", 200),
-    Label("claw", 100),
-    Label("head", 200),
-    Label("tail", 320),
-    Label("back", 200)
+    Label("body", 300, 800),
+    Label("arm", 100, 250),
+    Label("claw", 100, 150),
+    Label("head", 100, 200),
+    Label("tail", 150, 350),
+    Label("back", 200, 400)
 ]
 
 # Remove old queries
@@ -75,3 +75,5 @@ for match in good_matches:
 cv2window("test", image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+cv2.imwrite("test.kpg", image)

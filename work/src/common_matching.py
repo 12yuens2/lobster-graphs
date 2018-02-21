@@ -7,20 +7,25 @@ from common_graph import *
 
 
 class Label():
-    def __init__(self, name, size):
+    def __init__(self, name, size_min, size_max):
         self.name = name
-        self.size = size
+        self.size_min = size_min
+        self.size_max = size_max
 
     def __repr__(self):
         return str(self.name)
+
+
+    def in_range(self, value):
+        return self.size_min <= value <= self.size_max
 
 
 def possible_node_labels(actual_size, labels):
     possible_labels = []
     for label in labels:
         label_name = label.name
-        target_size = label.size
-        if within_value(target_size, actual_size):
+        #target_size = label.size
+        if label.in_range(actual_size):
             possible_labels.append(label_name)
 
     return possible_labels
