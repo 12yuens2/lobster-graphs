@@ -108,7 +108,7 @@ class Graph():
 ### Useful functions ###
 
 def within_value(v1, v2):
-    """ Check if actual_value is within 20% of target value """
+    """ Check if actual_value is within 10% of target value """
     percentage = 0.1
     error_allowed = percentage * v1
     high = v1 + error_allowed
@@ -121,7 +121,7 @@ def graph_from_permutation(permutation):
     """ Take permutation of n (keypoint, label) tuples and turn into a graph object """
     nodes = []
     for i in range(len(permutation)):
-        nodes.append(Node(i, permutation[i][1], permutation[i][0].size, kp=permutation[i][0]))
+        nodes.append(Node(i, permutation[i][1].name, permutation[i][0].size, kp=permutation[i][0]))
 
     edges = []
     for n1,n2 in zip(nodes[:-1], nodes[1:]):

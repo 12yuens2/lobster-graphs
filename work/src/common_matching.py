@@ -7,14 +7,15 @@ from common_graph import *
 
 
 class Label():
-    def __init__(self, name, size):
+    def __init__(self, name, probability):
         self.name = name
-        self.size = size
+        self.probability = probability
 
     def __repr__(self):
-        return str(self.name)
+        return str(self.name) + ": " + str(self.probability)
 
 
+   
 def possible_node_labels(actual_size, label_distributions, label_threshold):
     possible_labels = []
 
@@ -24,8 +25,9 @@ def possible_node_labels(actual_size, label_distributions, label_threshold):
             possible_labels.append(label.name)
     '''
     for label,distribution in label_distributions.items():
-        if distribution.get_probability(actual_size) > label_threshold:
-            possible_labels.append(label)
+        probability = distribution.get_probability(actual_size)
+        if probability > label_threshold:
+            possible_labels.append(Label(label, probability))
     
 
     return possible_labels
@@ -64,7 +66,7 @@ def write_as_query(permutations, filepath):
         f.write(str(len(permutation)) + "\n")
 
         for node in permutation:
-            label = node[1]
+            label = node[1].name
             f.write(str(label) + "\n")
 
         f.write("2\n0 1\n1 2\n")

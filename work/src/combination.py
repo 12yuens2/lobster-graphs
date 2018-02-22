@@ -33,12 +33,13 @@ for image_file in os.listdir(PATH):
     print("Start " + image_file)
     kps = get_image_kps(PATH + image_file)
 
+    permutation_size = 3
     combinations = get_combinations(kps, distributions, LABEL_THRESHOLD)
-    permutations = get_permutations(combinations,3)
+    permutations = get_permutations(combinations, permutation_size)
 
 
     print("Got " + str(len(kps)) + " keypoints.")
-    print(str(len(permutations)) + " permutations of size 3")
+    print(str(len(permutations)) + " permutations of size " + str(permutation_size))
 
     print("Writing graphs to file...")
     write_as_query(permutations, "../queries/query")
@@ -51,17 +52,23 @@ for image_file in os.listdir(PATH):
 
     print("Get " + str(len(good_matches)) + " matches")
 
+
+
+    
+    s = sorted(list(good_matches), key=lambda match: sum([x[1].probability for x in match]), reverse=True)
+    
     # draw lines and labels
     image = cv2.imread(PATH + image_file)
     y = 0
-    for match in good_matches:
+    for match in s[:5]:
         for t1,t2 in zip(list(match)[:-1], list(match)[1:]):
             image = cv2.drawKeypoints(image, [t1[0], t2[0]], image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
             cv2.line(image, get_point_tuple(t1[0]), get_point_tuple(t2[0]), (255,0,0), thickness=3)
-            cv2.putText(image, str(t1[1]), tuple(map(sum, zip(get_point_tuple(t1[0]), (0,y)))), 1, 1, (0,0,255), 2, cv2.LINE_AA)
+
+            cv2.putText(image, str(t1[1].name), tuple(map(sum, zip(get_point_tuple(t1[0]), (0,y)))), 1, 1, (0,0,255), 2, cv2.LINE_AA)
             y += 4
-            cv2.putText(image, str(t2[1]), tuple(map(sum, zip(get_point_tuple(t2[0]), (0,y)))), 1, 1, (0,0,255), 2, cv2.LINE_AA)
-            #print(str(t1) + " " + str(t2))
+            cv2.putText(image, str(t2[1].name), tuple(map(sum, zip(get_point_tuple(t2[0]), (0,y)))), 1, 1, (0,0,255), 2, cv2.LINE_AA)
             y += 4
 
     #cv2window("test", image)
