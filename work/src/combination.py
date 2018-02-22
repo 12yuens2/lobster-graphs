@@ -75,3 +75,5 @@ for match in good_matches:
 cv2window("test", image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+cv2.imwrite("test.jpg", image)
