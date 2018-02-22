@@ -109,7 +109,7 @@ class Graph():
 
 def within_value(v1, v2):
     """ Check if actual_value is within 20% of target value """
-    percentage = 0.2
+    percentage = 0.1
     error_allowed = percentage * v1
     high = v1 + error_allowed
     low = v1 - error_allowed
@@ -128,7 +128,6 @@ def graph_from_permutation(permutation):
         edges.append(Edge(n1, n2, common_cv.get_distance(n1.kp, n2.kp)))
 
     return Graph(nodes, edges, 0)
-
 
 
 def distance(pt1, pt2):

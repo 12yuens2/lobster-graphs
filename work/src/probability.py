@@ -1,6 +1,10 @@
-import itertools
-import math
+#import itertools
+import os
+#import math
+import numpy as np
+import scipy.stats
 
+'''
 class PossibleGraph():
     def __init__(self, possible_nodes, edges):
         self.possible_nodes = possible_nodes
@@ -19,11 +23,10 @@ class PossibleGraph():
                 probability_assignment *= node.probability
 
             edges = self.get_new_edges(permutation)
-            '''
+
             for edge in edges:
                 if edge in edge_db:
                     probability_assignment *= edge_db[edge][edge.length]
-            '''
 
             permutation_graphs.append(Graph(list(permutation), edges, probability_assignment))
 
@@ -83,29 +86,52 @@ class Distribution():
             return self.dictionary[item]
         else:
             return 1.0
+'''
 
 
+class LabelData():
+    def __init__(self, label, distribution, probability):
+        self.label = label
+        self.distribution = distribution
+        self.probability = probability
+
+    def get_probability(self, value):
+        return self.distribution.pdf(value) / self.probability
+
+def load_label_data(filepath):
+    label_data = {}
+
+    for graph_file in os.listdir(filepath):
+        f = open(filepath + graph_file)
+        lines = f.readlines()[1:]
+        for line in lines:
+            if "edgedef>" in line:
+                break
+
+            l = line.split(",")
+            label = l[1].strip("\"")
+            size = float(l[2])
+
+            if label in label_data:
+                label_data[label].append(size)
+            else:
+                label_data[label] = [size]
+
+    return label_data
+
+
+
+def get_distributions(filepath):
+    label_data = load_label_data(filepath)
+
+    total_length = sum([len(data) for key,data in label_data.items()])
     
-'''
-n1 = PossibleNode(1, {"claw": 0.8, "arm": 0.2})
-n2 = PossibleNode(2, {"arm": 0.7, "body": 0.3})
-n3 = PossibleNode(3, {"body": 0.6, "head": 0.25, "tail": 0.15})
+    for key,data in label_data.items():
+        mean = np.mean(data)
+        std = np.std(data)
+        dis = scipy.stats.norm(mean, std)
 
-# Possible edges
-e1 = Edge(n1.node_id, n2.node_id, 5)
-e2 = Edge(n2.node_id, n3.node_id, 4)
+        label_data[key] = LabelData(key, dis, len(data)/total_length)
 
-e3 = Edge(n1.node_id, n3.node_id, 8)
-e4 = Edge(n1.node_id, n2.node_id, 3)
-
-g1 = PossibleGraph([n1, n2, n3], [e1, e2])
-g2 = PossibleGraph([n1, n2, n3], [e3, e4])
-'''
-
-
-'''
-distributions = []
-distributions.append(Distribution(("claw", "body"), [3,4,3,3,5,4,2]))
-distributions.append(Distribution(("tail", "body"), [6,7,5,7,7]))
-distributions.append(Distribution(("claw", "head"), [5,4,5,3,3,4,3,4,5]))
-'''
+    return label_data
+    

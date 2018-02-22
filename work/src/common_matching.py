@@ -15,21 +15,26 @@ class Label():
         return str(self.name)
 
 
-def possible_node_labels(actual_size, labels):
+def possible_node_labels(actual_size, label_distributions, label_threshold):
     possible_labels = []
-    for label in labels:
-        label_name = label.name
-        target_size = label.size
-        if within_value(target_size, actual_size):
-            possible_labels.append(label_name)
+
+    '''
+    for label in label_distributions:
+        if within_value(label.size, actual_size):
+            possible_labels.append(label.name)
+    '''
+    for label,distribution in label_distributions.items():
+        if distribution.get_probability(actual_size) > label_threshold:
+            possible_labels.append(label)
+    
 
     return possible_labels
 
 
-def get_combinations(kps, label_params):
+def get_combinations(kps, label_distributions, label_threshold):
     kp_labels = []
     for kp in kps:
-        labels = possible_node_labels(kp.size, label_params)
+        labels = possible_node_labels(kp.size, label_distributions, label_threshold)
         if len(labels) > 0:
             kp_labels.append((kp,labels))
 
@@ -49,9 +54,9 @@ def get_permutations(combinations, length):
 
 
 def write_as_query(permutations, filepath):
+    f = open(filepath + ".querygfu", "w")
     for i in range(len(permutations)):
         permutation = permutations[i]
-        f = open(filepath + str(i).zfill(4) + ".querygfu", "w")
 
         # Graph header
         f.write("#graph" + str(i) + "\n")
@@ -64,7 +69,7 @@ def write_as_query(permutations, filepath):
 
         f.write("2\n0 1\n1 2\n")
         f.flush()
-        f.close()
+    f.close()
 
 
 def node_matches(query_graph, db_graph, matches):
@@ -87,7 +92,7 @@ def edge_matches(query_graph, db_graph, matches):
 
         if query_edge != target_edge:
             return False
-        
+
     return True
 
         
@@ -103,6 +108,7 @@ def get_matches(permutations, db_path):
 
             query_graph = graph_from_permutation(permutations[query_id])
             db_graph = get_db_graph(db_id, db_path)
+
 
             #if node_matches(query_graph, db_graph, matches):
                 #good_matches.append(matches)
