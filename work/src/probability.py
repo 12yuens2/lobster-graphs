@@ -98,7 +98,7 @@ class LabelData():
     def get_probability(self, value):
         return self.distribution.pdf(value) / self.probability
 
-def load_label_data(filepath):
+def load_node_data(filepath):
     label_data = {}
 
     for graph_file in os.listdir(filepath):
@@ -120,9 +120,8 @@ def load_label_data(filepath):
     return label_data
 
 
-
-def get_distributions(filepath):
-    label_data = load_label_data(filepath)
+def get_node_distributions(filepath):
+    label_data = load_node_data(filepath)
 
     total_length = sum([len(data) for key,data in label_data.items()])
     
@@ -135,3 +134,18 @@ def get_distributions(filepath):
 
     return label_data
     
+
+
+
+def get_edge_distributions(filepath):
+    graphs = []
+    
+    for graph_file in os.listdir(filepath):
+        f = open(filepath + graph_file)
+        lines = f.readlines()[1:]
+
+        graphs.append(translate_graph(lines))
+
+    for graph in graphs:
+        for edge in graph.edges:
+            
