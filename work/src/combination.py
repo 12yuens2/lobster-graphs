@@ -9,44 +9,17 @@ from common_cv import get_image_kps, get_point_tuple, cv2window
 
 FNULL = open(os.devnull, "w")
 PATH = "imgs/dither/"
-LABEL_THRESHOLD = 0.005
+LABEL_THRESHOLD = 0.0005
 
-distributions = get_node_distributions("graphs/complete/")
+node_distributions = get_node_distributions("graphs/complete/")
+
+edge_distributions = get_edge_distributions("graphs/complete/")
 
 
 # Remove old queries
 #print("Removing old queries...")
 #subprocess.run(["rm", "-f", "../queries/*"])
-
-
-
-
-class Model():
-    def __init__(self, labels):
-        self.labels = labels.copy()
-        self.current_nodes = []
-
-    def __repr__(self):
-        return str(self.labels) + "\n" + str(self.current_nodes)
-        
-    def check_nodes(self, nodes):
-        for kp,label in nodes:
-            if kp in [t[0] for t in self.current_nodes]:
-                return False
-            #elif label.name in self.labels and self.labels[label.name] <= 0:
-                # bug if count is 1 but two instances of that label in nodes
-                #return False
-        return True
-
-    def add_nodes(self, nodes):
-        self.current_nodes += nodes
-        for kp,label in nodes:
-            self.labels[label.name] -= 1
-
-    def add_if_valid(self, nodes):
-        if self.check_nodes(nodes):
-            self.add_nodes(nodes)
-            
+           
 
 # Model of lobster to match to
 model = {"body": 1,
@@ -61,7 +34,7 @@ for image_file in os.listdir(PATH):
     kps = get_image_kps(PATH + image_file)
 
     permutation_size = 3
-    combinations = get_combinations(kps, distributions, LABEL_THRESHOLD)
+    combinations = get_combinations(kps, node_distributions, LABEL_THRESHOLD)
     permutations = get_permutations(combinations, permutation_size)
 
 
@@ -101,26 +74,9 @@ for image_file in os.listdir(PATH):
     
     s = sorted(models, key=lambda model: sum([label.probability for kp,label in model.current_nodes]), reverse=True)
 
-    # draw lines and labels
+
+    #draw lines and labels
     image = cv2.imread(PATH + image_file)
-    '''
-    y = 0
-    for match in s[:5]:
-        for t1,t2 in zip(list(match)[:-1], list(match)[1:]):
-            image = cv2.drawKeypoints(image, [t1[0], t2[0]], image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-            cv2.line(image, get_point_tuple(t1[0]), get_point_tuple(t2[0]), (255,0,0), thickness=3)
-
-            cv2.putText(image, str(t1[1].name), tuple(map(sum, zip(get_point_tuple(t1[0]), (0,y)))), 1, 1, (0,0,255), 2, cv2.LINE_AA)
-            y += 4
-            cv2.putText(image, str(t2[1].name), tuple(map(sum, zip(get_point_tuple(t2[0]), (0,y)))), 1, 1, (0,0,255), 2, cv2.LINE_AA)
-            y += 4
-
-    #cv2window("test", image)
-    #cv2.waitKey(0)
-    #cv2.destroyAllWindows()
-    '''
-
     i = 1
     for match in s[:5]:
         image = cv2.imread(PATH + image_file)

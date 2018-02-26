@@ -51,7 +51,6 @@ class Edge():
                     (self.n1.label == other.n2.label and self.n2.label == other.n1.label)) and
                     (within_value(self.length, other.length) or
                      within_value(other.length, self.length)))
-                    
         else:
             return False
 

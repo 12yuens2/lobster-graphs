@@ -6,6 +6,34 @@ from common_graph import *
 #from common_cv import *
 
 
+class Model():
+    def __init__(self, labels):
+        self.labels = labels.copy()
+        self.current_nodes = []
+
+    def __repr__(self):
+        return str(self.labels) + "\n" + str(self.current_nodes)
+        
+    def check_nodes(self, nodes):
+        for kp,label in nodes:
+            if kp in [t[0] for t in self.current_nodes]:
+                return False
+            #elif label.name in self.labels and self.labels[label.name] <= 0:
+                # bug if count is 1 but two instances of that label in nodes
+                #return False
+        return True
+
+    def add_nodes(self, nodes):
+        self.current_nodes += nodes
+        for kp,label in nodes:
+            self.labels[label.name] -= 1
+
+    def add_if_valid(self, nodes):
+        if self.check_nodes(nodes):
+            self.add_nodes(nodes)
+
+ 
+
 class Label():
     def __init__(self, name, probability):
         self.name = name
@@ -14,6 +42,11 @@ class Label():
     def __repr__(self):
         return str(self.name) + ": " + str(self.probability)
 
+
+class Permutation():
+    def __init__(self, tuple, probability):
+        self.tuple = tuple
+        self.probability = probability
 
    
 def possible_node_labels(actual_size, label_distributions, label_threshold):
@@ -24,8 +57,9 @@ def possible_node_labels(actual_size, label_distributions, label_threshold):
         if within_value(label.size, actual_size):
             possible_labels.append(label.name)
     '''
-    for label,distribution in label_distributions.items():
-        probability = distribution.get_probability(actual_size)
+    for label,label_data in label_distributions.items():
+        probability = label_data.get_probability(actual_size)
+        print(label + ": " + str(probability))
         if probability > label_threshold:
             possible_labels.append(Label(label, probability))
     
@@ -47,10 +81,16 @@ def get_combinations(kps, label_distributions, label_threshold):
     return combinations
 
 def get_permutations(combinations, length):
-    permutations = list(itertools.permutations(combinations, length))
-
+    permutation_tuples = list(itertools.permutations(combinations, length))
+                 
     # Filter out permutations where both keypoints are the same
-    permutations = list(filter(lambda x: x[0][0] != x[1][0], permutations))
+    permutation_tuples = list(filter(lambda x: x[0][0] != x[1][0], permutation_tuples))
+
+    permutations = []
+    for pt in permutation_tuples:
+        probability = get_permutation_probability(pt)
+        permutations.append(Permutation(pt, probability))
+                 
     return permutations
 
 
