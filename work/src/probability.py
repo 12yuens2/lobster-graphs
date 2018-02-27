@@ -3,7 +3,7 @@ import os
 #import math
 import numpy as np
 import scipy.stats
-from common_graph import translate_graph
+from common_graph import translate_graph, graph_from_permutation
 
 
 class LabelData():
@@ -13,7 +13,8 @@ class LabelData():
         self.probability = probability
 
     def get_probability(self, value):
-        return self.distribution.pdf(value) * self.probability
+        p = self.distribution.pdf(value) * self.probability
+        return p
 
 def load_node_data(filepath):
     node_dict = {}
@@ -74,25 +75,36 @@ def get_node_distributions(filepath):
 
     return get_distribution(node_dict)
 
-    '''
-
-    total_length = sum([len(data) for key,data in node_dict.items()])
-    
-    for key,data in node_dict.items():
-        mean = np.mean(data)
-        std = np.std(data)
-        dis = scipy.stats.norm(mean, std)
-
-        node_dict[key] = LabelData(key, dis, len(data)/total_length)
-
-    return node_dict
-    '''
-
 def get_edge_distributions(filepath):
     edge_dict = load_edge_data(filepath)
 
     return get_distribution(edge_dict)
 
 
-def get_permutation_probability(permutation_tuple):
-    return 0
+def get_permutation_probability(node_distributions, edge_distributions, permutation_tuple):
+
+    total_probability = 0
+    
+    # Create triplet graph from permutation
+    triplet = graph_from_permutation(permutation_tuple)
+   
+    for kp,label in permutation_tuple:
+        #node_label_data = node_distributions[label.name]
+        total_probability += np.log(label.probability)
+
+    for edge in triplet.edges:
+        length = edge.length
+        edge.length = 0
+
+        if edge in edge_distributions:
+            edge_label_data = edge_distributions[edge]
+            edge_probability = edge_label_data.get_probability(length)
+
+            if edge_probability > 0:
+                total_probability += np.log(edge_probability)
+            else:
+                return 0
+        else:
+            return 0
+
+    return total_probability

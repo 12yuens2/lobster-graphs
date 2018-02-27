@@ -3,6 +3,7 @@ import subprocess
 import os
 import ast
 from common_graph import *
+from probability import get_permutation_probability
 #from common_cv import *
 
 
@@ -59,7 +60,6 @@ def possible_node_labels(actual_size, label_distributions, label_threshold):
     '''
     for label,label_data in label_distributions.items():
         probability = label_data.get_probability(actual_size)
-        print(label + ": " + str(probability))
         if probability > label_threshold:
             possible_labels.append(Label(label, probability))
     
@@ -86,12 +86,14 @@ def get_permutations(combinations, length):
     # Filter out permutations where both keypoints are the same
     permutation_tuples = list(filter(lambda x: x[0][0] != x[1][0], permutation_tuples))
 
+    '''
     permutations = []
     for pt in permutation_tuples:
         probability = get_permutation_probability(pt)
         permutations.append(Permutation(pt, probability))
+    '''
                  
-    return permutations
+    return permutation_tuples
 
 
 

@@ -9,12 +9,11 @@ from common_cv import get_image_kps, get_point_tuple, cv2window
 
 FNULL = open(os.devnull, "w")
 PATH = "imgs/dither/"
-LABEL_THRESHOLD = 0.0005
+LABEL_THRESHOLD = 0.00025
 
 node_distributions = get_node_distributions("graphs/complete/")
 
 edge_distributions = get_edge_distributions("graphs/complete/")
-
 
 # Remove old queries
 #print("Removing old queries...")
@@ -41,6 +40,8 @@ for image_file in os.listdir(PATH):
     print("Got " + str(len(kps)) + " keypoints.")
     print(str(len(permutations)) + " permutations of size " + str(permutation_size))
 
+
+    
     print("Writing graphs to file...")
     write_as_query(permutations, "../queries/query")
 
@@ -50,6 +51,9 @@ for image_file in os.listdir(PATH):
     good_matches = list(set(get_matches(permutations, "graphs/complete/")))
     print("Get " + str(len(good_matches)) + " matches")
 
+    for permutation in good_matches:
+        p = get_permutation_probability(node_distributions, edge_distributions, permutation)
+
 
     #1. Take 1 random match
     #2. Check against model and existing subgraph labels
@@ -57,6 +61,7 @@ for image_file in os.listdir(PATH):
     #4. Put all matches together as one graph and give probability as sum?product? of all matches
     #5. Do not have to worry about duplicate labels/keypoints because we can connect them all together rather than connect the exact matched subgraphs
 
+    '''
     models = []
     for i in range(10):
         current_model = Model(model.copy())
@@ -91,3 +96,4 @@ for image_file in os.listdir(PATH):
         cv2.imwrite("imgs/processed/" + image_file + str(i) + ".jpg", image)
         i += 1
     print("-------------------------------")
+    '''
