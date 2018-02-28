@@ -51,15 +51,33 @@ for image_file in os.listdir(PATH):
     good_matches = list(set(get_matches(permutations, "graphs/complete/")))
     print("Get " + str(len(good_matches)) + " matches")
 
-    for permutation in good_matches:
-        p = get_permutation_probability(node_distributions, edge_distributions, permutation)
-
 
     #1. Take 1 random match
     #2. Check against model and existing subgraph labels
     #3. Keep taking another random match until no more matches or model is filled, do not take match if label/keypoint already exists
     #4. Put all matches together as one graph and give probability as sum?product? of all matches
     #5. Do not have to worry about duplicate labels/keypoints because we can connect them all together rather than connect the exact matched subgraphs
+
+
+    kp_list = []
+    for kp in kps:
+        prob_list = []
+        for permutation in good_matches:
+            for x in permutation:
+                if kp in x:
+                    prob_list.append(permutation)
+
+        if len(prob_list) > 0:
+            s = sorted(prob_list, key=lambda kp_perm: get_permutation_probability(node_distributions, edge_distributions, kp_perm), reverse=True)
+
+            kp_list += s[:1]
+
+    
+
+    #s = sorted(good_matches, key=lambda permutation: get_permutation_probability(node_distributions, edge_distributions, permutation), reverse=True)
+
+    kp_list = sorted(kp_list, key=lambda permutation: get_permutation_probability(node_distributions, edge_distributions, permutation), reverse=True)
+
 
     '''
     models = []
@@ -68,24 +86,24 @@ for image_file in os.listdir(PATH):
 
         r = list(random.choice(good_matches))
         current_model.add_if_valid(r)
+    '''
 
+    current_model = Model(model.copy())
+    for triplet in kp_list:
+        current_model.add_if_valid(triplet)
 
-        for i in range(54):
-            r = list(random.choice(good_matches))
-            current_model.add_if_valid(r)
+    print(current_model.labels)
 
-        models.append(current_model)
+    '''
+
 
     
-    s = sorted(models, key=lambda model: sum([label.probability for kp,label in model.current_nodes]), reverse=True)
-
-
     #draw lines and labels
     image = cv2.imread(PATH + image_file)
-    i = 1
-    for match in s[:5]:
-        image = cv2.imread(PATH + image_file)
-        for n1,n2 in zip(match.current_nodes[:-1], match.current_nodes[1:]):
+    for triplet in kp_list:
+        print(triplet)
+        #print(get_permutation_probability(node_distributions, edge_distributions, triplet))
+        for n1,n2 in zip(list(triplet)[:-1], list(triplet)[1:]):
             image = cv2.drawKeypoints(image, [n1[0], n2[0]], image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
             cv2.line(image, get_point_tuple(n1[0]), get_point_tuple(n2[0]), (255,0,0), thickness=3)
@@ -93,7 +111,11 @@ for image_file in os.listdir(PATH):
             cv2.putText(image, str(n2[1]), get_point_tuple(n2[0]), 1, 1, (0,0,255), 2, cv2.LINE_AA)
     
 
-        cv2.imwrite("imgs/processed/" + image_file + str(i) + ".jpg", image)
-        i += 1
+        cv2.imwrite("imgs/processed/" + image_file, image)
+
+    image = cv2.imread(PATH + image_file)
+    cv2.drawKeypoints(image, kps, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    cv2.imwrite("imgs/keypoints/" + image_file, image)
+
     print("-------------------------------")
     '''
