@@ -20,6 +20,74 @@ edge_distributions = get_edge_distributions("graphs/complete/")
 #subprocess.run(["rm", "-f", "../queries/*"])
            
 
+
+# Brute force - get best triplet for each key point
+def bf_keypoints(kps, matches, node_dis, edge_dis):
+    kp_list = []
+    for kp in kps:
+        prob_list = []
+
+        # Get all permutations for each keypoint
+        for permutation in matches:
+            for x in permutation:
+                if kp in x:
+                    prob_list.append(permutation)
+
+        # Sort by probability and add best permutation to list
+        if len(prob_list) > 0:
+            s = sorted(prob_list, key=lambda kp_perm: get_permutation_probability(node_dis, edge_dis, kp_perm), reverse=True)
+
+            kp_list += s[:1]
+
+    return kp_list
+
+# Brute force - best triplet for each label in ideal model
+def bf_model(model, matches, node_dis, edge_dis):
+
+    # Get list of labels from model
+    labels = [label for label,count in model.items() for i in range(count)]
+
+    kp_list = []
+    for label in labels:
+        prob_list = []
+
+        # Get all permutations that contain the label
+        for permutation in matches:
+            for x in permutation:
+                print(x)
+                if label == x[1].name:
+                    prob_list.append(permutation)
+
+        # Get best permutation that contains label
+        if len(prob_list) > 0:
+            s = sorted(prob_list, key=lambda kp_perm: get_permutation_probability(node_dis, edge_dis, kp_perm), reverse=True)
+
+            kp_list += s[:1]
+
+    return kp_list
+
+
+def write_triplets(triplets, image_file, write_path):
+    image = cv2.imread(PATH + image_file)
+    
+    for triplet in triplets:
+        for n1,n2 in zip(list(triplet)[:-1], list(triplet)[1:]):
+            image = cv2.drawKeypoints(image, [n1[0], n2[0]], image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+            cv2.line(image, get_point_tuple(n1[0]), get_point_tuple(n2[0]), (255,0,0), thickness=3)
+            cv2.putText(image, str(n1[1]), get_point_tuple(n1[0]), 1, 1, (0,0,255), 2, cv2.LINE_AA)
+            cv2.putText(image, str(n2[1]), get_point_tuple(n2[0]), 1, 1, (0,0,255), 2, cv2.LINE_AA)
+
+    cv2.imwrite(write_path + image_file, image)
+
+
+def write_keypoints(image_file, kps):
+    image = cv2.imread(PATH + image_file)
+    cv2.drawKeypoints(image, kps, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    cv2.imwrite("imgs/keypoints/" + image_file, image)
+    
+
+
 # Model of lobster to match to
 model = {"body": 1,
          "head": 1,
@@ -40,7 +108,6 @@ for image_file in os.listdir(PATH):
     print("Got " + str(len(kps)) + " keypoints.")
     print(str(len(permutations)) + " permutations of size " + str(permutation_size))
 
-
     
     print("Writing graphs to file...")
     write_as_query(permutations, "../queries/query")
@@ -58,27 +125,6 @@ for image_file in os.listdir(PATH):
     #4. Put all matches together as one graph and give probability as sum?product? of all matches
     #5. Do not have to worry about duplicate labels/keypoints because we can connect them all together rather than connect the exact matched subgraphs
 
-
-    kp_list = []
-    for kp in kps:
-        prob_list = []
-        for permutation in good_matches:
-            for x in permutation:
-                if kp in x:
-                    prob_list.append(permutation)
-
-        if len(prob_list) > 0:
-            s = sorted(prob_list, key=lambda kp_perm: get_permutation_probability(node_distributions, edge_distributions, kp_perm), reverse=True)
-
-            kp_list += s[:1]
-
-    
-
-    #s = sorted(good_matches, key=lambda permutation: get_permutation_probability(node_distributions, edge_distributions, permutation), reverse=True)
-
-    kp_list = sorted(kp_list, key=lambda permutation: get_permutation_probability(node_distributions, edge_distributions, permutation), reverse=True)
-
-
     '''
     models = []
     for i in range(10):
@@ -88,34 +134,21 @@ for image_file in os.listdir(PATH):
         current_model.add_if_valid(r)
     '''
 
+    '''
     current_model = Model(model.copy())
     for triplet in kp_list:
         current_model.add_if_valid(triplet)
 
     print(current_model.labels)
-
     '''
 
 
-    
-    #draw lines and labels
-    image = cv2.imread(PATH + image_file)
-    for triplet in kp_list:
-        print(triplet)
-        #print(get_permutation_probability(node_distributions, edge_distributions, triplet))
-        for n1,n2 in zip(list(triplet)[:-1], list(triplet)[1:]):
-            image = cv2.drawKeypoints(image, [n1[0], n2[0]], image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-            cv2.line(image, get_point_tuple(n1[0]), get_point_tuple(n2[0]), (255,0,0), thickness=3)
-            cv2.putText(image, str(n1[1]), get_point_tuple(n1[0]), 1, 1, (0,0,255), 2, cv2.LINE_AA)
-            cv2.putText(image, str(n2[1]), get_point_tuple(n2[0]), 1, 1, (0,0,255), 2, cv2.LINE_AA)
+    best_kp = bf_keypoints(kps, good_matches, node_distributions, edge_distributions)
+    best_model = bf_model(model, good_matches, node_distributions, edge_distributions)
     
 
-        cv2.imwrite("imgs/processed/" + image_file, image)
+    write_triplets(best_kp, image_file, "imgs/kp-method/")
+    write_triplets(best_model, image_file, "imgs/model-method/")
+    write_keypoints(image_file, kps)
 
-    image = cv2.imread(PATH + image_file)
-    cv2.drawKeypoints(image, kps, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-    cv2.imwrite("imgs/keypoints/" + image_file, image)
-
-    print("-------------------------------")
-    '''
+    print("------------------------------")
