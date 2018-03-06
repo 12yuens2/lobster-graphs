@@ -13,13 +13,13 @@ LABEL_THRESHOLD = 0.00025
 
 node_distributions = get_node_distributions("graphs/complete/")
 
+
 edge_distributions = get_edge_distributions("graphs/complete/")
 
 # Remove old queries
 #print("Removing old queries...")
 #subprocess.run(["rm", "-f", "../queries/*"])
            
-
 
 # Brute force - get best triplet for each key point
 def bf_keypoints(kps, matches, node_dis, edge_dis):
@@ -85,8 +85,8 @@ def write_keypoints(image_file, kps):
     image = cv2.imread(PATH + image_file)
     cv2.drawKeypoints(image, kps, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     cv2.imwrite("imgs/keypoints/" + image_file, image)
-    
 
+    
 
 # Model of lobster to match to
 model = {"body": 1,

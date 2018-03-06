@@ -41,6 +41,7 @@ class Label():
         self.name = name
         self.probability = probability
 
+
     def __repr__(self):
         return str(self.name) + ": " + str(self.probability)
 
@@ -63,7 +64,6 @@ def possible_node_labels(actual_size, label_distributions, label_threshold):
         probability = label_data.get_probability(actual_size)
         if probability > label_threshold:
             possible_labels.append(Label(label, probability))
-    
 
     return possible_labels
 
