@@ -1,79 +1,154 @@
+import os
+import random
 import cv2
 import numpy as np
 
+from probability import *
 from common_matching import *
 from common_cv import get_image_kps, get_point_tuple, cv2window
 
-
 FNULL = open(os.devnull, "w")
-       
+PATH = "imgs/dither/"
+LABEL_THRESHOLD = 0.00025
 
-label_params = [
-    Label("body", 300, 800),
-    Label("arm", 100, 250),
-    Label("claw", 100, 150),
-    Label("head", 100, 200),
-    Label("tail", 150, 350),
-    Label("back", 200, 400)
-]
+node_distributions = get_node_distributions("graphs/complete/")
+
+
+edge_distributions = get_edge_distributions("graphs/complete/")
 
 # Remove old queries
-subprocess.run(["rm", "-f", "../queries/*"])
+#print("Removing old queries...")
+#subprocess.run(["rm", "-f", "../queries/*"])
+           
 
-kps = get_image_kps("imgs/dither/IMG_1380.JPG")
+# Brute force - get best triplet for each key point
+def bf_keypoints(kps, matches, node_dis, edge_dis):
+    kp_list = []
+    for kp in kps:
+        prob_list = []
 
-combinations = get_combinations(kps, label_params)
-permutations = get_permutations(combinations,3)
+        # Get all permutations for each keypoint
+        for permutation in matches:
+            for x in permutation:
+                if kp in x:
+                    prob_list.append(permutation)
+
+        # Sort by probability and add best permutation to list
+        if len(prob_list) > 0:
+            s = sorted(prob_list, key=lambda kp_perm: get_permutation_probability(node_dis, edge_dis, kp_perm), reverse=True)
+
+            kp_list += s[:1]
+
+    return kp_list
+
+# Brute force - best triplet for each label in ideal model
+def bf_model(model, matches, node_dis, edge_dis):
+
+    # Get list of labels from model
+    labels = [label for label,count in model.items() for i in range(count)]
+
+    kp_list = []
+    for label in labels:
+        prob_list = []
+
+        # Get all permutations that contain the label
+        for permutation in matches:
+            for x in permutation:
+                print(x)
+                if label == x[1].name:
+                    prob_list.append(permutation)
+
+        # Get best permutation that contains label
+        if len(prob_list) > 0:
+            s = sorted(prob_list, key=lambda kp_perm: get_permutation_probability(node_dis, edge_dis, kp_perm), reverse=True)
+
+            kp_list += s[:1]
+
+    return kp_list
 
 
-print("Got " + str(len(kps)) + " keypoints.")
-print(str(len(permutations)) + " permutations of size 3")
+def write_triplets(triplets, image_file, write_path):
+    image = cv2.imread(PATH + image_file)
+    
+    for triplet in triplets:
+        for n1,n2 in zip(list(triplet)[:-1], list(triplet)[1:]):
+            image = cv2.drawKeypoints(image, [n1[0], n2[0]], image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-print("Writing graphs to file...")
-write_as_query(permutations, "../queries/query")
+            cv2.line(image, get_point_tuple(n1[0]), get_point_tuple(n2[0]), (255,0,0), thickness=3)
+            cv2.putText(image, str(n1[1]), get_point_tuple(n1[0]), 1, 1, (0,0,255), 2, cv2.LINE_AA)
+            cv2.putText(image, str(n2[1]), get_point_tuple(n2[0]), 1, 1, (0,0,255), 2, cv2.LINE_AA)
+
+    cv2.imwrite(write_path + image_file, image)
 
 
-print("Start initial matching...")
-subprocess.run(["../ggsxe", "-f", "-gfu", "../new.gfu", "--dir", "../queries/"], stdout=FNULL)
-print("Finish initial matching...")
-
-
-'''
-good_permutations = []
-with open("matches", "r") as match_file:
-    current_id = -1
-    for line in match_file:
-        graph_id = int(line.split(":")[0])
-
-        if not graph_id == current_id:
-            good_permutations.append(permutations[graph_id])
-            current_id = graph_id
-'''
-
-print("get matches")
-good_matches = list(set(get_matches(permutations, "graphs/complete/")))
+def write_keypoints(image_file, kps):
+    image = cv2.imread(PATH + image_file)
+    cv2.drawKeypoints(image, kps, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    cv2.imwrite("imgs/keypoints/" + image_file, image)
 
     
-print(good_matches)
-print(str(len(good_matches)))
 
-print(type(good_matches[0]))
+# Model of lobster to match to
+model = {"body": 1,
+         "head": 1,
+         "claw": 2,
+         "arm": 2,
+         "back": 1,
+         "tail": 1}
 
-# draw lines and labels
-image = cv2.imread("imgs/dither/IMG_1380.JPG")
-y = 0
-for match in good_matches:
-    for t1,t2 in zip(list(match)[:-1], list(match)[1:]):
-        image = cv2.drawKeypoints(image, [t1[0], t2[0]], image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-        cv2.line(image, get_point_tuple(t1[0]), get_point_tuple(t2[0]), (255,0,0), thickness=3)
-        cv2.putText(image, str(t1[1]), tuple(map(sum, zip(get_point_tuple(t1[0]), (0,y)))), 1, 1, (0,0,255), 2, cv2.LINE_AA)
-        y += 4
-        cv2.putText(image, str(t2[1]), tuple(map(sum, zip(get_point_tuple(t2[0]), (0,y)))), 1, 1, (0,0,255), 2, cv2.LINE_AA)
-        print(str(t1) + " " + str(t2))
-        y += 4
+for image_file in os.listdir(PATH):
+    print("Start " + image_file)
+    kps = get_image_kps(PATH + image_file)
 
-cv2window("test", image)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    permutation_size = 3
+    combinations = get_combinations(kps, node_distributions, LABEL_THRESHOLD)
+    permutations = get_permutations(combinations, permutation_size)
 
-cv2.imwrite("test.kpg", image)
+
+    print("Got " + str(len(kps)) + " keypoints.")
+    print(str(len(permutations)) + " permutations of size " + str(permutation_size))
+
+    
+    print("Writing graphs to file...")
+    write_as_query(permutations, "../queries/query")
+
+    print("Start initial matching...")
+    subprocess.run(["../ggsxe", "-f", "-gfu", "../new.gfu", "--multi", "../queries/query.querygfu"], stdout=FNULL)
+
+    good_matches = list(set(get_matches(permutations, "graphs/complete/")))
+    print("Get " + str(len(good_matches)) + " matches")
+
+
+    #1. Take 1 random match
+    #2. Check against model and existing subgraph labels
+    #3. Keep taking another random match until no more matches or model is filled, do not take match if label/keypoint already exists
+    #4. Put all matches together as one graph and give probability as sum?product? of all matches
+    #5. Do not have to worry about duplicate labels/keypoints because we can connect them all together rather than connect the exact matched subgraphs
+
+    '''
+    models = []
+    for i in range(10):
+        current_model = Model(model.copy())
+
+        r = list(random.choice(good_matches))
+        current_model.add_if_valid(r)
+    '''
+
+    '''
+    current_model = Model(model.copy())
+    for triplet in kp_list:
+        current_model.add_if_valid(triplet)
+
+    print(current_model.labels)
+    '''
+
+
+    best_kp = bf_keypoints(kps, good_matches, node_distributions, edge_distributions)
+    best_model = bf_model(model, good_matches, node_distributions, edge_distributions)
+    
+
+    write_triplets(best_kp, image_file, "imgs/kp-method/")
+    write_triplets(best_model, image_file, "imgs/model-method/")
+    write_keypoints(image_file, kps)
+
+    print("------------------------------")

@@ -51,7 +51,6 @@ class Edge():
                     (self.n1.label == other.n2.label and self.n2.label == other.n1.label)) and
                     (within_value(self.length, other.length) or
                      within_value(other.length, self.length)))
-                    
         else:
             return False
 
@@ -108,8 +107,8 @@ class Graph():
 ### Useful functions ###
 
 def within_value(v1, v2):
-    """ Check if actual_value is within 20% of target value """
-    percentage = 0.2
+    """ Check if actual_value is within 10% of target value """
+    percentage = 0.1
     error_allowed = percentage * v1
     high = v1 + error_allowed
     low = v1 - error_allowed
@@ -121,14 +120,13 @@ def graph_from_permutation(permutation):
     """ Take permutation of n (keypoint, label) tuples and turn into a graph object """
     nodes = []
     for i in range(len(permutation)):
-        nodes.append(Node(i, permutation[i][1], permutation[i][0].size, kp=permutation[i][0]))
+        nodes.append(Node(i, permutation[i][1].name, permutation[i][0].size, kp=permutation[i][0]))
 
     edges = []
     for n1,n2 in zip(nodes[:-1], nodes[1:]):
         edges.append(Edge(n1, n2, common_cv.get_distance(n1.kp, n2.kp)))
 
     return Graph(nodes, edges, 0)
-
 
 
 def distance(pt1, pt2):

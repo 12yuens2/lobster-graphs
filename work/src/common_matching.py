@@ -3,38 +3,75 @@ import subprocess
 import os
 import ast
 from common_graph import *
+from probability import get_permutation_probability
 #from common_cv import *
 
 
-class Label():
-    def __init__(self, name, size_min, size_max):
-        self.name = name
-        self.size_min = size_min
-        self.size_max = size_max
+class Model():
+    def __init__(self, labels):
+        self.labels = labels.copy()
+        self.triplets = []
 
     def __repr__(self):
-        return str(self.name)
+        return str(self.labels) + "\n" + str(self.triplet)
+        
+    def check_nodes(self, nodes):
+        for kp,label in nodes:
+            if kp in [t[0] for t in self.triplets]:
+                return False
+            #elif label.name in self.labels and self.labels[label.name] <= 0:
+                # bug if count is 1 but two instances of that label in nodes
+                #return False
+        return True
+
+    def add_nodes(self, nodes):
+        self.triplets += nodes
+
+        for kp,label in nodes:
+            self.labels[label.name] -= 1
+
+    def add_if_valid(self, nodes):
+        if self.check_nodes(nodes):
+            self.add_nodes(nodes)
+
+ 
+
+class Label():
+    def __init__(self, name, probability):
+        self.name = name
+        self.probability = probability
 
 
-    def in_range(self, value):
-        return self.size_min <= value <= self.size_max
+    def __repr__(self):
+        return str(self.name) + ": " + str(self.probability)
 
 
-def possible_node_labels(actual_size, labels):
+class Permutation():
+    def __init__(self, tuple, probability):
+        self.tuple = tuple
+        self.probability = probability
+
+   
+def possible_node_labels(actual_size, label_distributions, label_threshold):
     possible_labels = []
-    for label in labels:
-        label_name = label.name
-        #target_size = label.size
-        if label.in_range(actual_size):
-            possible_labels.append(label_name)
+
+    '''
+    for label in label_distributions:
+        if within_value(label.size, actual_size):
+            possible_labels.append(label.name)
+    '''
+    for label,label_data in label_distributions.items():
+        probability = label_data.get_probability(actual_size)
+        if probability > label_threshold:
+            possible_labels.append(Label(label, probability))
 
     return possible_labels
 
 
-def get_combinations(kps, label_params):
+def get_combinations(kps, label_distributions, label_threshold):
     kp_labels = []
     for kp in kps:
-        labels = possible_node_labels(kp.size, label_params)
+        labels = possible_node_labels(kp.size, label_distributions, label_threshold)
         if len(labels) > 0:
             kp_labels.append((kp,labels))
 
@@ -45,18 +82,26 @@ def get_combinations(kps, label_params):
     return combinations
 
 def get_permutations(combinations, length):
-    permutations = list(itertools.permutations(combinations, length))
-
+    permutation_tuples = list(itertools.permutations(combinations, length))
+                 
     # Filter out permutations where both keypoints are the same
-    permutations = list(filter(lambda x: x[0][0] != x[1][0], permutations))
-    return permutations
+    permutation_tuples = list(filter(lambda x: x[0][0] != x[1][0], permutation_tuples))
+
+    '''
+    permutations = []
+    for pt in permutation_tuples:
+        probability = get_permutation_probability(pt)
+        permutations.append(Permutation(pt, probability))
+    '''
+                 
+    return permutation_tuples
 
 
 
 def write_as_query(permutations, filepath):
+    f = open(filepath + ".querygfu", "w")
     for i in range(len(permutations)):
         permutation = permutations[i]
-        f = open(filepath + str(i).zfill(4) + ".querygfu", "w")
 
         # Graph header
         f.write("#graph" + str(i) + "\n")
@@ -64,12 +109,12 @@ def write_as_query(permutations, filepath):
         f.write(str(len(permutation)) + "\n")
 
         for node in permutation:
-            label = node[1]
+            label = node[1].name
             f.write(str(label) + "\n")
 
         f.write("2\n0 1\n1 2\n")
         f.flush()
-        f.close()
+    f.close()
 
 
 def node_matches(query_graph, db_graph, matches):
@@ -92,7 +137,7 @@ def edge_matches(query_graph, db_graph, matches):
 
         if query_edge != target_edge:
             return False
-        
+
     return True
 
         
@@ -108,6 +153,7 @@ def get_matches(permutations, db_path):
 
             query_graph = graph_from_permutation(permutations[query_id])
             db_graph = get_db_graph(db_id, db_path)
+
 
             #if node_matches(query_graph, db_graph, matches):
                 #good_matches.append(matches)
