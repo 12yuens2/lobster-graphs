@@ -1,6 +1,6 @@
 #import itertools
 import math
-import common_cv
+import common.cv as cc
 
 # Type imports
 from typing import Dict, List, Tuple, Any, Optional
@@ -28,7 +28,7 @@ def graph_from_permutation(permutation: Tuple[KeyLabel,...]) -> Graph:
 
     edges = []
     for n1,n2 in zip(nodes[:-1], nodes[1:]):
-        edges.append(Edge(n1, n2, common_cv.get_distance(n1.kp, n2.kp)))
+        edges.append(Edge(n1, n2, cc.get_distance(n1.kp, n2.kp)))
 
     return Graph(nodes, edges, 0)
 

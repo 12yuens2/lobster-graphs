@@ -7,7 +7,7 @@ class Node():
                  label: str,
                  size: int,
                  kp: KeyPoint=None,
-                 pos: Tuple[float, float]=None) -> None: #probability):
+                 pos: Tuple[float, float]=None) -> None:
 
         self.node_id: int = int(node_id)
         self.label: str = label

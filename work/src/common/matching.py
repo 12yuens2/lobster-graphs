@@ -3,8 +3,8 @@ import subprocess
 import os
 import ast
 
-import common_graph as cg
-import common_probability as cp
+import common.graph as cg
+import common.probability as cp
 
 
 # Type imports

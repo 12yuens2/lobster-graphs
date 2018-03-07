@@ -1,4 +1,5 @@
-import common_graph as cg
+#import common.graph as cg
+from common import graph as cg
 
 from .node import Node
 

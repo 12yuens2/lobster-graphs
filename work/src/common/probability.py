@@ -3,26 +3,15 @@ import os
 #import math
 import numpy as np
 import scipy.stats
-from common_graph import translate_graph, graph_from_permutation
 
+from common.graph import translate_graph, graph_from_permutation
 
-from typing import TypeVar, Union, Generic
 
 # Type imports
 from typing import Dict, List
-from common_graph import Node, Edge
+from classes.graphs import Node, Edge
+from classes.matching import DictKey, LabelData
 
-DictKey = TypeVar('DictKey', str, Edge)
-
-class LabelData(Generic[DictKey]):
-    def __init__(self, label: DictKey, distribution, probability: float) -> None:
-        self.label: DictKey = label
-        self.distribution = distribution
-        self.probability: float = probability
-
-    def get_probability(self, value):
-        p = self.distribution.pdf(value) * self.probability
-        return p
 
 def load_node_data(filepath: str) -> Dict[str, List[int]]:
     node_dict: Dict[str, List[int]] = {}

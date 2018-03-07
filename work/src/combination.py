@@ -4,10 +4,10 @@ import subprocess
 import cv2
 import numpy as np
 
-import common_probability as cp
-import common_matching as cm
-import common_cv as cc
-import common_write as cw
+import common.probability as cp
+import common.matching as cm
+import common.cv as cc
+import common.write as cw
 
 '''
 from probability import *

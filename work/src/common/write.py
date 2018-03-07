@@ -1,6 +1,6 @@
 import cv2
 
-from common_cv import get_point_tuple
+from common.cv import get_point_tuple
 
 
 # Type imports
