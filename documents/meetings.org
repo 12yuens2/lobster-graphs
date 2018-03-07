@@ -1,5 +1,4 @@
 * Semester 1
-
 ** Week 3
 *** 06/10/17
 **** Look at edit distance based metric
@@ -61,7 +60,6 @@
 - create the larger graph from subgraphs that are already matched and labelled
 - more reliable to detect subgraph rather than entire lobster at once
 
-
 ** Week 5
 
 *** 27/10/17
@@ -99,7 +97,7 @@ next week - define cost fucntion
 2. see subgraph matching in graphgrep or nauty -> gives list of matched subgraphs -> cost function
 
 ** Week 6
-
+   
 *** 03/11/17
 
 **** Matching with errors
@@ -121,7 +119,6 @@ Go back after getting subgraph to get graph properties like edge length and angl
 
 With list of matched and labelled subgraphs -> building together into whole lobster.
 
-
 ** Week 7
 
 *** 10/11/17
@@ -135,7 +132,6 @@ With list of matched and labelled subgraphs -> building together into whole lobs
   - Is the configuration with the best score the assignment we expect?
 
 - Check how changing assignment probabilities change affect of matching with distance
-
 
 
 ** Week 9
@@ -194,8 +190,6 @@ Recognising and detecting:
 - visual similarity check on keypoints
 - probabilities after initial filtering
 
-
-
 ** Week 3
 - Look into compare against previous work for carapace length
 - Especially for images that didn't work before
@@ -241,4 +235,24 @@ func match_edges()
 
     return true
 #+END_SRC
+
+** Week 4
+- Probabilty of triplet by product of node probability and product of edge probability
+- Edge probability from normal distribution
+
+- For all triplets that contain the keypoint, which triplet is the strongest
+- Then sum once for each node
+- Edges are the connection of the strong triplet
+
+** Week 6
+- Larger annotated set
+- Body-tail classification 
+- script threshold parameter against existing dataset
+- Include edges in model method
+- Contrast with previous work to highlight what was done
+
+*** TODO Use edges in model method
+*** TODO Check body-tail classification rate
+*** TODO Script to analyse/get threshold parameters
+
 
