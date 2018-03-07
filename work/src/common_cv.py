@@ -158,7 +158,7 @@ def get_image_kps(image_file, hist_method=cv2.HISTCMP_CORREL):
     # Get all keypoints and their difference
     kps_diff = filter_keypoints_histogram(image, hist, kps, method=hist_method)
 
-    return [kp for kp,diff in kps_diff]
+    return remove_duplicates([kp for kp,diff in kps_diff])
 
 
 
@@ -182,9 +182,9 @@ def write_image(image, filename):
     cv2.imwrite(filename, image)
 
 
-def write_to_gdf(kps, filename):
+def write_to_gdf(kps, filename, filepath):
     """ Write kps to gdf file """
-    f = open("graphs/" + filename, "w")
+    f = open(filepath + filename, "w")
 
     # Node header definition
     f.write("nodedef> name VARCHAR,label VARCHAR,width DOUBLE,height DOUBLE,x DOUBLE,y DOUBLE,color VARCHAR\n")
@@ -194,13 +194,13 @@ def write_to_gdf(kps, filename):
     px,py = (0,0)
     for kp in kps:
         (x,y) = get_point_tuple(kp)
-        radius = kp.size/2
+        #radius = kp.size/2
 
         # Do not write duplicate keypoints
         if not (x,y) == (px,py):
             f.write(str(i)+",\"\"," +
-                    str(radius)+"," +
-                    str(radius)+"," +
+                    str(kp.size)+"," +
+                    str(kp.size)+"," +
                     str(x) + "," + str(y) +
                     ",'153,153,153'\n")
             i += 1

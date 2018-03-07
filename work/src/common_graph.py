@@ -12,7 +12,8 @@ class Node():
         #self.probability = probability
 
     def __repr__(self):
-        return str(self.node_id)
+        #return str(self.node_id)
+        return str(self.label) + ": " + str(self.size)
         #return str(self.node_id) + ": (" + str(self.label) + ", " + str(self.probability) + ")"
 
     def __eq__(self, other):
@@ -39,17 +40,17 @@ class Edge():
         #ratio
 
     def __repr__(self):
-        return str(self.n1.node_id) + " " + str(self.n2.node_id)
+        return str(self.n1.label) + " " + str(self.n2.label) + ": " + str(self.length)
+        #return str(int(self.n1.node_id) - 1) + " " + str(int(self.n2.node_id) - 1)
         #return str(self.n1) + "--" + str(self.n2) + ", " + str(self.length)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             # Both node labels are the same and length is similar values
-            return (((self.n1 == other.n1 and self.n2 == other.n2) or
-                    (self.n1 == other.n2 and self.n2 == other.n2)) and
+            return (((self.n1.label == other.n1.label and self.n2.label == other.n2.label) or
+                    (self.n1.label == other.n2.label and self.n2.label == other.n1.label)) and
                     (within_value(self.length, other.length) or
                      within_value(other.length, self.length)))
-                    
         else:
             return False
 
@@ -77,6 +78,12 @@ class Graph():
             if node.node_id == node_id:
                 return node
 
+    def get_edge(self, id1, id2):
+        for edge in self.edges:
+            if ((id1 == edge.n1.node_id and id2 == edge.n2.node_id) or
+                (id1 == edge.n2.node_id and id2 == edge.n1.node_id)):
+               return edge
+
     def write_to(self, file, id):
         """ Write graph for graphgrep query format """
         file.write("#graph" + str(id) + "\n")
@@ -100,8 +107,8 @@ class Graph():
 ### Useful functions ###
 
 def within_value(v1, v2):
-    """ Check if actual_value is within 20% of target value """
-    percentage = 0.2
+    """ Check if actual_value is within 10% of target value """
+    percentage = 0.1
     error_allowed = percentage * v1
     high = v1 + error_allowed
     low = v1 - error_allowed
@@ -113,14 +120,13 @@ def graph_from_permutation(permutation):
     """ Take permutation of n (keypoint, label) tuples and turn into a graph object """
     nodes = []
     for i in range(len(permutation)):
-        nodes.append(Node(i, permutation[i][1], permutation[i][0].size, kp=permutation[i][0]))
+        nodes.append(Node(i, permutation[i][1].name, permutation[i][0].size, kp=permutation[i][0]))
 
     edges = []
     for n1,n2 in zip(nodes[:-1], nodes[1:]):
         edges.append(Edge(n1, n2, common_cv.get_distance(n1.kp, n2.kp)))
 
     return Graph(nodes, edges, 0)
-
 
 
 def distance(pt1, pt2):
@@ -183,14 +189,13 @@ def graph_to_gdf(graph, filename):
     #kps = [node.kp for node in graph.nodes]
     for node in graph.nodes:
         (x,y) = node.pos
-        radius = node.size/2
 
         # Do not write duplicate keypoints
         if not (x,y) == (px,py):
             f.write(str(i)+"," +
                     "\"" + str(node.label) + "\"," + 
-                    str(radius)+"," +
-                    str(radius)+"," +
+                    str(node.size)+"," +
+                    str(node.size)+"," +
                     str(x) + "," + str(y) +
                     ",'153,153,153'\n")
             i += 1

@@ -1,0 +1,122 @@
+#graph0
+8
+claw
+arm
+head
+arm
+body
+arm
+back
+tail
+7
+0 1
+1 3
+3 4
+2 4
+4 5
+4 6
+6 7
+#graph1
+9
+arm
+arm
+claw
+body
+body
+back
+head
+claw
+arm
+8
+2 0
+0 1
+7 8
+8 3
+6 3
+1 3
+3 5
+5 4
+#graph2
+7
+arm
+claw
+claw
+head
+arm
+body
+back
+6
+1 0
+0 5
+3 5
+2 4
+4 5
+5 6
+#graph3
+5
+arm
+tail
+arm
+body
+arm
+4
+2 0
+0 3
+4 3
+3 1
+#graph4
+6
+claw
+arm
+head
+claw
+body
+arm
+5
+0 1
+1 4
+2 4
+3 5
+5 4
+#graph5
+7
+arm
+claw
+head
+body
+arm
+back
+tail
+6
+0 3
+2 3
+1 4
+4 3
+3 5
+5 6
+#graph6
+5
+arm
+head
+body
+arm
+tail
+4
+3 2
+0 2
+1 2
+2 4
+#graph7
+6
+arm
+claw
+body
+back
+claw
+arm
+5
+1 0
+0 2
+4 5
+5 2
+2 3

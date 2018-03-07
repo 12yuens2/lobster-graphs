@@ -17,14 +17,14 @@ for image_file in os.listdir(images_path):
     image = drawKeypoints(filename, kps)
     
     print("Write to gdf")
-    write_to_gdf(kps, str(image_file) + ".gdf")
+    write_to_gdf(kps, str(image_file) + ".gdf", "graphs/")
 
     print("Write image with keypoints")
     annotated_image = image.copy()
     for i in range(len(kps)):
         kp = kps[i]
         pos = get_point_tuple(kp)
-        cv2.putText(annotated_image, str(i) + ": " + str(int(kp.size)), pos, 1, 1, (0,0,255), 2, cv2.LINE_AA)
+        cv2.putText(annotated_image, str(i+1) + ": " + str(int(kp.size)), pos, 1, 1, (0,0,255), 2, cv2.LINE_AA)
         
     write_image(annotated_image, "imgs/keypoints/" + str(image_file))
 
