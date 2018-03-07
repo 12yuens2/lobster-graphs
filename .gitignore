@@ -1,5 +1,16 @@
 *.o
 appagata/build/*
+work/queries/*
 *.*~
 *.*#
 .DS_STORE
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.run.xml
+*.toc
+*.pyc
