@@ -2,57 +2,17 @@ import itertools
 import subprocess
 import os
 import ast
-from common_graph import *
-from probability import get_permutation_probability
-#from common_cv import *
 
+import common_graph as cg
+import common_probability as cp
 
 
 # Type imports
 from typing import Dict, List, Any, Tuple
 from cv2 import KeyPoint
-from probability import LabelData
+from classes.matching import Label, LabelData, KeyLabel
+from classes.graphs import Graph, Edge
 
-
-
-
-class Model():
-    def __init__(self, labels):
-        self.labels = labels.copy()
-        self.triplets = []
-
-    def __repr__(self):
-        return str(self.labels) + "\n" + str(self.triplet)
-        
-    def check_nodes(self, nodes):
-        for kp,label in nodes:
-            if kp in [t[0] for t in self.triplets]:
-                return False
-            #elif label.name in self.labels and self.labels[label.name] <= 0:
-                # bug if count is 1 but two instances of that label in nodes
-                #return False
-        return True
-
-    def add_nodes(self, nodes):
-        self.triplets += nodes
-
-        for kp,label in nodes:
-            self.labels[label.name] -= 1
-
-    def add_if_valid(self, nodes):
-        if self.check_nodes(nodes):
-            self.add_nodes(nodes)
-
- 
-
-class Label():
-    def __init__(self, name: str, probability: float) -> None:
-        self.name: str = name
-        self.probability: float = probability
-
-
-    def __repr__(self):
-        return str(self.name) + ": " + str(self.probability)
 
 
 '''
@@ -63,13 +23,13 @@ class Node():
         self.label = label
 '''
     
-KeyLabel = Tuple[KeyPoint, Label]
 
+'''
 class Permutation():
-    def __init__(self, tuple, probability):
-        self.tuple = tuple
-        self.probability = probability
-
+    def __init__(self, tuple: KeyLabel, probability: float) -> None:
+        self.tuple: KeyLabel = tuple
+        self.probability: float = probability
+'''
    
 def possible_node_labels(actual_size: float,
                          label_distributions: Dict[str, LabelData],
@@ -113,27 +73,6 @@ def get_permutations(combinations: List[KeyLabel],
 
 
 
-def write_as_query(permutations: List[Tuple[KeyLabel, ...]],
-                   permutation_size: int,
-                   filepath: str) -> None:
-
-    f = open(filepath + ".querygfu", "w")
-    for i in range(len(permutations)):
-        permutation = permutations[i]
-
-        # Graph header
-        f.write("#graph" + str(i) + "\n")
-
-        f.write(str(permutation_size) + "\n")
-
-        for node in permutation:
-            label = node[1].name
-            f.write(str(label) + "\n")
-
-        f.write("2\n0 1\n1 2\n")
-        f.flush()
-    f.close()
-
 
 '''
 def node_matches(query_graph, db_graph, matches):
@@ -147,11 +86,13 @@ def node_matches(query_graph, db_graph, matches):
     return True
 '''
 
-def edge_matches(query_graph, db_graph, matches):
-    print(type(matches))
+def edge_matches(query_graph: Graph,
+                 db_graph: Graph,
+                 matches: List[Tuple[int, int]]) -> bool:
+
     for t1,t2 in zip(matches[:-1], matches[1:]):
-        query_edge = query_graph.get_edge(t1[0], t2[0])
-        target_edge = db_graph.get_edge(t1[1], t2[1])
+        query_edge: Edge = query_graph.get_edge(t1[0], t2[0])
+        target_edge: Edge = db_graph.get_edge(t1[1], t2[1])
 
         if query_edge != target_edge:
             return False
@@ -159,7 +100,8 @@ def edge_matches(query_graph, db_graph, matches):
     return True
 
         
-def get_matches(permutations, db_path):
+def get_matches(permutations: List[Tuple[KeyLabel, ...]],
+                db_path: str) -> List[Tuple[KeyLabel, ...]]:
     good_matches = []
     with open("matches", "r") as match_file:
         for line in match_file:
@@ -169,7 +111,7 @@ def get_matches(permutations, db_path):
 
             matches = list(ast.literal_eval(data[2][1:-1]))
 
-            query_graph = graph_from_permutation(permutations[query_id])
+            query_graph = cg.graph_from_permutation(permutations[query_id])
             db_graph = get_db_graph(db_id, db_path)
 
             if edge_matches(query_graph, db_graph, matches):
@@ -178,14 +120,14 @@ def get_matches(permutations, db_path):
 
     return good_matches
             
-def get_db_graph(graph_id, graphs_path):
+def get_db_graph(graph_id: int, graphs_path: str) -> Graph:
     with open(graphs_path+str(graph_id)+".gdf") as graph_file:
         lines = graph_file.read().splitlines()[1:]
-        db_graph = translate_graph(lines)
+        db_graph = cg.translate_graph(lines)
 
         # Offset node ids due to graph format translation issues
         for node in db_graph.nodes:
             node.node_id -= 1
         
         return db_graph
- 
+

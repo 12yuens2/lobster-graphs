@@ -1,110 +1,14 @@
-import itertools
+#import itertools
 import math
 import common_cv
 
-class Node():
-    def __init__(self, node_id, label, size, kp=None, pos=None): #probability):
-        self.node_id = int(node_id)
-        self.label = label
-        self.size = size
-        self.kp = kp
-        self.pos = pos
-        #self.probability = probability
+# Type imports
+from typing import Dict, List, Tuple, Any, Optional
+from cv2 import KeyPoint
 
-    def __repr__(self):
-        #return str(self.node_id)
-        return str(self.label) + ": " + str(self.size)
-        #return str(self.node_id) + ": (" + str(self.label) + ", " + str(self.probability) + ")"
+from classes.graphs import Graph, Edge, Node
+from classes.matching import KeyLabel
 
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return (self.label == other.label and
-                    (within_value(self.size, other.size) or
-                     within_value(other.size, self.size)))
-        else:
-            return False
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-
-    def __hash__(self):
-        return self.label.__hash__()
-
-
-class Edge():
-    def __init__(self, node1, node2, length):
-        self.n1 = node1
-        self.n2 = node2
-        self.length = length
-        #ratio
-
-    def __repr__(self):
-        return str(self.n1.label) + " " + str(self.n2.label) + ": " + str(self.length)
-        #return str(int(self.n1.node_id) - 1) + " " + str(int(self.n2.node_id) - 1)
-        #return str(self.n1) + "--" + str(self.n2) + ", " + str(self.length)
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            # Both node labels are the same and length is similar values
-            return (((self.n1.label == other.n1.label and self.n2.label == other.n2.label) or
-                    (self.n1.label == other.n2.label and self.n2.label == other.n1.label)) and
-                    (within_value(self.length, other.length) or
-                     within_value(other.length, self.length)))
-        else:
-            return False
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-
-    def __hash__(self):
-        return self.n1.__hash__() + self.n2.__hash__()
-
-        
-class Graph():
-    def __init__(self, nodes, edges, probability_assignment):
-        self.nodes = nodes
-        self.edges = edges
-
-        self.prob_a = probability_assignment
-
-    def __repr__(self):
-        return str(self.nodes) + " | " + str(self.edges) + " : " + str(self.prob_a)
-
-
-    def get_node(self, node_id):
-        for node in self.nodes:
-            if node.node_id == node_id:
-                return node
-
-    def get_edge(self, id1, id2):
-        for edge in self.edges:
-            if ((id1 == edge.n1.node_id and id2 == edge.n2.node_id) or
-                (id1 == edge.n2.node_id and id2 == edge.n1.node_id)):
-               return edge
-
-    def write_to(self, file, id):
-        """ Write graph for graphgrep query format """
-        file.write("#graph" + str(id) + "\n")
-
-        file.write(str(len(self.nodes)) + "\n")
-        for node in self.nodes:
-            file.write(node.label + "\n")
-
-        file.write(str(len(self.edges)) + "\n")
-        for edge in self.edges:
-            file.write(str(edge) + "\n")
-
-
-    def export(self, filename, id):
-        f = open(filename, "w")
-        self.write_to(f, id)
-        f.close()
-
-
-
-### Useful functions ###
 
 def within_value(v1, v2):
     """ Check if actual_value is within 10% of target value """
@@ -116,7 +20,7 @@ def within_value(v1, v2):
     return low <= v2 <= high
 
 
-def graph_from_permutation(permutation):
+def graph_from_permutation(permutation: Tuple[KeyLabel,...]) -> Graph:
     """ Take permutation of n (keypoint, label) tuples and turn into a graph object """
     nodes = []
     for i in range(len(permutation)):
@@ -132,7 +36,7 @@ def graph_from_permutation(permutation):
 def distance(pt1, pt2):
     return math.hypot(pt2[0] - pt1[0], pt2[1] - pt1[1])
 
-def translate_graph(lines):
+def translate_graph(lines: List[str]) -> Graph:
     """ Translate graph from gdf to graphgrep query format """
     nodes = []
     edges = []
@@ -153,11 +57,11 @@ def translate_graph(lines):
                 first_value = int(a[0])
 
             # Create node with Node(id, label, size)
-            n = Node(a[0], str(a[1]).replace("\"", ""), float(a[2]), pos=(float(a[4]),float(a[5])))
+            n = Node(int(a[0]), str(a[1]).replace("\"", ""), int(float(a[2])), pos=(float(a[4]),float(a[5])))
 
             if (a[1] == ""):
                 print("Node " + a[0] + " missing label.")
-                sys.exit()
+                exit()
             nodes.append(n)
         else:
             n1 = None
@@ -176,7 +80,7 @@ def translate_graph(lines):
 
     return Graph(nodes, edges, 1)
 
-def graph_to_gdf(graph, filename):
+def graph_to_gdf(graph: Graph, filename: str) -> None:
     """ Write internal graph to gdf file, requires graph nodes have keypoints """
     f = open(filename, "w")
 
@@ -185,7 +89,7 @@ def graph_to_gdf(graph, filename):
 
     # Write nodes
     i = 1
-    px,py = (0,0)
+    px,py = (0.0,0.0)
     #kps = [node.kp for node in graph.nodes]
     for node in graph.nodes:
         (x,y) = node.pos

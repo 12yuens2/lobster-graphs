@@ -1,20 +1,27 @@
 import os
-import random
+#import random
+import subprocess
 import cv2
 import numpy as np
 
+import common_probability as cp
+import common_matching as cm
+import common_cv as cc
+import common_write as cw
+
+'''
 from probability import *
 from common_matching import *
 from common_cv import get_image_kps, get_point_tuple, cv2window
+'''
 
 FNULL = open(os.devnull, "w")
-PATH = "imgs/dither/"
 LABEL_THRESHOLD = 0.00025
 
-node_distributions = get_node_distributions("graphs/complete/")
+node_distributions = cp.get_node_distributions("graphs/complete/")
 
 
-edge_distributions = get_edge_distributions("graphs/complete/")
+edge_distributions = cp.get_edge_distributions("graphs/complete/")
 
 # Remove old queries
 #print("Removing old queries...")
@@ -35,7 +42,7 @@ def bf_keypoints(kps, matches, node_dis, edge_dis):
 
         # Sort by probability and add best permutation to list
         if len(prob_list) > 0:
-            s = sorted(prob_list, key=lambda kp_perm: get_permutation_probability(node_dis, edge_dis, kp_perm), reverse=True)
+            s = sorted(prob_list, key=lambda kp_perm: cp.get_permutation_probability(node_dis, edge_dis, kp_perm), reverse=True)
 
             kp_list += s[:1]
 
@@ -62,7 +69,7 @@ def bf_model(model, matches, node_dis, edge_dis):
 
         # Get best permutation that contains label
         if len(prob_list) > 0:
-            s = sorted(prob_list, key=lambda kp_perm: get_permutation_probability(node_dis, edge_dis, kp_perm), reverse=True)
+            s = sorted(prob_list, key=lambda kp_perm: cp.get_permutation_probability(node_dis, edge_dis, kp_perm), reverse=True)
 
             #for p in kp_list:
                 
@@ -70,26 +77,6 @@ def bf_model(model, matches, node_dis, edge_dis):
             kp_list += s[:1]
 
     return kp_list
-
-
-def write_triplets(triplets, image_file, write_path):
-    image = cv2.imread(PATH + image_file)
-    
-    for triplet in triplets:
-        for n1,n2 in zip(list(triplet)[:-1], list(triplet)[1:]):
-            image = cv2.drawKeypoints(image, [n1[0], n2[0]], image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-            cv2.line(image, get_point_tuple(n1[0]), get_point_tuple(n2[0]), (255,0,0), thickness=3)
-            cv2.putText(image, str(n1[1]), get_point_tuple(n1[0]), 1, 1, (0,0,255), 2, cv2.LINE_AA)
-            cv2.putText(image, str(n2[1]), get_point_tuple(n2[0]), 1, 1, (0,0,255), 2, cv2.LINE_AA)
-
-    cv2.imwrite(write_path + image_file, image)
-
-
-def write_keypoints(image_file, kps):
-    image = cv2.imread(PATH + image_file)
-    cv2.drawKeypoints(image, kps, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-    cv2.imwrite("imgs/keypoints/" + image_file, image)
 
     
 
@@ -101,13 +88,13 @@ model = {"body": 1,
          "back": 1,
          "tail": 1}
 
-for image_file in os.listdir(PATH):
+for image_file in os.listdir(cw.PATH):
     print("Start " + image_file)
-    kps = get_image_kps(PATH + image_file)
+    kps = cc.get_image_kps(cw.PATH + image_file)
 
     permutation_size = 3
-    combinations = get_combinations(kps, node_distributions, LABEL_THRESHOLD)
-    permutations = get_permutations(combinations, permutation_size)
+    combinations = cm.get_combinations(kps, node_distributions, LABEL_THRESHOLD)
+    permutations = cm.get_permutations(combinations, permutation_size)
 
 
     print("Got " + str(len(kps)) + " keypoints.")
@@ -117,12 +104,12 @@ for image_file in os.listdir(PATH):
 
     
     print("Writing graphs to file...")
-    write_as_query(permutations, permutation_size, "../queries/query")
+    cw.permutations_as_query(permutations, permutation_size, "../queries/query")
 
     print("Start initial matching...")
     subprocess.run(["../ggsxe", "-f", "-gfu", "../new.gfu", "--multi", "../queries/query.querygfu"], stdout=FNULL)
 
-    good_matches = list(set(get_matches(permutations, "graphs/complete/")))
+    good_matches = list(set(cm.get_matches(permutations, "graphs/complete/")))
     print("Get " + str(len(good_matches)) + " matches")
 
 
@@ -130,7 +117,7 @@ for image_file in os.listdir(PATH):
     
     for permutation_tuple in good_matches:
         kp, label = permutation_tuple[0]
-        probability = get_permutation_probability(node_distributions, edge_distributions, permutation_tuple)
+        probability = cp.get_permutation_probability(node_distributions, edge_distributions, permutation_tuple)
         
     print(good_matches[0])
 
@@ -162,8 +149,8 @@ for image_file in os.listdir(PATH):
     best_model = bf_model(model, good_matches, node_distributions, edge_distributions)
     
 
-    write_triplets(best_kp, image_file, "imgs/kp-method/")
-    write_triplets(best_model, image_file, "imgs/model-method/")
-    write_keypoints(image_file, kps)
+    cw.write_triplets(best_kp, image_file, "imgs/kp-method/")
+    cw.write_triplets(best_model, image_file, "imgs/model-method/")
+    cw.write_keypoints(image_file, kps)
 
     print("------------------------------")

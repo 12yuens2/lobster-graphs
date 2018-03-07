@@ -162,8 +162,6 @@ def get_image_kps(image_file, hist_method=cv2.HISTCMP_CORREL):
 
 
 
-
-
 ### Misc functions ###
 
 def cv2window(window_name, image):
@@ -177,36 +175,4 @@ def drawKeypoints(image_file, keypoints):
     image = cv2.imread(image_file)
     return cv2.drawKeypoints(image, keypoints, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-
-def write_image(image, filename):
-    cv2.imwrite(filename, image)
-
-
-def write_to_gdf(kps, filename, filepath):
-    """ Write kps to gdf file """
-    f = open(filepath + filename, "w")
-
-    # Node header definition
-    f.write("nodedef> name VARCHAR,label VARCHAR,width DOUBLE,height DOUBLE,x DOUBLE,y DOUBLE,color VARCHAR\n")
-
-    # Write nodes
-    i = 1
-    px,py = (0,0)
-    for kp in kps:
-        (x,y) = get_point_tuple(kp)
-        #radius = kp.size/2
-
-        # Do not write duplicate keypoints
-        if not (x,y) == (px,py):
-            f.write(str(i)+",\"\"," +
-                    str(kp.size)+"," +
-                    str(kp.size)+"," +
-                    str(x) + "," + str(y) +
-                    ",'153,153,153'\n")
-            i += 1
-
-        (px,py) = (x,y)
-        f.flush()
-    
-    f.close()
 
