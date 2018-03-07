@@ -14,6 +14,8 @@ from cv2 import KeyPoint
 from probability import LabelData
 
 
+
+
 class Model():
     def __init__(self, labels):
         self.labels = labels.copy()
@@ -61,6 +63,8 @@ class Node():
         self.label = label
 '''
     
+KeyLabel = Tuple[KeyPoint, Label]
+
 class Permutation():
     def __init__(self, tuple, probability):
         self.tuple = tuple
@@ -83,7 +87,7 @@ def possible_node_labels(actual_size: float,
 
 def get_combinations(kps: List[Any],
                      label_distributions: Dict[str, LabelData],
-                     label_threshold: float) -> List[Tuple[KeyPoint, Label]]:
+                     label_threshold: float) -> List[KeyLabel]:
     kp_labels = []
     for kp in kps:
         labels = possible_node_labels(kp.size, label_distributions, label_threshold)
@@ -96,7 +100,10 @@ def get_combinations(kps: List[Any],
 
     return combinations
 
-def get_permutations(combinations, length):
+
+def get_permutations(combinations: List[KeyLabel],
+                     length: int) -> List[Tuple[KeyLabel, ...]]:
+
     permutation_tuples = list(itertools.permutations(combinations, length))
                  
     # Filter out permutations where both keypoints are the same
@@ -106,7 +113,10 @@ def get_permutations(combinations, length):
 
 
 
-def write_as_query(permutations, permutation_size, filepath):
+def write_as_query(permutations: List[Tuple[KeyLabel, ...]],
+                   permutation_size: int,
+                   filepath: str) -> None:
+
     f = open(filepath + ".querygfu", "w")
     for i in range(len(permutations)):
         permutation = permutations[i]
@@ -125,6 +135,7 @@ def write_as_query(permutations, permutation_size, filepath):
     f.close()
 
 
+'''
 def node_matches(query_graph, db_graph, matches):
     for query,target in matches:
         query_node = query_graph.get_node(query)
@@ -134,8 +145,10 @@ def node_matches(query_graph, db_graph, matches):
             return False
 
     return True
+'''
 
 def edge_matches(query_graph, db_graph, matches):
+    print(type(matches))
     for t1,t2 in zip(matches[:-1], matches[1:]):
         query_edge = query_graph.get_edge(t1[0], t2[0])
         target_edge = db_graph.get_edge(t1[1], t2[1])
