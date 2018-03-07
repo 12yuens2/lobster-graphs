@@ -53,14 +53,19 @@ def bf_model(model, matches, node_dis, edge_dis):
 
         # Get all permutations that contain the label
         for permutation in matches:
+            prob_list += [permutation for x in permutation if label == x[1].name]
+            '''
             for x in permutation:
-                print(x)
                 if label == x[1].name:
                     prob_list.append(permutation)
+            '''
 
         # Get best permutation that contains label
         if len(prob_list) > 0:
             s = sorted(prob_list, key=lambda kp_perm: get_permutation_probability(node_dis, edge_dis, kp_perm), reverse=True)
+
+            #for p in kp_list:
+                
 
             kp_list += s[:1]
 
@@ -108,9 +113,11 @@ for image_file in os.listdir(PATH):
     print("Got " + str(len(kps)) + " keypoints.")
     print(str(len(permutations)) + " permutations of size " + str(permutation_size))
 
+    print(permutations[0])
+
     
     print("Writing graphs to file...")
-    write_as_query(permutations, "../queries/query")
+    write_as_query(permutations, permutation_size, "../queries/query")
 
     print("Start initial matching...")
     subprocess.run(["../ggsxe", "-f", "-gfu", "../new.gfu", "--multi", "../queries/query.querygfu"], stdout=FNULL)
@@ -118,6 +125,14 @@ for image_file in os.listdir(PATH):
     good_matches = list(set(get_matches(permutations, "graphs/complete/")))
     print("Get " + str(len(good_matches)) + " matches")
 
+
+    print(good_matches[0])
+    
+    for permutation_tuple in good_matches:
+        kp, label = permutation_tuple[0]
+        probability = get_permutation_probability(node_distributions, edge_distributions, permutation_tuple)
+        
+    print(good_matches[0])
 
     #1. Take 1 random match
     #2. Check against model and existing subgraph labels

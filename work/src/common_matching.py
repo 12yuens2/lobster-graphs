@@ -7,6 +7,13 @@ from probability import get_permutation_probability
 #from common_cv import *
 
 
+
+# Type imports
+from typing import Dict, List, Any, Tuple
+from cv2 import KeyPoint
+from probability import LabelData
+
+
 class Model():
     def __init__(self, labels):
         self.labels = labels.copy()
@@ -37,29 +44,35 @@ class Model():
  
 
 class Label():
-    def __init__(self, name, probability):
-        self.name = name
-        self.probability = probability
+    def __init__(self, name: str, probability: float) -> None:
+        self.name: str = name
+        self.probability: float = probability
 
 
     def __repr__(self):
         return str(self.name) + ": " + str(self.probability)
 
 
+'''
+class Node():
+    def __init__(self, kp, label):
+        print(type(kp))
+        self.kp = kp
+        self.label = label
+'''
+    
 class Permutation():
     def __init__(self, tuple, probability):
         self.tuple = tuple
         self.probability = probability
 
    
-def possible_node_labels(actual_size, label_distributions, label_threshold):
+def possible_node_labels(actual_size: float,
+                         label_distributions: Dict[str, LabelData],
+                         label_threshold: float) -> List[Label]:
+
     possible_labels = []
 
-    '''
-    for label in label_distributions:
-        if within_value(label.size, actual_size):
-            possible_labels.append(label.name)
-    '''
     for label,label_data in label_distributions.items():
         probability = label_data.get_probability(actual_size)
         if probability > label_threshold:
@@ -68,14 +81,16 @@ def possible_node_labels(actual_size, label_distributions, label_threshold):
     return possible_labels
 
 
-def get_combinations(kps, label_distributions, label_threshold):
+def get_combinations(kps: List[Any],
+                     label_distributions: Dict[str, LabelData],
+                     label_threshold: float) -> List[Tuple[KeyPoint, Label]]:
     kp_labels = []
     for kp in kps:
         labels = possible_node_labels(kp.size, label_distributions, label_threshold)
         if len(labels) > 0:
             kp_labels.append((kp,labels))
 
-    combinations = []
+    combinations: List[Tuple[KeyPoint, Label]] = []
     for kp,labels in kp_labels:
         combinations += list(itertools.product([kp],labels))
 
@@ -87,18 +102,11 @@ def get_permutations(combinations, length):
     # Filter out permutations where both keypoints are the same
     permutation_tuples = list(filter(lambda x: x[0][0] != x[1][0], permutation_tuples))
 
-    '''
-    permutations = []
-    for pt in permutation_tuples:
-        probability = get_permutation_probability(pt)
-        permutations.append(Permutation(pt, probability))
-    '''
-                 
     return permutation_tuples
 
 
 
-def write_as_query(permutations, filepath):
+def write_as_query(permutations, permutation_size, filepath):
     f = open(filepath + ".querygfu", "w")
     for i in range(len(permutations)):
         permutation = permutations[i]
@@ -106,7 +114,7 @@ def write_as_query(permutations, filepath):
         # Graph header
         f.write("#graph" + str(i) + "\n")
 
-        f.write(str(len(permutation)) + "\n")
+        f.write(str(permutation_size) + "\n")
 
         for node in permutation:
             label = node[1].name
@@ -121,9 +129,6 @@ def node_matches(query_graph, db_graph, matches):
     for query,target in matches:
         query_node = query_graph.get_node(query)
         target_node = db_graph.get_node(target)
-
-        #print(str(query_node))
-        #print(str(target_node))
 
         if query_node != target_node:
             return False
@@ -154,9 +159,6 @@ def get_matches(permutations, db_path):
             query_graph = graph_from_permutation(permutations[query_id])
             db_graph = get_db_graph(db_id, db_path)
 
-
-            #if node_matches(query_graph, db_graph, matches):
-                #good_matches.append(matches)
             if edge_matches(query_graph, db_graph, matches):
                 good_matches.append(permutations[query_id])
 

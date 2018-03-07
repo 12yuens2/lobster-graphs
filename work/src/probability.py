@@ -6,18 +6,26 @@ import scipy.stats
 from common_graph import translate_graph, graph_from_permutation
 
 
-class LabelData():
-    def __init__(self, label, distribution, probability):
-        self.label = label
+from typing import TypeVar, Union, Generic
+
+# Type imports
+from typing import Dict, List
+from common_graph import Node, Edge
+
+DictKey = TypeVar('DictKey', str, Edge)
+
+class LabelData(Generic[DictKey]):
+    def __init__(self, label: DictKey, distribution, probability: float) -> None:
+        self.label: DictKey = label
         self.distribution = distribution
-        self.probability = probability
+        self.probability: float = probability
 
     def get_probability(self, value):
         p = self.distribution.pdf(value) * self.probability
         return p
 
-def load_node_data(filepath):
-    node_dict = {}
+def load_node_data(filepath: str) -> Dict[str, List[int]]:
+    node_dict: Dict[str, List[int]] = {}
 
     for graph_file in os.listdir(filepath):
         f = open(filepath + graph_file)
@@ -28,7 +36,7 @@ def load_node_data(filepath):
 
             l = line.split(",")
             label = l[1].strip("\"")
-            size = float(l[2])
+            size = int(float(l[2]))
 
             if label in node_dict:
                 node_dict[label].append(size)
@@ -37,8 +45,8 @@ def load_node_data(filepath):
 
     return node_dict
 
-def load_edge_data(filepath):
-    edge_dict = {}
+def load_edge_data(filepath: str) -> Dict[Edge, List[int]]:
+    edge_dict: Dict[Edge, List[int]] = {}
     
     for graph_file in os.listdir(filepath):
         f = open(filepath + graph_file)
@@ -58,25 +66,26 @@ def load_edge_data(filepath):
     return edge_dict   
 
 
-def get_distribution(data_dict):
+def get_distribution(data_dict: Dict[DictKey, List[int]]) -> Dict[DictKey, LabelData]:
     total_length = sum([len(data) for key,data in data_dict.items()])
 
+    distribution = {}
     for key,data in data_dict.items():
        mean = np.mean(data)
        std = np.std(data)
        dis = scipy.stats.norm(mean, std)
 
-       data_dict[key] = LabelData(key, dis, len(data)/total_length)
+       distribution[key] = LabelData(key, dis, len(data)/total_length)
 
-    return data_dict
+    return distribution
 
-def get_node_distributions(filepath):
-    node_dict = load_node_data(filepath)
+def get_node_distributions(filepath: str) -> Dict[str, LabelData]:
+    node_dict: Dict[str, List[int]] = load_node_data(filepath)
 
     return get_distribution(node_dict)
 
-def get_edge_distributions(filepath):
-    edge_dict = load_edge_data(filepath)
+def get_edge_distributions(filepath: str) -> Dict[Edge, LabelData]:
+    edge_dict: Dict[Edge, List[int]] = load_edge_data(filepath)
 
     return get_distribution(edge_dict)
 
