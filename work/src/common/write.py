@@ -4,11 +4,12 @@ from common.cv import get_point_tuple
 
 
 # Type imports
-from typing import List, Tuple
+from cv2 import KeyPoint
+from typing import List, Tuple, Any
 from classes.matching import KeyLabel
 
 
-PATH = "imgs/dither/"
+PATH = "imgs/lobsters/"
 
 # Write permutations as .querygfu
 def permutations_as_query(permutations: List[Tuple[KeyLabel, ...]],
@@ -28,13 +29,18 @@ def permutations_as_query(permutations: List[Tuple[KeyLabel, ...]],
             label = node[1].name
             f.write(str(label) + "\n")
 
-        f.write("2\n0 1\n1 2\n")
+        f.write(str(permutation_size - 1) + "\n")
+        for x,y in zip(range(permutation_size - 1), range(1, permutation_size)):
+            f.write(str(x) + " " + str(y) + "\n")
+
         f.flush()
     f.close()
 
 # Write list of opencv keypoints as .gdf format
-def kps_as_gdf(kps, filename, filepath):
-    """ Write kps to gdf file """
+def kps_as_gdf(kps: List[KeyPoint],
+               filename: str,
+               filepath: str) -> None:
+
     f = open(filepath + filename, "w")
 
     # Node header definition
@@ -63,7 +69,7 @@ def kps_as_gdf(kps, filename, filepath):
 
 
 # Write opencv image to file
-def write_image(image, filename):
+def write_image(image: Any, filename: str) -> None:
     cv2.imwrite(filename, image)
 
 
