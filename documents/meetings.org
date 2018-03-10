@@ -255,4 +255,50 @@ func match_edges()
 *** TODO Check body-tail classification rate
 *** TODO Script to analyse/get threshold parameters
 
+- Issue with histogram method for some keypoints not being detected
+  > Try histogram for each label and use higher threshold
 
+*** Meeting
+Filter before graphgrep with node/edge
+max edge distance as function of node size
+
+-> All annotated histograms into flann for comparison
+
+** Week 7
+Monday 2pm
+compare previous models that only use size/histogram vs more structured approach
+- how well we can recognise parts/labels of the lobster
+- cross validate by leaving one out -> 20 fold
+
+*** Work
+- Previous histogram method was too harsh even with low threshold
+- Use multiple histograms (one for each label) and add all points that match
+- Better more points and do more processing since any points lost in filtered cannot be used after
+- Have to be careful with being too lenient as that would lead to too much detection with noise
+
+* Notes
+
+** Method Pipeline
+
+1. Get keypoints with SIFT
+
+2. Filter with octave 
+   - Removes all tiny keypoints that are of no relevance
+
+3-0. Tried filtering with size distributions, but not reliable because of different sized lobsters and not robust against scaling 
+
+3. Filter with colour histograms
+   a. Histogram for each label from model
+       - Too strict filtering means losing data
+       - Too lenient filtering means too large combination for next step
+       - Too lenient filtering also leads to worse performance against noise
+
+4. Create combinations of triplets and filter with graphgrep
+   a. Keypoint labelling for combinations using node size probability
+   b. Match triplet subgraphs with graphgrep to eliminate impossible configurations
+   c. Remaining triplets assigned probability based on node sizes and distribution of edges with those node labels
+
+5. Re-create full lobster graph from remaining triplet permutations
+   a. Keypoint method - find best triplet for each keypoint, use the best one if there is overlap
+   b. Model method - use a model with a number of labels that should be filled if possible and find best triplet for each label
+   c. Graph method - similar to model method but instead of filling just labels, try to fill a graph by each (node-edge-node)
