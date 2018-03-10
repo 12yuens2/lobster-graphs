@@ -1,4 +1,5 @@
 import cv2
+import os
 import math
 import numpy as np
 
@@ -90,8 +91,8 @@ def filter_keypoints_histogram(image, histogram, kps, method=cv2.HISTCMP_CORREL)
         # Calculate histogram on BGR
         hist2 = cv2.calcHist([image], [0,1,2], mask_image(image, kp), [256,256,256], [0,256,0,256,0,256])
         diff = cv2.compareHist(histogram, hist2, method)
-        if diff > 0.1:
-            filtered_kps.append((kp,diff))
+        if diff > 0.6:
+            filtered_kps.append(kp)
 
     return filtered_kps
 
@@ -152,13 +153,23 @@ def get_image_kps(image_file, hist_method=cv2.HISTCMP_CORREL):
     kps = get_all_keypoints(image_file)
 
     # Load pre-defined histogram
-    hist = np.load("lobster.hist.npy")
-    hist.reshape(256,256,256)
+    #hist = np.load("lobster.hist.npy")
+    #hist.reshape(256,256,256)
+
+    filtered_kps = []
+    for hist_file in os.listdir("hists/"):
+        hist = np.load("hists/" + hist_file)
+        hist.reshape(256,256,256)
+
+        filtered_kps += filter_keypoints_histogram(image, hist, kps, method=hist_method)
+
+        print(hist_file)
+        print(len(filtered_kps))
 
     # Get all keypoints and their difference
-    kps_diff = filter_keypoints_histogram(image, hist, kps, method=hist_method)
+    #kps = filter_keypoints_histogram(image, hist, kps, method=hist_method)
 
-    return remove_duplicates([kp for kp,diff in kps_diff])
+    return remove_duplicates([kp for kp in filtered_kps])
 
 
 
@@ -170,9 +181,11 @@ def cv2window(window_name, image):
     cv2.imshow(window_name, image)
 
 
+def get_histogram(image, kp):
+    return cv2.calcHist([image], [0,1,2], mask_image(image, kp), [256,256,256], [0,256,0,256,0,256])
+
 def drawKeypoints(image_file, keypoints):
     """ Draw all keypoints on given image """
     image = cv2.imread(image_file)
     return cv2.drawKeypoints(image, keypoints, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
 

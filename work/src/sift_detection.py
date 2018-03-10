@@ -11,24 +11,25 @@ import common.write as cw
 
 def save_histogram(image, kp, filename):
     hist = cc.get_histogram(image, kp)
-    np.save(filename, hist)
+    np.save("hists/" + filename, hist)
 
 filename = sys.argv[1]
 
-kps = cc.get_all_keypoints(filename)
+all_kps = cc.get_all_keypoints(filename)
+kps = cc.get_image_kps(filename)
 #kps = cc.get_image_kps(filename)
+
+all_image = cc.drawKeypoints(filename, all_kps)
 image = cc.drawKeypoints(filename, kps)
 
-
-claw = cc.get_histogram(image, kps[1])
-arm = cc.get_histogram(image, kps[2])
-
+'''
 save_histogram(image, kps[1], "claw.hist")
 save_histogram(image, kps[2], "arm.hist")
 save_histogram(image, kps[13], "head.hist")
 save_histogram(image, kps[18], "body.hist")
 save_histogram(image, kps[40], "back.hist")
 save_histogram(image, kps[50], "tail.hist")
+'''
 
 #np.save("part.hist", hist)
 
@@ -42,8 +43,8 @@ for i in range(len(kps)):
     pos = cc.get_point_tuple(kp)
     cv2.putText(annotated_image, str(i) + ": " + str(int(kp.size)), pos, 1, 3, (0,0,255), 2, cv2.LINE_AA)
 
-cw.write_image(annotated_image, "test.JPG")
-
+cw.write_image(annotated_image, "after.JPG")
+cw.write_image(all_image, "before.JPG")
 
 
 

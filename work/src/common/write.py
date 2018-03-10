@@ -54,13 +54,13 @@ def kps_as_gdf(kps: List[KeyPoint],
         #radius = kp.size/2
 
         # Do not write duplicate keypoints
-        if not (x,y) == (px,py):
-            f.write(str(i)+",\"\"," +
-                    str(kp.size)+"," +
-                    str(kp.size)+"," +
-                    str(x) + "," + str(y) +
-                    ",'153,153,153'\n")
-            i += 1
+        #if not (x,y) == (px,py):
+        f.write(str(i)+",\"\"," +
+                str(kp.size)+"," +
+                str(kp.size)+"," +
+                str(x) + "," + str(y) +
+                ",'153,153,153'\n")
+        i += 1
 
         (px,py) = (x,y)
         f.flush()

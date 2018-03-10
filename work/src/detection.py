@@ -10,7 +10,10 @@ import common.cv as cc
 import common.write as cw
 
 
-
+"""
+This file detects all keypoints on a lobster image and writes the images with keypoints on them
+Also writes all the keypoints into .gdf format as nodes with sizes and positions
+"""
 
 def get_detected_image(image, kps):
     for i in range(len(kps)):
@@ -37,8 +40,9 @@ write_path = "imgs/dataset/" + category + "/detected/"
 
 for image_file in os.listdir(read_path):
     print(image_file)
-    kps = cc.get_image_kps(read_path + image_file)
-    #cw.kps_as_gdf(kps, image_file[4:8] + ".gdf", "graphs/annotated/" + category + "/")
+    kps = cc.get_all_keypoints(read_path + image_file)
+    kps = cc.remove_duplicates(kps)
+    cw.kps_as_gdf(kps, image_file[4:8] + ".gdf", "graphs/annotated/" + category + "/")
 
     write_detected_image(read_path + image_file, write_path + image_file, kps)
 
