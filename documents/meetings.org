@@ -278,6 +278,23 @@ compare previous models that only use size/histogram vs more structured approach
 
 * Notes
 
+
+** Graph matching notes
+- Label nodes having expected number of edges
+eg, body should have 4 edges connected to it
+  , arm has 2
+  , head/tail/claw has 1
+
+** Annotating dataset
+
+1. Get all keypoints with SIFT (no filtering)
+
+2. Write all keypoints into gdf format
+
+3. Manually label important keypoints, removing all other keypoints and annotating edges between keypoints
+
+4. Put all .gdf files as grapgrep db file
+
 ** Method Pipeline
 
 1. Get keypoints with SIFT
