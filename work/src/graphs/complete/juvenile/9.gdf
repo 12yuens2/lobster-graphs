@@ -1,0 +1,8 @@
+nodedef> name VARCHAR,label VARCHAR,width DOUBLE,height DOUBLE,x DOUBLE,y DOUBLE,color VARCHAR
+1,"arm",167,167,2169.0,801.0,'153,153,153'
+2,"claw",96,96,2195.0,559.0,'153,153,153'
+3,"head",130,130,2645.0,980.0,'153,153,153'
+4,"tail",297,297,2671.0,2172.0,'153,153,153'
+5,"claw",106,106,2939.0,540.0,'153,153,153'
+edgedef> node1,node2,weight DOUBLE,directed BOOLEAN,color VARCHAR
+1,2,243.39268682522078,false,'128,128,128'

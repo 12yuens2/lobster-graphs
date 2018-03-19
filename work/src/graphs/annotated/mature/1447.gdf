@@ -13,4 +13,3 @@ edgedef> node1,node2,weight DOUBLE,directed BOOLEAN,color VARCHAR
 5,7
 4,7
 6,7
-

@@ -5,4 +5,3 @@ nodedef> name VARCHAR,label VARCHAR,width DOUBLE,height DOUBLE,x DOUBLE,y DOUBLE
 4,"arm",195.10987854003906,195.10987854003906,3406,1100,'153,153,153'
 edgedef> node1,node2,weight DOUBLE,directed BOOLEAN,color VARCHAR
 3,1
-
