@@ -8,7 +8,7 @@ from cv2 import KeyPoint
 from typing import List, Tuple, Any
 from classes.matching import KeyLabel
 
-
+# Path for lobster images to match on
 PATH = "imgs/lobsters/"
 
 # Write permutations as .querygfu

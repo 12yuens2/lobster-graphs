@@ -10,6 +10,8 @@ class LabelData(Generic[DictKey]):
         self.probability: float = probability
 
     def get_probability(self, value):
-        p = self.distribution.pdf(value) * self.probability
-        return p
+        if self.label == "body":
+            return self.distribution.pdf(value)
+        else:
+            return self.distribution.pdf(value) * self.probability
 
