@@ -1,0 +1,77 @@
+* Python files
+
+** classes
+Contains files for objects that are needed.
+
+*** graphs
+Class files for objects in graph representation
+
+**** edge.py
+Edge object which contains the two nodes it is connected to and its length.
+- Equivalence between two edge objects is based on its node labels and its length.
+
+**** graph.py
+Graph representation which contains a list of edges and nodes. 
+Nodes and edges can be fetched and the graph can be written as a gdf or gfu format.
+
+**** node.py
+Node object for each node in graph.
+Contains node label, size, associated opencv keypoint and (x,y) coordinates).
+
+*** matching
+Common class files or data structures used for matching
+
+**** label.py
+Label abstraction which contains the name of the label and probability of the label occuring in matching.
+
+Also contains typedef'd ~KeyLabel~, which is a tuple of a label and an opencv keypoint.
+
+**** labeldata.py
+LabelData class contains the either the label for a node or edge and keeps information about it such as its probability and distribution. 
+
+the typedef'd ~DictKey~ is a type of either string or edge. String is key to a node whereas edge is key to an edge.
+
+**** model.py
+Model for reconstructing full lobster from keypoints
+- Keypoints will be matched to try and fit the "best" model of the lobster
+
+** common
+
+*** cv.py
+Contains methods for opencv operations. 
+
+*** graph.py
+Contains methods to work the the Graph, Edge and Node data structures
+Mostly creates Graph objects and writes them to file
+
+*** matching.py
+Deals with matching graphing objects and getting combinations/permutations from keypoints
+
+*** probability.py
+Helps with matching by creating probability distributions and working out probabilities or nodes, edges and triplets
+
+*** write.py
+Deals with writing things to file or images.
+- writing permutations or keypoints to graph format
+- writing text or keypoints over images
+** src
+Source file scripts for running various steps of project
+
+*** combination.py
+Full pipeline:
+- detecting keypoints
+- filtering keypoints
+- creating combinations/permutations of keypoints
+- run graphgrep matching
+- run model/label matching
+- write matched graph with nodes/edges to image
+
+*** detection.py
+Runs all intermediate steps of detecting and filtering keypoints, then outputs all images with filtered keypoints as images and graph formats for further annotation
+
+*** sift_detection.py
+Test intermediate step to see what keypoints are being detected/filtered for a specific image
+- Takes image filename as ~argv[1]~ and writes a ~before.JPG~ and ~after.JPG~ of all keypoints vs filtered keypoints
+
+*** translate.py
+Translate between annotated .gdf graphs and .gfu format for graphgrep

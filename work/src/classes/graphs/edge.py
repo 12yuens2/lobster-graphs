@@ -11,8 +11,8 @@ class Edge():
         #ratio
 
     def __repr__(self):
-        return str(self.n1.label) + " " + str(self.n2.label) + ": " + str(self.length)
-        #return str(int(self.n1.node_id) - 1) + " " + str(int(self.n2.node_id) - 1)
+        #return str(self.n1.label) + " " + str(self.n2.label) + ": " + str(self.length)
+        return str(int(self.n1.node_id) - 1) + " " + str(int(self.n2.node_id) - 1)
         #return str(self.n1) + "--" + str(self.n2) + ", " + str(self.length)
 
     def __eq__(self, other):

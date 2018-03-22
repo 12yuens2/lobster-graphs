@@ -37,13 +37,15 @@ read_path = "imgs/dataset/" + category + "/raw/"
 write_path = "imgs/dataset/" + category + "/detected/"
 
 
-
 for image_file in os.listdir(read_path):
     print(image_file)
     kps = cc.get_all_keypoints(read_path + image_file)
     kps = cc.remove_duplicates(kps)
+
+    # Write keypoints as gdf nodes
     cw.kps_as_gdf(kps, image_file[4:8] + ".gdf", "graphs/annotated/" + category + "/")
 
+    # Draw lobster image with keypoints
     write_detected_image(read_path + image_file, write_path + image_file, kps)
 
 

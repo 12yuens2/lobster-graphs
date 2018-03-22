@@ -5,7 +5,7 @@ import numpy as np
 
 """ common_cv.py: All common functions that use OpenCV and deal with keypoints. """
 
-
+HIST_BINS = [8,8,8]
 
 ### Metric functions ###
 
@@ -89,9 +89,9 @@ def filter_keypoints_histogram(image, histogram, kps, method=cv2.HISTCMP_CORREL)
 
     for kp in kps:
         # Calculate histogram on BGR
-        hist2 = cv2.calcHist([image], [0,1,2], mask_image(image, kp), [256,256,256], [0,256,0,256,0,256])
+        hist2 = cv2.calcHist([image], [0,1,2], mask_image(image, kp), HIST_BINS, [0,256,0,256,0,256])
         diff = cv2.compareHist(histogram, hist2, method)
-        if diff > 0.6:
+        if diff > 0.5:
             filtered_kps.append(kp)
 
     return filtered_kps
@@ -100,16 +100,25 @@ def remove_duplicates(kps):
     """ Remove duplicate key points that have the same coordinates. """
     filtered_kps = []
 
-    px,py = (0,0)
+    class KP():
+        def __init__(self, kp, pos):
+            self.kp = kp
+            self.pos  = pos
+
+        def __eq__(self, other):
+            return self.pos == other.pos
+
+        def __hash__(self):
+            return hash(self.pos)
+
+
+    KPs = []
     for kp in kps:
         (x,y) = get_point_tuple(kp)
 
-        if (x,y) != (px,py):
-            filtered_kps.append(kp)
-
-        (px,py) = (x,y)
-
-    return filtered_kps
+        KPs.append(KP(kp, (x,y)))
+       
+    return list(a.kp for a in set(KPs)) #filtered_kps
 
 
 
@@ -152,22 +161,16 @@ def get_image_kps(image_file, hist_method=cv2.HISTCMP_CORREL):
     image = cv2.imread(image_file)
     kps = get_all_keypoints(image_file)
 
-    # Load pre-defined histogram
-    #hist = np.load("lobster.hist.npy")
-    #hist.reshape(256,256,256)
-
+    # Load pre-defined histograms
     filtered_kps = []
     for hist_file in os.listdir("hists/"):
         hist = np.load("hists/" + hist_file)
-        hist.reshape(256,256,256)
+        hist.reshape(8,8,8)
 
         filtered_kps += filter_keypoints_histogram(image, hist, kps, method=hist_method)
 
-        print(hist_file)
-        print(len(filtered_kps))
-
-    # Get all keypoints and their difference
-    #kps = filter_keypoints_histogram(image, hist, kps, method=hist_method)
+        #print(hist_file)
+        #print(len(filtered_kps))
 
     return remove_duplicates([kp for kp in filtered_kps])
 
@@ -182,7 +185,7 @@ def cv2window(window_name, image):
 
 
 def get_histogram(image, kp):
-    return cv2.calcHist([image], [0,1,2], mask_image(image, kp), [256,256,256], [0,256,0,256,0,256])
+    return cv2.calcHist([image], [0,1,2], mask_image(image, kp), HIST_BINS, [0,256,0,256,0,256])
 
 def drawKeypoints(image_file, keypoints):
     """ Draw all keypoints on given image """

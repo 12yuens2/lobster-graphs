@@ -51,6 +51,9 @@ def get_combinations(kps: List[Any],
     kp_labels = []
     for kp in kps:
         labels = possible_node_labels(kp.size, label_distributions, label_threshold)
+        if "body" in labels:
+            print("body")
+            exit(1)
         if len(labels) > 0:
             kp_labels.append((kp,labels))
 
@@ -130,4 +133,122 @@ def get_db_graph(graph_id: int, graphs_path: str) -> Graph:
             node.node_id -= 1
         
         return db_graph
+
+
+
+def run_matching(db_file: str,
+                 permutations: List[Tuple[KeyLabel, ...]]) -> List[Tuple[KeyLabel, ...]]:
+
+    # Match with graphgrep
+    print("Start initial matching...")
+    subprocess.run(["../ggsxe", "-f", "-gfu", db_file, "--multi", "../queries/query.querygfu"], stdout=FNULL)
+
+    # Get good matches from graphgrep output
+    good_matches: List[Tuple[KeyLabel, ...]] = list(set(cm.get_matches(permutations, "graphs/complete/" + category + "/")))
+    print("Get " + str(len(good_matches)) + " matches")
+
+    return good_matches
+
+
+# Brute force - get best triplet for each key point
+def bf_keypoints(kps, matches, node_dis, edge_dis):
+    kp_list = []
+    for kp in kps:
+        prob_list = []
+
+        # Get all permutations for each keypoint
+        for permutation in matches:
+            for x in permutation:
+                if kp in x:
+                    prob_list.append(permutation)
+
+        # Sort by probability and add best permutation to list
+        if len(prob_list) > 0:
+            s = sorted(prob_list, key=lambda kp_perm: cp.get_permutation_probability(node_dis, edge_dis, kp_perm), reverse=True)
+
+            kp_list += s[:1]
+
+    return kp_list
+
+
+
+# Brute force - best triplet for each label in ideal model
+def bf_model(model: Any,
+             matches: List[Tuple[KeyLabel, ...]],
+             node_dis: Dict[str, LabelData],
+             edge_dis: Dict[Edge, LabelData]) -> List[Tuple[KeyLabel, ...]]:
+
+    # Get list of labels from model
+    labels = [label for label,count in model.items() for i in range(count)]
+
+    kp_list: List[Tuple[KeyLabel, ...]] = []
+    for label in labels:
+        prob_list: List[Tuple[KeyLabel, ...]] = []
+
+        # Get all permutations that contain the label
+        for permutation in matches:
+            prob_list += [permutation for x in permutation if label == x[1].name]
+            '''
+            for x in permutation:
+                if label == x[1].name:
+                    prob_list.append(permutation)
+            '''
+
+        # Get best permutation that contains label
+        if len(prob_list) > 0:
+            s = sorted(prob_list, key=lambda kp_perm: cp.get_permutation_probability(node_dis, edge_dis, kp_perm), reverse=True)
+
+            # Deal with overlap
+            #for p in kp_list:
+
+            kp_list = add_best_to_list(kp_list, s)
+
+    return kp_list
+
+
+
+def bf_graph(graph: Graph,
+             matches: List[Tuple[KeyLabel, ...]],
+             node_dis: Dict[str, LabelData],
+             edge_dis: Dict[Edge, LabelData]) -> List[Tuple[KeyLabel, ...]]:
+
+    kp_list: List[Tuple[KeyLabel, ...]] = []
+    for edge in graph.edges:
+        edge_tuple: Tuple[str, str] = (edge.n1.label, edge.n2.label)
+
+        prob_list: List[Tuple[KeyLabel, ...]] = []
+        for permutation in matches:
+            triplet = [label.name for kp,label in permutation]
+            for doublet in zip(triplet[:-1], triplet[1:]):
+                if edge_tuple == doublet:
+                    prob_list.append(permutation)
+
+        if len(prob_list) > 0:
+            s = sorted(prob_list, key=lambda kp_perm: cp.get_permutation_probability(node_dis, edge_dis, kp_perm), reverse=True)
+
+
+            kp_list = add_best_to_list(kp_list, s)
+
+    return kp_list
+
+
+def add_best_to_list(kp_list: List[Tuple[KeyLabel, ...]],
+                     sorted_prob: List[Tuple[KeyLabel, ...]]) -> List[Tuple[KeyLabel, ...]]:
+
+    for new_permutation in sorted_prob:
+            if not permutations_overlap(kp_list, new_permutation):
+                return kp_list + [new_permutation]
+
+    return kp_list
+                            
+
+def permutations_overlap(ps: List[Tuple[KeyLabel, ...]],
+                         p2: Tuple[KeyLabel, ...]) -> bool:
+
+    for p1 in ps:
+        for kp1,label1 in p1:
+            for kp2,label2 in p2:
+                if kp1 == kp2 and label1 != label2:
+                    return True
+    return False
 
