@@ -14,6 +14,7 @@ from classes.matching import Label, LabelData, KeyLabel
 from classes.graphs import Graph, Edge
 
 
+FNULL = open(os.devnull, "w")
 
 '''
 class Node():
@@ -51,9 +52,6 @@ def get_combinations(kps: List[Any],
     kp_labels = []
     for kp in kps:
         labels = possible_node_labels(kp.size, label_distributions, label_threshold)
-        if "body" in labels:
-            print("body")
-            exit(1)
         if len(labels) > 0:
             kp_labels.append((kp,labels))
 
@@ -111,14 +109,15 @@ def get_matches(permutations: List[Tuple[KeyLabel, ...]],
             data = line.strip().split(":")
             query_id = int(data[0])
             db_id = int(data[1])
+            permutation = permutations[query_id]
 
             matches = list(ast.literal_eval(data[2][1:-1]))
 
-            query_graph = cg.graph_from_permutation(permutations[query_id])
+            query_graph = cg.graph_from_permutation(permutation)
             db_graph = get_db_graph(db_id, db_path)
 
             if edge_matches(query_graph, db_graph, matches):
-                good_matches.append(permutations[query_id])
+                good_matches.append(permutation)
 
 
     return good_matches
@@ -136,15 +135,16 @@ def get_db_graph(graph_id: int, graphs_path: str) -> Graph:
 
 
 
-def run_matching(db_file: str,
+def run_matching(category: str,
                  permutations: List[Tuple[KeyLabel, ...]]) -> List[Tuple[KeyLabel, ...]]:
 
     # Match with graphgrep
     print("Start initial matching...")
-    subprocess.run(["../ggsxe", "-f", "-gfu", db_file, "--multi", "../queries/query.querygfu"], stdout=FNULL)
+    subprocess.run(["../ggsxe", "-f", "-gfu", "../" + category + ".gfu", "--multi", "../queries/query.querygfu"], stdout=FNULL)
+    print("Finish matching")
 
     # Get good matches from graphgrep output
-    good_matches: List[Tuple[KeyLabel, ...]] = list(set(cm.get_matches(permutations, "graphs/complete/" + category + "/")))
+    good_matches: List[Tuple[KeyLabel, ...]] = list(set(get_matches(permutations, "graphs/complete/" + category + "/")))
     print("Get " + str(len(good_matches)) + " matches")
 
     return good_matches

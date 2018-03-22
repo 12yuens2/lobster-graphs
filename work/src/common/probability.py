@@ -1,4 +1,4 @@
-#import itertools
+import itertools
 import os
 #import math
 import numpy as np
@@ -58,13 +58,18 @@ def load_edge_data(filepath: str) -> Dict[Edge, List[int]]:
 def get_distribution(data_dict: Dict[DictKey, List[int]]) -> Dict[DictKey, LabelData]:
     total_length = sum([len(data) for key,data in data_dict.items()])
 
+    sizes = [size for key,data in data_dict.items() for size in data]
+    mean_size = np.mean(sizes)
+    std_size = np.std(sizes)
+    size_dis = scipy.stats.norm(mean_size, std_size)
+    
     distribution = {}
     for key,data in data_dict.items():
        mean = np.mean(data)
        std = np.std(data)
        dis = scipy.stats.norm(mean, std)
 
-       distribution[key] = LabelData(key, dis, len(data)/total_length)
+       distribution[key] = LabelData(key, dis, size_dis, len(data)/total_length)
 
     return distribution
 

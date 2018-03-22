@@ -39,10 +39,16 @@ def model_graph():
     ]
 
     return Graph(nodes, edges, 0.0)
-    
 
-FNULL = open(os.devnull, "w")
-LABEL_THRESHOLD = 0.00025
+def model_dict():
+    return {"body": 1,
+            "head": 1,
+            "claw": 2,
+            "arm":  2,
+            "back": 1,
+            "tail": 1 }
+
+LABEL_THRESHOLD = 0.1
 
 category = sys.argv[1]
 
@@ -50,8 +56,9 @@ if not (category == "juvenile" or category == "mature"):
     print("Category " + category + " not recognised!")
     exit(1)
 
-
 print("Running pipeline on " + category + " model.")
+
+# Get probability distributions from annotated dataset
 node_distributions = cp.get_node_distributions("graphs/complete/" + category + "/")
 edge_distributions = cp.get_edge_distributions("graphs/complete/" + category + "/")
 
@@ -82,12 +89,12 @@ for image_file in os.listdir(cw.PATH):
     #4. Put all matches together as one graph and give probability as sum?product? of all matches
     #5. Do not have to worry about duplicate labels/keypoints because we can connect them all together rather than connect the exact matched subgraphs
     
-    matches = run_matching("../" + category + ".gfu", permutations)
+    matches = cm.run_matching(category, permutations)
     
     # Do different methods to get triplets
-    best_kp = bf_keypoints(kps, matches, node_distributions, edge_distributions)
-    best_model = bf_model(model, matches, node_distributions, edge_distributions)
-    best_graph = bf_graph(model_graph(), matches, node_distributions, edge_distributions)
+    best_kp = cm.bf_keypoints(kps, matches, node_distributions, edge_distributions)
+    best_model = cm.bf_model(model_dict(), matches, node_distributions, edge_distributions)
+    best_graph = cm.bf_graph(model_graph(), matches, node_distributions, edge_distributions)
 
 
     print("kp: " + str(len(best_kp)))

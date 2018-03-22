@@ -2,11 +2,11 @@ import cv2
 
 from common.cv import get_point_tuple
 
-
 # Type imports
 from cv2 import KeyPoint
 from typing import List, Tuple, Any
 from classes.matching import KeyLabel
+from classes.graphs import Graph
 
 # Path for lobster images to match on
 PATH = "imgs/lobsters/"
@@ -97,3 +97,25 @@ def write_keypoints(image_file: str, kps: List[cv2.KeyPoint]) -> None:
     cv2.drawKeypoints(image, kps, image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     cv2.imwrite("imgs/keypoints/" + image_file, image)
 
+
+def write_graph(graph: Graph,
+                image_name: str,
+                image_path: str,
+                write_path: str) -> None:
+
+    image = cv2.imread(image_path + image_name)
+
+    # Draw graph nodes
+    image = cv2.drawKeypoints(image, [node.kp for node in graph.nodes], image, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+    # Draw graph edges
+    for edge in graph.edges:
+        n1_pos = tuple(map(int, edge.n1.pos))
+        n2_pos = tuple(map(int, edge.n2.pos))
+        cv2.line(image, n1_pos, n2_pos, (255,0,0), thickness=3)
+
+        # Draw node labels
+        cv2.putText(image, edge.n1.label, n1_pos, 1, 3, (0,0,255), 4, cv2.LINE_AA)
+        cv2.putText(image, edge.n2.label, n2_pos, 1, 3, (0,0,255), 4, cv2.LINE_AA)
+
+    cv2.imwrite(write_path + image_name, image)

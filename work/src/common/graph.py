@@ -57,11 +57,17 @@ def translate_graph(lines: List[str]) -> Graph:
                 first_value = int(a[0])
 
             # Create node with Node(id, label, size)
-            n = Node(int(a[0]), str(a[1]).replace("\"", ""), int(float(a[2])), pos=(float(a[4]),float(a[5])))
+            pos_x = float(a[4])
+            pos_y = float(a[5])
+            n = Node(int(a[0]),
+                     str(a[1]).replace("\"", ""),
+                     int(float(a[2])),
+                     kp=KeyPoint(pos_x, pos_y, float(a[2])),
+                     pos=(float(a[4]),float(a[5])))
 
             if (a[1] == ""):
                 print("Node " + a[0] + " missing label.")
-                exit()
+                exit(1)
             nodes.append(n)
         else:
             n1 = None
