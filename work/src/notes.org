@@ -57,6 +57,11 @@ Deals with writing things to file or images.
 ** src
 Source file scripts for running various steps of project
 
+*** annotate.py
+Takes annotated ~.gdf~ files and draws the annotated graph on the lobster image
+- gdf files taken from ~graphs/annotated/category/~
+- images output to ~imgs/dataset/category/annotated~
+
 *** combination.py
 Full pipeline:
 - detecting keypoints
