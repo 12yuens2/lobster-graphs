@@ -80,3 +80,8 @@ Test intermediate step to see what keypoints are being detected/filtered for a s
 
 *** translate.py
 Translate between annotated .gdf graphs and .gfu format for graphgrep
+
+*** keypoints.py
+Runs different vision algorithms on an image to show off each of them detect. 
+- The filename of the image must be specified as an argument
+- Fetches images from the path ~imgs/lobsters~
