@@ -4,6 +4,7 @@
 \usepackage{color}
 \usepackage{tikz}
 \usepackage{float}
+\usepackage{subcaption}
 \usepackage{tabularx}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -15,10 +16,20 @@
 \usepackage{parskip}
 \usepackage{fancyhdr}
 \usepackage{vmargin}
+\usepackage{xr}
+
+% Appendix
+\usepackage[toc,page,title]{appendix}
+\usepackage{chngcntr}
 
 % References
 \usepackage[backend=biber]{biblatex}
 \addbibresource{references.bib}
+\setlength\bibitemsep{0.5\baselineskip}
+
+% Section titles
+\usepackage{sectsty}
+\sectionfont{\Huge}
 
 % Code listing style
 \definecolor{dkgreen}{rgb}{0,0.6,0}
@@ -52,14 +63,27 @@
 % New line macro
 \newcommand{\n}[0]{\\[\baselineskip]}
 
+
+% Single image in figure
+% #1 - Width
+% #2 - Image path
+% #3 - Caption
+\newcommand{\imagefig}[3]{
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=#1, keepaspectratio]{#2}
+	\caption{#3}
+\end{figure}
+}
+
 % Title page
 % #1 - Module code
 % #2 - Lecturer
 \newcommand{\maketitlepage}[2]{
 \begin{titlepage}
 	\centering
-    \includegraphics[scale = 0.4]{imgs/01-standard-vertical-black.png}\\	% University Logo
-	\textsc{\LARGE #1}\\[0.5 cm]				% Course Code
+    \includegraphics[scale = 0.4]{imgs/01-standard-vertical-black.png}\\ % University Logo
+	\textsc{\LARGE #1}\\[0.5 cm] % Course Code
 	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
 	{ \huge \bfseries \thetitle}
 	\rule{\linewidth}{0.2 mm} \\[0.5 cm]
@@ -74,7 +98,7 @@
 			\begin{minipage}{0.4\textwidth}
             
 			\begin{flushright} \large
-			\emph{Submitted By :} \\
+			\emph{Submitted By:} \\
 			\theauthor
 		\end{flushright}
         
@@ -90,5 +114,5 @@
 \makeatother
 
 
-% Table of contents
+% Table of contents max depth
 \setcounter{tocdepth}{2}

@@ -1,0 +1,66 @@
+\section{Design}
+\externaldocument{appendix/appendix}
+\vspace{1cm}
+\subsection{Annotation of dataset}
+
+\subsection{Keypoint detection}
+First, to identify important parts from our lobster images, keypoints or areas of interest must be identified. \texttt{OpenCV} provides a host of different algorithms for feature detection such as Harris and Shi-Tomasi corner detectors and \texttt{SIFT}, \texttt{SURF}, \texttt{ORB} to extract keypoints \cite{opencv-tut1}. All these algorithms were tried and tested on a small subset of the dataset to see if any would provide both useful and consistent features that can be used. 
+
+\begin{figure}[H]
+\centering
+TODO fig of detector algorithms comparison
+\caption{Further comparison of the different detection algorithms on more images in appendix \ref{apdx:cv-algos}}
+\end{figure}
+\noindent
+
+From visually seeing the effects of each algorithm, it can be seen that the corner detectors do not work very well for our purpose. Though the shape of the lobster can be detected, much of the background such as slabs with sharp contrasting corners are also detected. Furthermore, simply detecting the shape of the lobster is not strong enough to extract further features such as positions of claws or the length of the carapace. 
+\n
+The keypoint detectors are able to provide better results as we can see keypoints of important body parts being identified. These keypoints are further able to be consistently identified from multiple images, showing that use of these algorithms are promising for automatically detecting the various parts of the lobster for construction of a graph. It is also non-trivial to create a graph from an outline of corners to represent the shape of a lobster, whereas the keypoints naturally translate well as nodes of a graph, with edges connecting them to form the shape and pose of a lobster. 
+
+\begin{figure}[H]
+\centering
+TODO  fig of keypoint detector algorithm comparison
+\caption{Comparison of different keypoint detection algorithms on multiple lobster images. See comparison of more images in appendix \ref{apdx:cv-algos}}
+\end{figure}
+\noindent
+
+Between the different keypoint detection algorithms, SIFT was chosen as it gave the most consistent results and the kind of useful keypoints that are needed.
+
+
+\subsection{Keypoint filtering}
+From just running a SIFT detector on the lobster images, it can be seen that there are a lot of small keypoints that are unimportant for our purposes. There are also many keypoints around the lobster that we would like to filter out, as we want all our keypoints to be on the lobster. Initially, the classic vision approach for feature matching using the keypoint descriptors \cite{sift} was tried, but the results obtained were surprisingly poor. Because of this, a more novel approach was taken for filtering. The small keypoints are filtered out by specifying an octave where all keypoints below the octave are filtered. Larger keypoints that are not on the lobster are filtered with a colour histogram method where the histograms of the keypoints are compared and any below a certain threshold are filtered.
+
+\subsubsection{SIFT descriptors}
+In computer vision, keypoint descriptors obtained from detectors like SIFT and SURF are often used for feature matching \cite{cv-matching}. Lowe's paper \cite{sift} on the SIFT detector states that keypoints descriptors are highly distinctive, allowing a single feature to be correctly matching with good probability in a large database of features. This is exactly what we want, as we wish to extract the different features of a lobster (tail, claws, head). The only difference is we do not have a dataset of the lobsters, but not of dataset of individual lobster parts. 
+\n
+Because we do not have a dataset for individual parts, it made more sense to do the opposite of matching. Instead of using the distance between descriptors to match a detected keypoint with a known keypoint, the distance can be used as filter out keypoints that do not match closely to known ones. This distance can then be used as a threshold to filter more or less keypoints away. 
+\n
+As a test, the descriptor for the important body keypoint was taken from one image and calculated. The descriptor was then matched to the closest other keypoints on another image to see if the body could be identified again. 
+
+\begin{figure}[H]
+\centering
+TODO keypoint descriptor matching other image
+\caption{The image on the left shows the keypoint that the descriptor was calculated from and the image on the right is the closest TODO matched keypoints to that descriptor.}
+\label{fig:kp-descriptor}
+\end{figure}
+\noindent
+Figure \ref{fig:kp-descriptor} shows that the use of keypoint descriptors as a means of matching or filtering was not very reliable. TODO
+\n
+As the traditional method of descriptors proved unreliable for our means, a slightly more novel method was needed to filter out keypoints. (TODO sentance wording)
+
+\subsubsection{Octave filtering}
+SIFT uses a Difference of Gaussians for different octaves of the image.  TODO. The octaves represent. It noticed from the keypoint information provided 
+
+
+\subsubsection{Colour histogram filtering}
+
+
+\subsection{Graph creation}
+
+\subsubsection{Probabilistic model}
+
+\subsection{Graph matching}
+
+\subsubsection{Subgraph matching}
+
+\subsubsection{Subgraph rebuilding}
