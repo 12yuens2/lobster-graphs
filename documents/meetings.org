@@ -34,6 +34,7 @@
 
 **** Graph creation software
 - Gephi to draw graphs, it can export drawn graphs into a number of data formats. 
+- What is the issue with networkx/d3.js? Can't express edge/node relations?
 
 *** 12/10/17
 **** Create graphs from lobsters to try matching
@@ -149,6 +150,7 @@ With list of matched and labelled subgraphs -> building together into whole lobs
 - look into subset of all triplet assignments and how they could fit into whole lobster
 
 * Semester 2 - Interim demo
+** Pre
 - Brief summary of everything that has been done.
 
 Feature detection:
@@ -274,6 +276,17 @@ compare previous models that only use size/histogram vs more structured approach
 - Use multiple histograms (one for each label) and add all points that match
 - Better more points and do more processing since any points lost in filtered cannot be used after
 - Have to be careful with being too lenient as that would lead to too much detection with noise
+
+** Spring week 1
+Which of juvenile/mature model is more probably for matched image
+- predict juvenile/mature as classification
+
+Labelling accuracy with precision/recall
+
+Report:
+- Justify decisions to show that i am not just randomly trying things
+- Evaluate if decisions work for some (eg, vision detectors, using 3 for permutations instead of 2 or 4)
+
 
 * Notes
 
