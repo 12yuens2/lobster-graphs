@@ -148,7 +148,6 @@ With list of matched and labelled subgraphs -> building together into whole lobs
 
 - look into subset of all triplet assignments and how they could fit into whole lobster
 
-
 * Semester 2 - Interim demo
 - Brief summary of everything that has been done.
 
@@ -278,12 +277,14 @@ compare previous models that only use size/histogram vs more structured approach
 
 * Notes
 
-
 ** Graph matching notes
 - Label nodes having expected number of edges
 eg, body should have 4 edges connected to it
   , arm has 2
   , head/tail/claw has 1
+
+** Histogram matching notes
+Follow pyimagesearch guide to utilizing color histograms
 
 ** Annotating dataset
 
@@ -293,9 +294,17 @@ eg, body should have 4 edges connected to it
 
 3. Manually label important keypoints, removing all other keypoints and annotating edges between keypoints
 
-4. Put all .gdf files as grapgrep db file
+4. Run ~translate.py~ to create finished ~.gdf~ files and put all finished ~.gdf~ files into one.
+4a, all complete ~.gdf~ files are needed for node/edge distributions
+
+5. Put all .gdf files as grapgrep db file by running 
+~./ggsxe -b -gfu db.gfu~ where ~db.gfu~ contains all annotated graph files together
+
+6. Use separate db file for mature and juvenile
 
 ** Method Pipeline
+
+0. Annotation of dataset for keypoint/node/edge distributions
 
 1. Get keypoints with SIFT
 
@@ -303,6 +312,7 @@ eg, body should have 4 edges connected to it
    - Removes all tiny keypoints that are of no relevance
 
 3-0. Tried filtering with size distributions, but not reliable because of different sized lobsters and not robust against scaling 
+3-0a. Also tried filtering with keypoint descriptors, but again not effective, often detects very small keypoints
 
 3. Filter with colour histograms
    a. Histogram for each label from model
@@ -319,3 +329,8 @@ eg, body should have 4 edges connected to it
    a. Keypoint method - find best triplet for each keypoint, use the best one if there is overlap
    b. Model method - use a model with a number of labels that should be filled if possible and find best triplet for each label
    c. Graph method - similar to model method but instead of filling just labels, try to fill a graph by each (node-edge-node)
+
+** Using dataset notes
+10 lobsters from each category (mature/juvenile)
+
+Leave one out validation where try to match back to one of the 20 dataset lobsters
