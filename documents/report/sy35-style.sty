@@ -2,7 +2,6 @@
 
 % Packages
 \usepackage{color}
-\usepackage{tikz}
 \usepackage{float}
 \usepackage{subcaption}
 \usepackage{tabularx}
@@ -17,6 +16,16 @@
 \usepackage{fancyhdr}
 \usepackage{vmargin}
 \usepackage{xr}
+
+% Flow diagram
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows}
+
+\tikzstyle{data} = [rectangle, rounded corners, text width=2cm, minimum height=1cm,text centered, draw=black, fill=red!30]
+\tikzstyle{process} = [rectangle, text width=2cm, minimum height=1cm, text centered, draw=black, fill=orange!30]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+
 
 % Appendix
 \usepackage[toc,page,title]{appendix}
@@ -49,10 +58,6 @@
   showstringspaces=false,
   columns=flexible,
   basicstyle={\small\ttfamily},
-  numberstyle=\color{gray},
-  keywordstyle=\color{blue},
-  commentstyle=\color{dkgreen},
-  stringstyle=\color{mauve},
   breaklines=true,
   breakatwhitespace=true,
   tabsize=2,
@@ -66,6 +71,7 @@
 
 % New line macro
 \newcommand{\n}[0]{\\[\baselineskip]}
+\newcommand{\imgpath}{}
 
 
 % Single image in figure

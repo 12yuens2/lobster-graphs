@@ -4,12 +4,19 @@
 \subsection{Existing software}
 
 \subsubsection{Graph visualisation}
-In order to visualise what a graph representation of a lobster may look like, graph drawing software that could import and export into a graph data format was needed. Initially the popular Graphviz and its \texttt{.dot} graph format \cite{graphviz-dot} was explored. The \texttt{dot} graph format had all the attributes needed such as size of nodes and weights of edges, however there was no readily available GUI tool for drawing graphs as Graphviz mostly works on rendering existing \texttt{dot} files. 
+In order to visualise what a graph representation of a lobster may look like, graph drawing software that could import and export into a graph data format was needed. Initially the popular Graphviz and its \texttt{.dot} graph format \cite{graphviz-dot} was explored. The \texttt{dot} graph format had all the attributes needed such as size of nodes and weights of edges, however there was no readily available GUI tool for drawing graphs as Graphviz mostly works on rendering existing \texttt{.dot} files. This was not ideal as the initial stage of the project involved manual annotation of the dataset with graph drawing software, to be done before any automatic generation graph files. 
 \n
-The open source Gephi \cite{gephi} tool was exactly what was needed in terms of a graph drawing tools as it allowed a simple graph to be drawn with nodes and edges labelled.
+The open source Gephi \cite{gephi} tool was the next piece of software explored and it was exactly what was needed in terms of a graph drawing tool. It allowed a simple graph to be drawn with nodes and edges labelled, so this could be done on top of a lobster image from the dataset. Further, the software was able to import and export from and into various different file formats such as \texttt{.graphml}, \texttt{.gml}, \texttt{.gdf} and \texttt{.dl}. Unfortunately it did not handle the \texttt{.dot} file format, so a choice had to be made between choosing the drawing too or more powerful file format. 
+\begin{lstlisting}[caption={Header formats for \texttt{.gdf} files showing the kind of node and edge data it could keep.}]
+nodedef> name VARCHAR,label VARCHAR,width DOUBLE,height DOUBLE,x DOUBLE,y DOUBLE,color VARCHAR
+
+edgedef> node1,node2,weight DOUBLE,directed BOOLEAN,color VARCHAR
+\end{lstlisting}
+From exploring the various file formats that Gephi could use, it was discovered that the \texttt{.gdf} format contained enough information for our purposes. Specifically it contained a label, width, height, x and y coordinates for nodes and weights for edges. 
 
 \subsubsection{Graph matching}
-Different graph matching and graph querying software was explored to deal with subgraph matching. What was needed was a tool that could find if a labelled subgraph was part of a larger graph in a database of pre-defined lobster graphs. The tool also had to be fast and able to query a large number ($> 100,000$) of subgraphs with sufficient speed. 
+The problem of graph matching, or \textbf{subgraph isomorphism}
+Different graph matching and graph querying software was also explored to deal with subgraph matching. What was needed was a tool that could find if a labelled subgraph was part of a larger graph in a database of pre-defined lobster graphs. The tool also had to be fast and able to query a large number ($> 100,000$) of subgraphs with sufficient speed. 
 \cite{graphgrep} \cite{appagato}
 
 \subsection{Technologies used}
@@ -17,7 +24,9 @@ Different graph matching and graph querying software was explored to deal with s
 \subsubsection{OpenCV}
 OpenCV (Open Source Computer Vision Library) \cite{opencv} is an open source library which contains a vast number of functions and interfaces for computer vision algorithms. The library was used heavily to prevent the need for implementing classical computer vision algorithms such as SIFT \cite{sift} and to make use of its image processing functions such as drawing detected keypoints and calculating colour histograms. 
 \n
-As OpenCV supports 
+As OpenCV supports C++, Python, Java and MATLAB, the choice of language used was between these languages. 
 
 \subsubsection{Python}
-Python was chosen as the primary language used for development.
+Python was chosen as the primary language used for development. It is popular in the scientific community thanks to its extensive library support and ease of writing. Since performance was not a major issue, using Python would make it easier and faster to test and prototype different methods without the need for heavy error checking and debugging. Using Python gives us access to powerful libraries such as NumPy and SciPy, providing useful functionality such as probability distributions and matrix manipulation out of the box. Additionally, Python is well supported by OpenCV, with both extensive documentation and examples available. 
+\n
+Although Python is a dynamically typed language, newer versions (Python 3.5 and above) have added support for type hints and static type checking with \texttt{mypy} \cite{mypy}. As the implementation of the project grew, the addition of type hints was added to keep the code organised and readable. 

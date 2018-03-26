@@ -1,6 +1,27 @@
-\section{Design}
-\newcommand{\imgpath}{tex/design/imgs}
+\section{Design}\label{sec:design}
+\renewcommand{\imgpath}{tex/design/imgs}
 \vspace{1cm}
+
+\subsection{Overview}
+
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\node (raw) [data] {Lobster image};
+\node (extraction) [process, right of=raw, xshift=2cm] {Keypoint extraction};
+\node (creation) [process, right of=extraction, xshift=2cm] {Subgraph creation};
+\node (subgraph) [data, right of=creation, xshift=2cm] {Lobster subgraphs};
+\node (graphgrep) [process, right of=subgraph, xshift=2cm] {Subgraph matching};
+
+\draw [arrow] (raw) -- (extraction);
+\draw [arrow] (extraction) -- (creation);
+\draw [arrow] (creation) -- (subgraph);
+\draw [arrow] (subgraph) -- (graphgrep);
+
+\end{tikzpicture}
+\caption{Flow chart of the whole matching process from getting keypoints to creation of the lobster graphs.}
+\end{figure}
 
 \subsection{Annotation of dataset}
 The dataset provided by \cite{lobster-thesis} was tagged with information on each image such as the lobster's sex, length of 
