@@ -5,21 +5,9 @@
 \subsubsection{Previous work}
 A large part of this project follows on from \cite{lobster-thesis}. In his work, Abdallah created a dataset consisting of images and features of lobsters. The lobsters were measured and categorised and segmentation and feature extraction techniques were applied to create a more diverse dataset with baseline results.  Additionally, classification and regression techniques were used to both classify the category of the lobster (juvenile or mature) and predict the carapace length. 
 \n
-This project is a continuation of Abdallah's work
+This project is a continuation of Abdallah's work 
 
 \subsubsection{Human pose recognition}
 The use of graphs in human pose estimation has been studied in the past
 \cite{human-pose} \cite{human-skeleton} where labelled nodes that represent important features such as hands and head are used to build skeleton models. 
 \subsubsection{Cattle identification}
-
-\subsection{Existing software}
-
-
-\subsubsection{Graph visualisation}
-In order to visualise what a graph representation of a lobster may look like, graph drawing software that could import and export into a graph data format was needed. Initially the popular Graphviz and its \texttt{.dot} graph format \cite{graphviz-dot} was explored. The \texttt{dot} graph format had all the attributes needed such as size of nodes and weights of edges, however there was no readily available GUI tool for drawing graphs as Graphviz mostly works on rendering existing \texttt{dot} files. 
-\n
-The open source Gephi \cite{gephi} tool was exactly what was needed in terms of a graph drawing tools as it allowed a simple graph to be drawn with nodes and edges labelled.
-
-\subsubsection{Graph matching}
-Different graph matching and graph querying software was explored to deal with subgraph matching. What was needed was a tool that could find if a labelled subgraph was part of a larger graph in a database of pre-defined lobster graphs. The tool also had to be fast and able to query a large number ($> 100,000$) of subgraphs with sufficient speed. 
-\cite{graphgrep} \cite{appagato}

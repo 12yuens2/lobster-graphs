@@ -1,0 +1,23 @@
+\section{Software Engineering Process}
+
+
+\subsection{Existing software}
+
+\subsubsection{Graph visualisation}
+In order to visualise what a graph representation of a lobster may look like, graph drawing software that could import and export into a graph data format was needed. Initially the popular Graphviz and its \texttt{.dot} graph format \cite{graphviz-dot} was explored. The \texttt{dot} graph format had all the attributes needed such as size of nodes and weights of edges, however there was no readily available GUI tool for drawing graphs as Graphviz mostly works on rendering existing \texttt{dot} files. 
+\n
+The open source Gephi \cite{gephi} tool was exactly what was needed in terms of a graph drawing tools as it allowed a simple graph to be drawn with nodes and edges labelled.
+
+\subsubsection{Graph matching}
+Different graph matching and graph querying software was explored to deal with subgraph matching. What was needed was a tool that could find if a labelled subgraph was part of a larger graph in a database of pre-defined lobster graphs. The tool also had to be fast and able to query a large number ($> 100,000$) of subgraphs with sufficient speed. 
+\cite{graphgrep} \cite{appagato}
+
+\subsection{Technologies used}
+
+\subsubsection{OpenCV}
+OpenCV (Open Source Computer Vision Library) \cite{opencv} is an open source library which contains a vast number of functions and interfaces for computer vision algorithms. The library was used heavily to prevent the need for implementing classical computer vision algorithms such as SIFT \cite{sift} and to make use of its image processing functions such as drawing detected keypoints and calculating colour histograms. 
+\n
+As OpenCV supports 
+
+\subsubsection{Python}
+Python was chosen as the primary language used for development.
