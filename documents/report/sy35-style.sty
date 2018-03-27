@@ -17,15 +17,9 @@
 \usepackage{vmargin}
 \usepackage{xr}
 
-% Flow diagram
-\usepackage{tikz}
-\usetikzlibrary{shapes.geometric, arrows}
 
-\tikzstyle{data} = [rectangle, rounded corners, text width=2cm, minimum height=1cm,text centered, draw=black, fill=red!30]
-\tikzstyle{process} = [rectangle, text width=2cm, minimum height=1cm, text centered, draw=black, fill=orange!30]
-\tikzstyle{arrow} = [thick,->,>=stealth]
-
-
+% Header
+%\pagestyle{headings} TODO
 
 % Appendix
 \usepackage[toc,page,title]{appendix}
@@ -65,6 +59,15 @@
 }
 
 \setlength{\grammarindent}{12em}
+
+
+% Flow diagram
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows}
+
+\tikzstyle{data} = [rectangle, rounded corners, text width=2cm, minimum height=1cm,text centered, draw=black, fill=red!30]
+\tikzstyle{process} = [rectangle, text width=2cm, minimum height=1cm, text centered, draw=black, fill=orange!30]
+\tikzstyle{arrow} = [thick,->,>=stealth]
 
 %\renewcommand{\lstlistingname}{Algorithm}
 %\newcommand{\tablerow}[4]{ #1 & #2 & #3 & #4\\}

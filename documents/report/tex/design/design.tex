@@ -1,30 +1,54 @@
-\section{Design}\label{sec:design}
+\section{Methodology}\label{sec:design}
 \renewcommand{\imgpath}{tex/design/imgs}
 \vspace{1cm}
 
 \subsection{Overview}
-
-
+Figure \ref{fig:overview} shows the key steps of overall method used to go from an image of a lobster to a labelled graph of the lobster. In the initial stages, keypoints are extracted and filtered from the image through the use of various OpenCV algorithms and techniques such as SIFT for keypoint detection and colour histograms for keypoint filtering. The remaining set of keypoints are then labelled using Bayes' theorem and all permutations of possible subgraphs are created. Next, the subgraphs are matched using GraphGrep \cite{graphgrep} and all matches combined using a simple probability model to get the final lobster graph. 
 \begin{figure}[H]
+\centering
+\begin{subfigure}{\textwidth}
 \centering
 \begin{tikzpicture}
 \node (raw) [data] {Lobster image};
 \node (extraction) [process, right of=raw, xshift=2cm] {Keypoint extraction};
 \node (creation) [process, right of=extraction, xshift=2cm] {Subgraph creation};
 \node (subgraph) [data, right of=creation, xshift=2cm] {Lobster subgraphs};
-\node (graphgrep) [process, right of=subgraph, xshift=2cm] {Subgraph matching};
 
 \draw [arrow] (raw) -- (extraction);
 \draw [arrow] (extraction) -- (creation);
 \draw [arrow] (creation) -- (subgraph);
-\draw [arrow] (subgraph) -- (graphgrep);
 
 \end{tikzpicture}
-\caption{Flow chart of the whole matching process from getting keypoints to creation of the lobster graphs.}
-\end{figure}
+\caption{Initial process of creating labelled subgraphs for matching.}
+\vspace{0.7cm}
+\end{subfigure}
 
+\begin{subfigure}{\textwidth}
+\centering
+\begin{tikzpicture}
+\node (subgraph) [data] {Lobster subgraphs};
+\node (graphgrep) [process, right of=subgraph, xshift=2cm] {Subgraph matching};
+\node (model) [process, right of=graphgrep, xshift=2cm] {Build complete graph (TODO name)};
+\node (graph) [data, right of=model, xshift=2cm] {Matched lobster graph};
+
+\draw [arrow] (subgraph) -- (graphgrep);
+\draw [arrow] (graphgrep) -- (model);
+\draw [arrow] (model) -- (graph);
+\end{tikzpicture}
+\caption{Process of taking the labelled subgraphs to creating a full lobster graph.}
+\end{subfigure}
+\caption{Flow chart of the whole matching process from getting keypoints to creation of the lobster graphs.}
+\label{fig:overview}
+\end{figure}
+\noindent
+A subset of the dataset was taken to create a database of manually annotated attributed lobster graphs. This database is important for many aspects of the overall method as it is the set of complete graphs for subgraph matching. Further, the attributes such as node labels, node sizes and edge weights contribute as a basis of the probability models used in both subgraph creation and rebuilding a complete lobster graph. 
 \subsection{Annotation of dataset}
-The dataset provided by \cite{lobster-thesis} was tagged with information on each image such as the lobster's sex, length of 
+The dataset provided by \cite{lobster-thesis} was tagged with information on each image such as the lobster's sex, length of the carapace and width of the tail. To be able to apply the probability models to the dataset and match to complete lobster graphs, the dataset had to be further annotated as attributed graphs. This was initially done and prototyped using Gephi to explore different graph configurations. Later, with the introduction of applying OpenCV keypoint detection algorithms, the annotations were amended with the detected keypoints to include node sizes and edge lengths.
+
+\begin{figure}
+\centering
+TODO Gephi prototype lobster graph
+\end{figure}
 
 \imagefig{1\textwidth}{\imgpath/annotated.JPG}{Example of annotated lobster image with nodes and edges of the graph perfectly matched.}
 
@@ -159,13 +183,59 @@ After applying the octave filter, there still remains some noisy keypoints we wa
 \noindent
 The pre-defined histograms TODO
 
-\subsection{Graph creation}
+\subsection{Subgraph creation}
+With a set of keypoints extracted and filtered from the image, the next step was to label the keypoints and create combinations and permutations of subgraphs to be matched.
+\subsubsection{Node labelling}\label{sec:probabilistic-model}
+A simple probabilistic model was used to determine how to label the keypoints through the use of Bayes' Theorem. 
+\begin{equation}
+P(label | size) = \frac{P(size | label)P(label)}{P(size)}
+\end{equation}
+The probability of $P(size | label)$ can be found using a normal distribution for all sizes of a label found in the annotated dataset. With the probability for each possible labelling for every keypoint, the labels can be applied based on a probability threshold. This means multiple labels can be applied to the same keypoint and each separate labelling must be treated as a separate node during subgraph creation. The threshold for labelling represents another trade off between computation required and completeness. If the threshold is too high, then we may miss many potential labels, but if the threshold is too low, then too many labels are applied, leading to a combinatorial explosion when creating the permutations of subgraphs. The result of the labelling process is a list of tuples containing a keypoint and its label. The same keypoint can appear multiple times with different labels.
 
-\subsubsection{Probabilistic model}\label{sec:probabilistic-model}
-
+\subsubsection{Subgraph permutations}
+To create labelled subgraphs from the labelled keypoints, all possible permutations are produced. The size of the subgraph to create (and therefore the size of the permutation) is an important consideration in this step. The equation for the number of permutations of size $k$ from $n$ labelled keypoints is as follows:
+\begin{equation}
+P(n, k) = \frac{n!}{(n-k)!}
+\end{equation}
+A large $k$ would make the matching step easier as a larger subgraph conveys more information about the node labels and connectivity, so there would be fewer but more distinct matches. However, this would lead to considerably more permutations, for example, given 20 labelled nodes, there would be 6840 possible permutations for $k=3$ while $k=4$ would give 116280 permutations. Having this combinatorial explosion is unsustainable. Though a single permutation cannot contain the same keypoint with two different labels, each permutation of a single keypoint and its multiple labels must be explored. Further these are permutations so the order matters as it directly represents the connection of the nodes to edges.
+\begin{figure}[H]
+\centering
+	\begin{subfigure}{0.45\textwidth}
+	\centering
+	\begin{tikzpicture}
+	\node (body) [circle, draw, minimum size=1.5cm] {body};
+	\node (claw) [circle, draw, minimum size=1.5cm, right of=body, xshift=1cm] {claw};
+	\node (tail) [circle, draw, minimum size=1.5cm, right of=claw, xshift=1cm] {tail};
+	
+	\draw (body) -- (claw);
+	\draw (claw) -- (tail);
+	\end{tikzpicture}
+	\caption{Permutation (body, claw, tail)}
+	\end{subfigure}
+	\hspace*{\fill}
+	\begin{subfigure}{0.45\textwidth}
+	\centering
+	\begin{tikzpicture}
+	\node (claw) [circle, draw, minimum size=1.5cm] {claw};
+	\node (body) [circle, draw, minimum size=1.5cm, right of=claw, xshift=1cm] {body};
+	\node (tail) [circle, draw, minimum size=1.5cm, right of=body, xshift=1cm] {tail};
+	
+	\draw (claw) -- (body);
+	\draw (body) -- (tail);
+	\end{tikzpicture}
+	\caption{Permutation (claw, body, tail)}
+	\end{subfigure}
+\caption{The order of the permutations matter as it determines the edges between the nodes.}
+\end{figure}
+\noindent
+A subgraph size of 3 was chosen in the end as it was a strong middle ground between retaining enough information for effective subgraph matching and not causing a large number of permutations to match. A size of 2 is ineffective for matching, it leads to too many successful matches because it is easy to find subgraphs of two nodes and one connecting edge as long as the labels are correct. However using 4 nodes as the subgraph led to too many permutations being produced, leading to a slow process in matching. This is why subgraphs of size 3 were chosen.
 
 \subsection{Graph matching}
-
+The crucial step of taking a large list of subgraphs and matching them to rebuild the complete lobster graph consists of two main steps:
+\begin{enumerate}
+\item Run GraphGrep to find all subgraphs of valid configurations against the database of complete lobster graphs. 
+\item Use the probability of each remaining subgraph to piece together the complete lobster graph.
+\end{enumerate}
 \subsubsection{Subgraph matching}
 
 \subsubsection{Subgraph rebuilding}

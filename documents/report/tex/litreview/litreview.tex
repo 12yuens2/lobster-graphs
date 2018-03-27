@@ -20,11 +20,11 @@ Some of the methodology used in human pose estimation can be applied to our lobs
 The methodology in this project, which is explained in section \ref{sec:design}, follows some parts of Tanaka's method. Most notably the use of example lobster graphs stored in a database for input subgraphs to match to. The aspect of having labelled attributed graphs of human skeletons extends well to labelled graphs of lobster. 
  
 \subsubsection{Cattle identification}
-The concept of combining local invariant features (keypoints) and graph matching has also been studied for use in automatic cattle identification \cite{cattle}. 
+The concept of combining local invariant features (keypoints) and graph matching has also been studied for use in automatic cattle identification \cite{cattle}. The application of feature extraction and graph matching in Monteiro's paper is different from the approach taken in this project, but there are a few similarities which show the concept of combining feature extraction and graph matching can give good results (TODO reword). 
+\n
+In the paper, the goal of graph matching was to match images of the same muzzle as a means of identification (like human fingerprints). 
 
 \subsection{Graph matching problem}
-The graph matching, or subgraph isomorphism problem is where given two undirected graphs $G_1$ and $G_2$, it must be determined whether the graph $G_1$ contains a subgraph that is isomorphic to $G_2$ \cite{subgraph}. Cook showed in his paper that subgraph isomorphism was NP-complete with a reduction to the 3-SAT problem. 
-\n
-This problem applies to the project from the use of subgraph matching to determine if a labelled subgraph is contained in a larger complete graph of a lobster. 
+The graph matching, or subgraph isomorphism problem is where given two undirected graphs $G_1$ and $G_2$, it must be determined whether the graph $G_1$ contains a subgraph that is isomorphic to $G_2$ \cite{subgraph}. Cook showed in his paper that subgraph isomorphism was NP-complete with a reduction to the 3-SAT problem. This problem applies to the project from the use of subgraph matching to determine if a labelled subgraph is contained in a larger complete graph of a lobster. 
 \n
 In this project, the problem of graph matching extends beyond that of pure subgraph isomorphism, where only the number of vertices and its connections are relevant. Because the shape of the lobster is a crucial part in determining successful matches, the size (weight) of each node in the graph and the length (weight) of the edges are all included as an important aspect in matching. 
