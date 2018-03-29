@@ -1,0 +1,32 @@
+\section{Results}\label{sec:results}
+\newcommand{\resultspath}{tex/results}
+To evaluate how well this method of recreating lobster graphs performs, precision and recall metrics are used. The evaluation is split into two evaluations, one for the performance of identifying correct keypoints and the second for the performance of keypoint labelling. The evaluations are split up into two parts because defining false positives and false negatives when evaluating both aspects together is a difficult problem. For example, if a keypoint has been incorrectly identified, then how is the labelling of the keypoint dealt with? The label cannot be correct, but only because the keypoint itself is wrong and there is not defined correct label for them. 
+
+\subsection{Keypoint identification}
+First, the precision and recall metrics were calculated for keypoint identification to see how many keypoints from the annotated images could be re-identified in the final graph. The labels of each keypoint and the edges between them are not taken into account for these results. 
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+	title = {Overall precision/recall},
+	legend pos=outer north east,
+	xlabel={Recall},
+	ylabel={Precision}
+]
+
+\addplot+[only marks, fill opacity=0.2, discard if not={Method}{graph}] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
+\addlegendentry{Graph method}
+
+\addplot+[only marks, fill opacity=0.2, discard if not={Method}{model}] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
+\addlegendentry{Model method}
+
+\end{axis}
+\end{tikzpicture}
+
+\end{figure}
+
+\subsection{Keypoint labelling}
+
+\subsection{Classification}
+

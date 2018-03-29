@@ -11,7 +11,6 @@
 \usepackage{enumitem}
 \usepackage{syntax}
 \usepackage{csquotes}
-\usepackage{pgfplots}
 \usepackage{parskip}
 \usepackage{fancyhdr}
 \usepackage{vmargin}
@@ -60,6 +59,30 @@
 
 \setlength{\grammarindent}{12em}
 
+% Plots
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{
+    discard if/.style 2 args={
+        x filter/.append code={
+            \edef\tempa{\thisrow{#1}}
+            \edef\tempb{#2}
+            \ifx\tempa\tempb
+                \def\pgfmathresult{inf}
+            \fi
+        }
+    },
+    discard if not/.style 2 args={
+        x filter/.append code={
+            \edef\tempa{\thisrow{#1}}
+            \edef\tempb{#2}
+            \ifx\tempa\tempb
+            \else
+                \def\pgfmathresult{inf}
+            \fi
+        }
+    }
+}
 
 % Flow diagram
 \usepackage{tikz}
