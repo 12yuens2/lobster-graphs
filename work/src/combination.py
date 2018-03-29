@@ -8,6 +8,8 @@ import common.probability as cp
 import common.matching as cm
 import common.cv as cc
 import common.write as cw
+import common.graph as cg
+import common.experiment as ce
 
 
 from typing import List, Tuple, Dict, Any
@@ -48,62 +50,88 @@ def model_dict():
             "back": 1,
             "tail": 1 }
 
-LABEL_THRESHOLD = 0.1
 
-category = sys.argv[1]
-
-if not (category == "juvenile" or category == "mature"):
-    print("Category " + category + " not recognised!")
-    exit(1)
-
-print("Running pipeline on " + category + " model.")
-
-# Get probability distributions from annotated dataset
-node_distributions = cp.get_node_distributions("graphs/complete/" + category + "/")
-edge_distributions = cp.get_edge_distributions("graphs/complete/" + category + "/")
-
-for image_file in os.listdir(cw.PATH):
-    print("Start " + image_file)
-    kps = cc.get_image_kps(cw.PATH + image_file)
-
-    # Remove old queries
+def remove_old_queries():
     print("Removing old queries...")
     for f in [f for f in os.listdir("../queries/")]:
         os.remove("../queries/" + f) 
 
-        
-    permutation_size = 3
-    combinations = cm.get_combinations(kps, node_distributions, LABEL_THRESHOLD)
-    permutations = cm.get_permutations(combinations, permutation_size)
+def get_unique_labels(subgraphs):
+    labels = []
+    for tup in subgraphs:
+        for keylabel in tup:
+            kp,label = keylabel
+            labels.append(label.name)
 
-    print("Got " + str(len(kps)) + " keypoints.")
-    print(str(len(permutations)) + " permutations of size " + str(permutation_size))
+    return list(set(labels))
     
-    print("Writing graphs to file...")
-    cw.permutations_as_query(permutations, permutation_size, "../queries/query")
+LABEL_THRESHOLD = 0.06
+HISTOGRAM_THRESHOLD = 0.5
+PERMUTATION_SIZE = 3
+#category = sys.argv[1]
 
-   
-    #1. Take 1 random match
-    #2. Check against model and existing subgraph labels
-    #3. Keep taking another random match until no more matches or model is filled, do not take match if label/keypoint already exists
-    #4. Put all matches together as one graph and give probability as sum?product? of all matches
-    #5. Do not have to worry about duplicate labels/keypoints because we can connect them all together rather than connect the exact matched subgraphs
-    
-    matches = cm.run_matching(category, permutations)
-    
-    # Do different methods to get triplets
-    best_kp = cm.bf_keypoints(kps, matches, node_distributions, edge_distributions)
-    best_model = cm.bf_model(model_dict(), matches, node_distributions, edge_distributions)
-    best_graph = cm.bf_graph(model_graph(), matches, node_distributions, edge_distributions)
+identification_file = open("identification.csv", "w")
+identification_file.write("Image,Method,Model,Category,Precision,Recall\n")
+identification_file.flush()
+
+labelling_file = open("labelling.csv", "w")
+labelling_file.write("Image,Method,Model,Category,Label,Precision,Recall\n")
+labelling_file.flush()
+
+#if not (category == "juvenile" or category == "mature"):
+#    print("Category " + category + " not recognised!")
+#    exit(1)
+
+for category in ["mature", "juvenile"]:
+    print("Running pipeline on " + category + " model.")
+
+    # Get probability distributions from annotated dataset
+    node_distributions = cp.get_node_distributions("graphs/complete/" + category + "/")
+    edge_distributions = cp.get_edge_distributions("graphs/complete/" + category + "/")
+
+    for image_file in os.listdir(cw.PATH):
+        print("Start " + image_file)
+        kps = cc.get_image_kps(cw.PATH + image_file, HISTOGRAM_THRESHOLD)
+
+        # Remove old queries
+        remove_old_queries() 
+
+        # Get labelling combinations
+        combinations = cm.get_combinations(kps, node_distributions, LABEL_THRESHOLD)
+
+        # Get subgraph permutations
+        permutations = cm.get_permutations(combinations, PERMUTATION_SIZE)
+
+        print("Got " + str(len(kps)) + " keypoints.")
+        print(str(len(permutations)) + " permutations of size " + str(PERMUTATION_SIZE))
+
+        print("Writing graphs to file...")
+        cw.permutations_as_query(permutations, PERMUTATION_SIZE, "../queries/query")
+
+        matches = cm.run_matching(category, permutations)
+
+        # Do different methods to get triplets
+        #best_kp = cm.bf_keypoints(kps, matches, node_distributions, edge_distributions)
+        best_model = cm.bf_model(model_dict(), matches, node_distributions, edge_distributions)
+        best_graph = cm.bf_graph(model_graph(), matches, node_distributions, edge_distributions)
 
 
-    print("kp: " + str(len(best_kp)))
-    print("model:" + str(len(best_model)))
-    print("graph:" + str(len(best_graph)))
+        #print("kp: " + str(len(best_kp)))
+        print("model:" + str(len(best_model)))
+        print("graph:" + str(len(best_graph)))
 
-    cw.write_triplets(best_kp, image_file, "imgs/method-kp/" + category + "/")
-    cw.write_triplets(best_model, image_file, "imgs/method-model/" + category + "/")
-    cw.write_triplets(best_graph, image_file, "imgs/method-graph/" + category + "/")
-    cw.write_keypoints(image_file, kps)
+        ce.experiment_file(image_file, category, best_model, best_graph, identification_file)
+        for label in get_unique_labels(best_model):
+            ce.experiment_label(image_file, "model", category, label, best_model)
 
-    print("------------------------------")
+        for label in get_unique_labels(best_graph):
+            ce.experiment_label(image_file, "graph", category, label, best_graph)
+
+        cw.write_triplets(best_model, image_file, "imgs/method-model/" + category + "/")
+        cw.write_triplets(best_graph, image_file, "imgs/method-graph/" + category + "/")
+        cw.write_keypoints(image_file, kps)
+
+        print("------------------------------")
+
+
+ce.write_label_experiment(labelling_file)

@@ -30,7 +30,7 @@ def write_detected_image(read_path, write_path, kps):
         cv2.putText(image, str(i+1), cc.get_point_tuple(kp), 1, 4, (0,0,255), 2, cv2.LINE_AA)
     cv2.imwrite(write_path, image)
 
-    
+
 
 category: str = sys.argv[1]
 read_path = "imgs/dataset/" + category + "/raw/"

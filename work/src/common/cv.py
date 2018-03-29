@@ -83,7 +83,7 @@ def filter_keypoints_size(kps):
 
     return filtered_kps
 
-def filter_keypoints_histogram(image, histogram, kps, method=cv2.HISTCMP_CORREL):
+def filter_keypoints_histogram(image, histogram, kps, threshold, method=cv2.HISTCMP_CORREL):
     """ Filter keypoints by colour histogram """
     filtered_kps = []
 
@@ -91,7 +91,7 @@ def filter_keypoints_histogram(image, histogram, kps, method=cv2.HISTCMP_CORREL)
         # Calculate histogram on BGR
         hist2 = cv2.calcHist([image], [0,1,2], mask_image(image, kp), HIST_BINS, [0,256,0,256,0,256])
         diff = cv2.compareHist(histogram, hist2, method)
-        if diff > 0.5:
+        if diff > threshold:
             filtered_kps.append(kp)
 
     return filtered_kps
@@ -156,7 +156,7 @@ def mask_image(image, keypoint):
 
 
 
-def get_image_kps(image_file, hist_method=cv2.HISTCMP_CORREL):
+def get_image_kps(image_file, threshold, hist_method=cv2.HISTCMP_CORREL):
     """ Get histogram filtered keypoints of an image """
     image = cv2.imread(image_file)
     kps = get_all_keypoints(image_file)
@@ -167,7 +167,7 @@ def get_image_kps(image_file, hist_method=cv2.HISTCMP_CORREL):
         hist = np.load("hists/" + hist_file)
         hist.reshape(8,8,8)
 
-        filtered_kps += filter_keypoints_histogram(image, hist, kps, method=hist_method)
+        filtered_kps += filter_keypoints_histogram(image, hist, kps, threshold, method=hist_method)
 
         #print(hist_file)
         #print(len(filtered_kps))

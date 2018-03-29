@@ -2,6 +2,8 @@ import sys
 import cv2
 import numpy as np
 
+import common.cv as cc
+
 def draw_keypoints(image, kps, scale):
     img = image.copy()
     img = cv2.resize(image, (0,0), fx=scale, fy=scale)
@@ -39,10 +41,13 @@ def shi_tomasi(gray_image, image):
     return shi_tomasi_img
 
 def sift(image):
-    sift = cv2.xfeatures2d.SIFT_create()
-    sift_kps = sift.detect(image, None)
+    #sift = cv2.xfeatures2d.SIFT_create()
+    #sift_kps = sift.detect(image, None)
+    #sift_kps = cc.filter_keypoints_octave(sift_kps)
 
-    return draw_keypoints(image, sift_kps, 0.2)
+    sift_kps = cc.get_image_kps("imgs/lobsters/IMG_1398.JPG")
+
+    return draw_keypoints(image, sift_kps, 0.1)
 
 def surf(image):
     surf = cv2.xfeatures2d.SURF_create(2000)
@@ -76,7 +81,7 @@ cv2.imwrite("img-shi-tomasi2.png", shi_tomasi_img)
 
 # SIFT
 sift_img = sift(image)
-cv2.imwrite("img-sift2.png", sift_img)
+cv2.imwrite("sift-histogram.png", sift_img)
 
 # SURF
 surf_img = surf(image)
