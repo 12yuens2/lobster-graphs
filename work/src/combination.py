@@ -78,6 +78,8 @@ labelling_file = open("labelling.csv", "w")
 labelling_file.write("Image,Method,Model,Category,Label,Precision,Recall\n")
 labelling_file.flush()
 
+label_dict = {}
+
 #if not (category == "juvenile" or category == "mature"):
 #    print("Category " + category + " not recognised!")
 #    exit(1)
@@ -122,10 +124,10 @@ for category in ["mature", "juvenile"]:
 
         ce.experiment_file(image_file, category, best_model, best_graph, identification_file)
         for label in get_unique_labels(best_model):
-            ce.experiment_label(image_file, "model", category, label, best_model)
+            ce.experiment_label(image_file, "model", category, label, best_model, label_dict)
 
         for label in get_unique_labels(best_graph):
-            ce.experiment_label(image_file, "graph", category, label, best_graph)
+            ce.experiment_label(image_file, "graph", category, label, best_graph, label_dict)
 
         cw.write_triplets(best_model, image_file, "imgs/method-model/" + category + "/")
         cw.write_triplets(best_graph, image_file, "imgs/method-graph/" + category + "/")

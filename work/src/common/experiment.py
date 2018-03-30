@@ -79,9 +79,8 @@ def experiment_file(image_file, model_category, best_model, best_graph, csv_file
     csv_file.flush()
 
 
-label_experiment_dict = {}
 
-def experiment_label(image_file, method, model_category, label, best_model):
+def experiment_label(image_file, method, model_category, label, best_model, experiment_dict):
 
     actual_category = "juvenile" if image_file[4] == "4" else "mature"
     annotated_nodes = get_annotated_nodes(image_file)
@@ -93,17 +92,24 @@ def experiment_label(image_file, method, model_category, label, best_model):
     #writer.writerow([image_file, method, model_category, actual_category, label, precision, recall])
     #csv_file.flush()
 
-    if label in label_experiment_dict:
-        total = label_experiment_dict[method,label,model_category,actual_category]
-        label_experiment_dict[method,label,model_category,actual_category] = tuple(sum(x) for x in zip(total,pr))
+    if (method,label,model_category,actual_category) in experiment_dict:
+        total = experiment_dict[method,label,model_category,actual_category]
+        print(total)
+        print(pr)
+        print("-")
+        experiment_dict[method,label,model_category,actual_category] = tuple(sum(x) for x in zip(total,pr))
+
+        print(experiment_dict[method,label,model_category,actual_category])
+        print("")
     else:
-        label_experiment_dict[method,label,model_category,actual_category] = pr
+        experiment_dict[method,label,model_category,actual_category] = pr
 
 
-def write_label_experiment(csv_file):
+        
+def write_label_experiment(csv_file, experiment_dict):
     writer = csv.writer(csv_file, delimiter=",")
 
-    for key,data in label_experiment_dict.items():
+    for key,data in experiment_dict.items():
         method,label,model_category,actual_category = key
         precision,recall = data
 
