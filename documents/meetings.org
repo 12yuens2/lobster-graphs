@@ -288,6 +288,15 @@ Report:
 - Evaluate if decisions work for some (eg, vision detectors, using 3 for permutations instead of 2 or 4)
 
 
+** Spring week 2
+*** Before meeting notes
+- Context survey -> background
+- Context survey -> previous work
+- Results -> keypoint labelling how to plot
+- Introduction -> objectives
+
+- Draft
+
 * Notes
 
 ** Graph matching notes
