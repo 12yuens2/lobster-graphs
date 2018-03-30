@@ -9,21 +9,86 @@ First, the precision and recall metrics were calculated for keypoint identificat
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-	title = {Overall precision/recall},
+	title = {\textbf{Overall precision/recall using Mature model}},
 	legend pos=outer north east,
 	xlabel={Recall},
 	ylabel={Precision}
 ]
 
-\addplot+[only marks, fill opacity=0.2, discard if not={Method}{graph}] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
-\addlegendentry{Graph method}
+\addplot+[only marks, fill opacity=0.2, 
+	discard if not={Method}{graph}, 
+	discard if not={Model}{mature}, 
+	discard if not={Category}{mature}
+] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
+\addlegendentry{Graph method on mature lobsters}
 
-\addplot+[only marks, fill opacity=0.2, discard if not={Method}{model}] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
-\addlegendentry{Model method}
+\addplot+[only marks, fill opacity=0.2, 
+	discard if not={Method}{model}, 
+	discard if not={Model}{mature}, 
+	discard if not={Category}{mature}
+] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
+\addlegendentry{Model method on mature lobsters}
+
+\addplot+[only marks, fill opacity=0.2, 
+	discard if not={Method}{graph}, 
+	discard if not={Model}{mature}, 
+	discard if not={Category}{juvenile}
+] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
+\addlegendentry{Graph method on juvenile lobsters}
+
+\addplot+[only marks, fill opacity=0.2, 
+	discard if not={Method}{model}, 
+	discard if not={Model}{mature}, 
+	discard if not={Category}{juvenile}
+] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
+\addlegendentry{Model method on juvenile lobsters}
 
 \end{axis}
 \end{tikzpicture}
+\caption{Precision Recall for different graph building methods}
+\end{figure}
 
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+	title = {\textbf{Overall precision/recall using Juvenile model}},
+	legend pos=outer north east,
+	xlabel={Recall},
+	ylabel={Precision}
+]
+
+\addplot+[only marks, fill opacity=0.2, 
+	discard if not={Method}{graph}, 
+	discard if not={Model}{juvenile}, 
+	discard if not={Category}{mature}
+] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
+\addlegendentry{Graph method on mature lobsters}
+
+\addplot+[only marks, fill opacity=0.2, 
+	discard if not={Method}{model}, 
+	discard if not={Model}{juvenile}, 
+	discard if not={Category}{mature}
+] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
+\addlegendentry{Model method on mature lobsters}
+
+\addplot+[only marks, fill opacity=0.2, 
+	discard if not={Method}{graph}, 
+	discard if not={Model}{juvenile}, 
+	discard if not={Category}{juvenile}
+] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
+\addlegendentry{Graph method on juvenile lobsters}
+
+\addplot+[only marks, fill opacity=0.2, 
+	discard if not={Method}{model}, 
+	discard if not={Model}{juvenile}, 
+	discard if not={Category}{juvenile}
+] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
+\addlegendentry{Model method on juvenile lobsters}
+
+\end{axis}
+\end{tikzpicture}
+\caption{Precision Recall for different graph building methods}
 \end{figure}
 
 \subsection{Keypoint labelling}

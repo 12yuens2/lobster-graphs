@@ -3,7 +3,7 @@
 \vspace{1cm}
 
 \subsection{Overview}
-Figure \ref{fig:overview} shows the key steps of overall method used to go from an image of a lobster to a labelled graph of the lobster. In the initial stages, keypoints are extracted and filtered from the image through the use of various OpenCV algorithms and techniques such as SIFT for keypoint detection and colour histograms for keypoint filtering. The remaining set of keypoints are then labelled using Bayes' theorem and all permutations of possible subgraphs are created. Next, the subgraphs are matched using GraphGrep \cite{graphgrep} and all matches combined using a simple probability model to get the final lobster graph. 
+Figure \ref{fig:overview} shows the key steps of overall method used to go from an image of a lobster to a labelled graph of the lobster. In the initial stages, keypoints are extracted and filtered from the image through the use of various OpenCV algorithms and techniques such as SIFT for keypoint detection and colour histograms for keypoint filtering. The remaining set of keypoints are then labelled using Bayes' theorem and all permutations of possible subgraphs are created. Next, the subgraphs are matched using GraphGrep \cite{graphgrep} and all matches combined using probability models to get the final lobster graph. 
 \begin{figure}[H]
 \centering
 \begin{subfigure}{\textwidth}
@@ -41,7 +41,7 @@ Figure \ref{fig:overview} shows the key steps of overall method used to go from 
 \label{fig:overview}
 \end{figure}
 \noindent
-A subset of the dataset was taken to create a database of manually annotated attributed lobster graphs. This database is important for many aspects of the overall method as it is the set of complete graphs for subgraph matching. Further, the attributes such as node labels, node sizes and edge weights contribute as a basis of the probability models used in both subgraph creation and rebuilding a complete lobster graph. 
+A subset of the dataset was taken to create a database of manually annotated attributed lobster graphs. This dataset is important for many aspects of the overall method as it is the set of complete graphs for subgraph matching. Further, the attributes such as node labels, node sizes and edge weights contribute as a basis for the probability models used in both subgraph creation and rebuilding a complete lobster graph. 
 \subsection{Annotation of dataset}
 The dataset provided by \cite{lobster-thesis} was tagged with information on each image such as the lobster's sex, length of the carapace and width of the tail. To be able to apply the probability models to the dataset and match to complete lobster graphs, the dataset had to be further annotated as attributed graphs. This was initially done and prototyped using Gephi to explore different graph configurations. Later, with the introduction of applying OpenCV keypoint detection algorithms, the annotations were amended with the detected keypoints to include node sizes and edge lengths.
 
@@ -49,6 +49,8 @@ The dataset provided by \cite{lobster-thesis} was tagged with information on eac
 \centering
 TODO Gephi prototype lobster graph
 \end{figure}
+\noindent
+In the first lobster graph prototyping done with Gephi, 
 
 \imagefig{1\textwidth}{\imgpath/annotated.JPG}{Example of annotated lobster image with nodes and edges of the graph perfectly matched.}
 
@@ -166,7 +168,7 @@ From this observation, we can apply a filter on all keypoints found below a cert
 
 
 \subsubsection{Colour histogram filtering}
-After applying the octave filter, there still remains some noisy keypoints we want to remove. Most notably are the keypoints found on the white background of the images. There have been studies \cite{color-histogram} \cite{color-filter} that show applying a colour filter to eliminate unwanted feature points can be quite effective, especially if the background is very different from the target of the image. Following from this, colour histograms of each keypoints were calculated and compared to a set of pre-defined histograms. The difference between the histograms was compared and only keypoints whose different is above a certain threshold are kept. 
+After applying the octave filter, there still remains some noisy keypoints that need to be removed. Most notably are the keypoints found on the white background of the images. There have been studies \cite{color-histogram} \cite{color-filter} that show applying a colour filter to eliminate unwanted feature points can be quite effective, especially if the background is very different from the target of the image. Following from this, colour histograms of each keypoints were calculated and compared to a set of pre-defined histograms. The difference between the histograms was compared and only keypoints whose different is above a certain threshold are kept. 
 
 \begin{figure}[H]
 	\begin{subfigure}{0.5\textwidth}
@@ -182,15 +184,29 @@ After applying the octave filter, there still remains some noisy keypoints we wa
 \end{figure}
 \noindent
 The pre-defined histograms TODO
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth, keepaspectratio]{\imgpath/noisy-keypoints.png}
+\caption{Keypoints detected after filtering, showing the weakness of colour histogram filtering against noise.}
+\label{fig:noisy-histogram}
+\end{figure}
+\noindent
+A potential issue that was not fully explored is the application of this approach to noisy backgrounds. The colour histograms are effective due to the large contrast between the white background and the lobster. However, this means that keypoints detected in noisy backgrounds that have similar dark colours are not filtered out. Figure \ref{fig:noisy-histogram} shows an image with more in the background and it can be seen that multiple keypoints from the background not belonging to the lobster are kept. (TODO ref return to issue in results)
 
 \subsection{Subgraph creation}
-With a set of keypoints extracted and filtered from the image, the next step was to label the keypoints and create combinations and permutations of subgraphs to be matched.
+With a set of keypoints extracted and filtered from the image, the next step was to label the keypoints and create permutations of subgraphs to be matched. To reduce problems with combinatorial explosions when creating subgraph permutations, the number of labels assigned to each point and the size of the subgraphs have to be kept low.  
 \subsubsection{Node labelling}\label{sec:probabilistic-model}
 A simple probabilistic model was used to determine how to label the keypoints through the use of Bayes' Theorem. 
 \begin{equation}
 P(label | size) = \frac{P(size | label)P(label)}{P(size)}
 \end{equation}
-The probability of $P(size | label)$ can be found using a normal distribution for all sizes of a label found in the annotated dataset. With the probability for each possible labelling for every keypoint, the labels can be applied based on a probability threshold. This means multiple labels can be applied to the same keypoint and each separate labelling must be treated as a separate node during subgraph creation. The threshold for labelling represents another trade off between computation required and completeness. If the threshold is too high, then we may miss many potential labels, but if the threshold is too low, then too many labels are applied, leading to a combinatorial explosion when creating the permutations of subgraphs. The result of the labelling process is a list of tuples containing a keypoint and its label. The same keypoint can appear multiple times with different labels.
+The three probabilities $P(size | label)$, $P(label)$, $P(size)$ are defined as follows:
+\begin{itemize}
+\item $P(size | label)$ - This probability was found using a normal distribution for all sizes of the particular label found in the annotated dataset.
+\item $P(label)$ - This is defined as how often that label appears in the annotated dataset relative to the total number of all labels. For example, if there were a total of 100 labels and the \textit{body} label appears 20 times, then $P(label = body) = \frac{20}{100}$.
+\item $P(size)$ - The probability of keypoint sizes again uses a normal distribution for all keypoint sizes in the annotated dataset.
+\end{itemize}
+With the probability calculated for each possible labelling for every keypoint, the labels can be applied based on a threshold. This means multiple labels can be applied to the same keypoint and each separate labelling must be treated as a separate node during subgraph creation. The threshold for labelling represents the trade off between computation required and completeness. If the threshold is too high, then we may miss many potential labels. This is important because the size of the annotated dataset is quite small, so there is a high standard deviation in the distributions for label sizes. On the other hand, if the threshold is too low, then too many labels are applied, leading to a combinatorial explosion when creating the permutations of subgraphs. The result of the labelling process is a list of tuples containing a keypoint and its label. Having all the keypoints labelled, the next step is to create subgraphs where the nodes are represented by labelled keypoints and edges are defined  between the nodes to create the subgraph. 
 
 \subsubsection{Subgraph permutations}
 To create labelled subgraphs from the labelled keypoints, all possible permutations are produced. The size of the subgraph to create (and therefore the size of the permutation) is an important consideration in this step. The equation for the number of permutations of size $k$ from $n$ labelled keypoints is as follows:
@@ -225,10 +241,12 @@ A large $k$ would make the matching step easier as a larger subgraph conveys mor
 	\end{tikzpicture}
 	\caption{Permutation (claw, body, tail)}
 	\end{subfigure}
-\caption{The order of the permutations matter as it determines the edges between the nodes.}
+\caption{The order of the permutations matters as it determines the edges between the nodes.}
 \end{figure}
 \noindent
 A subgraph size of 3 was chosen in the end as it was a strong middle ground between retaining enough information for effective subgraph matching and not causing a large number of permutations to match. A size of 2 is ineffective for matching, it leads to too many successful matches because it is easy to find subgraphs of two nodes and one connecting edge as long as the labels are correct. However using 4 nodes as the subgraph led to too many permutations being produced, leading to a slow process in matching. This is why subgraphs of size 3 were chosen.
+\n
+
 
 \subsection{Graph matching}
 The crucial step of taking a large list of subgraphs and matching them to rebuild the complete lobster graph consists of two main steps:
@@ -237,5 +255,5 @@ The crucial step of taking a large list of subgraphs and matching them to rebuil
 \item Use the probability of each remaining subgraph to piece together the complete lobster graph.
 \end{enumerate}
 \subsubsection{Subgraph matching}
-
+After the matching step with GrapGrep, the list of matches is used to pick out the matched permutations. During this step, the lengths of the edges between each node is taken into account. This acts as a late filter step for keypoints that may not be on the lobster, not allowing graph configurations where the points are too far apart to make sense. For example if the distance between an \textit{arm} node and \textit{claw} node is the same as the distance between a \textit{body} and \textit{tail}, the \textit{arm}/\textit{claw} permutation will be discarded. This is helpful in discarding keypoints that are far away from the lobster, for example on the edges of the background. 
 \subsubsection{Subgraph rebuilding}

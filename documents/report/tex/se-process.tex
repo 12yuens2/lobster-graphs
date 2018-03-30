@@ -16,6 +16,8 @@ From exploring the various file formats that Gephi could use, it was discovered 
 
 \subsubsection{Graph matching}
 Different graph matching and graph querying software was explored to deal with subgraph matching without the need for our own implementation. What was needed was a tool that could find if a labelled subgraph was part of a larger graph in a database of pre-defined lobster graphs. The tool also had to be fast and able to query a large number ($> 100,000$) of subgraphs with sufficient speed. Two tools, GraphGrep \cite{graphgrep} and APPAGATO \cite{appagato} were looked at for this purpose. 
+\n
+Both tools were similar, using the same input/output formats for graphs and matches. They allowed input graphs nodes to be labelled with names, which was convenient for labelling the different parts of a lobster. The advantage APPAGATO offered over GraphGrep was its parallel GPU implementation for large speed up. During the initial prototyping stage, both tools were tested for their speed and suitability to the problem. Example graphs and queries were created and ran with large numbers of queries
 
 \subsection{Technologies used}
 
