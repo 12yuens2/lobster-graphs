@@ -113,7 +113,7 @@ def write_label_experiment(csv_file, experiment_dict):
         method,label,model_category,actual_category = key
         precision,recall = data
 
-        writer.writerow([method,model_category,actual_category,label,precision/20,recall/20])
+        writer.writerow([method,model_category,actual_category,label,precision/10,recall/10])
         csv_file.flush()
         
 

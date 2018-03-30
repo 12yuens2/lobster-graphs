@@ -136,4 +136,4 @@ for category in ["mature", "juvenile"]:
         print("------------------------------")
 
 
-ce.write_label_experiment(labelling_file)
+ce.write_label_experiment(labelling_file, label_dict)

@@ -45,9 +45,9 @@ def sift(image):
     #sift_kps = sift.detect(image, None)
     #sift_kps = cc.filter_keypoints_octave(sift_kps)
 
-    sift_kps = cc.get_image_kps("imgs/lobsters/IMG_1398.JPG")
+    sift_kps = cc.get_image_kps("imgs/lobsters/IMG_5252.JPG", 0.5)
 
-    return draw_keypoints(image, sift_kps, 0.1)
+    return draw_keypoints(image, sift_kps, 0.4)
 
 def surf(image):
     surf = cv2.xfeatures2d.SURF_create(2000)

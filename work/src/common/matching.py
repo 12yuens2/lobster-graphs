@@ -16,22 +16,7 @@ from classes.graphs import Graph, Edge
 
 FNULL = open(os.devnull, "w")
 
-'''
-class Node():
-    def __init__(self, kp, label):
-        print(type(kp))
-        self.kp = kp
-        self.label = label
-'''
-    
-
-'''
-class Permutation():
-    def __init__(self, tuple: KeyLabel, probability: float) -> None:
-        self.tuple: KeyLabel = tuple
-        self.probability: float = probability
-'''
-   
+  
 def possible_node_labels(actual_size: float,
                          label_distributions: Dict[str, LabelData],
                          label_threshold: float) -> List[Label]:
@@ -73,20 +58,6 @@ def get_permutations(combinations: List[KeyLabel],
     return permutation_tuples
 
 
-
-
-'''
-def node_matches(query_graph, db_graph, matches):
-    for query,target in matches:
-        query_node = query_graph.get_node(query)
-        target_node = db_graph.get_node(target)
-
-        if query_node != target_node:
-            return False
-
-    return True
-'''
-
 def edge_matches(query_graph: Graph,
                  db_graph: Graph,
                  matches: List[Tuple[int, int]]) -> bool:
@@ -116,6 +87,7 @@ def get_matches(permutations: List[Tuple[KeyLabel, ...]],
             query_graph = cg.graph_from_permutation(permutation)
             db_graph = get_db_graph(db_id, db_path)
 
+            # Only need to check edge matches as it indirectly checks node matches
             if edge_matches(query_graph, db_graph, matches):
                 good_matches.append(permutation)
 
