@@ -75,7 +75,7 @@ def edge_matches(query_graph: Graph,
 def get_matches(permutations: List[Tuple[KeyLabel, ...]],
                 db_path: str) -> List[Tuple[KeyLabel, ...]]:
     good_matches = []
-    with open("matches", "r") as match_file:
+    with open("/tmp/matches", "r") as match_file:
         for line in match_file:
             data = line.strip().split(":")
             query_id = int(data[0])
@@ -109,15 +109,16 @@ def get_db_graph(graph_id: int, graphs_path: str) -> Graph:
 
 def run_matching(category: str,
                  permutations: List[Tuple[KeyLabel, ...]]) -> List[Tuple[KeyLabel, ...]]:
-
+    path = "~/Documents/cs4099/work"
+    
     # Match with graphgrep
-    print("Start initial matching...")
-    subprocess.run(["../ggsxe", "-f", "-gfu", "../" + category + ".gfu", "--multi", "../queries/query.querygfu"], stdout=FNULL)
-    print("Finish matching")
+    #print("Start initial matching...")
+    subprocess.run(["cd /tmp && " + path + "/ggsxe", "-f", "-gfu", path + "/" + category + ".gfu", "--multi", "/tmp/query.querygfu"], stdout=FNULL)
+    #print("Finish matching")
 
     # Get good matches from graphgrep output
     good_matches: List[Tuple[KeyLabel, ...]] = list(set(get_matches(permutations, "graphs/complete/" + category + "/")))
-    print("Get " + str(len(good_matches)) + " matches")
+    #print("Get " + str(len(good_matches)) + " matches")
 
     return good_matches
 

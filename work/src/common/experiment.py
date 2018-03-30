@@ -61,61 +61,53 @@ def get_precision_recall(annotated_poses, model_poses):
     return (precision,recall)
 
 
-def experiment_file(image_file, model_category, best_model, best_graph, csv_file):
-    writer = csv.writer(csv_file, delimiter=",")
+def get_classification_metrics(annotated_poses, model_poses):
+    tp = len(set(annotated_poses).intersection(poses))
+    fp = len(poses)
+    fn = len(annotated_poses)
 
+    return (tp,fp,fn)
+
+def update_dictionary(key, data, dictionary):
+    if key in dictionary:
+        total = dictionary[key]
+        dictionary[key] = tuple(sum(x) for x in zip(total,data))
+    else:
+        dictionary[key] = data
+
+
+
+def experiment_identification(image_file, method, model_category, best_model, experiment_dict):
     actual_category = "juvenile" if image_file[4] == "4" else "mature"
-
     annotated_poses = get_annotated_poses(image_file)
-    model_poses = get_generated_poses(best_model)
-    graph_poses = get_generated_poses(best_graph)
+    poses = get_generated_poses(best_model)
 
-    model_precision, model_recall = get_precision_recall(annotated_poses, model_poses)
-    graph_precision, graph_recall = get_precision_recall(annotated_poses, graph_poses)
-
-    writer.writerow([image_file, "model", model_category, actual_category, model_precision, model_recall])
-    writer.writerow([image_file, "graph", model_category, actual_category, graph_precision, graph_recall])
-
-    csv_file.flush()
-
-
+    key = (method,model_category,actual_category)
+    data = get_classification_metrics(annotated_poses, poses)
+    update_dictionary(key, data, experiment_dict)
+  
 
 def experiment_label(image_file, method, model_category, label, best_model, experiment_dict):
-
     actual_category = "juvenile" if image_file[4] == "4" else "mature"
     annotated_nodes = get_annotated_nodes(image_file)
     filtered_nodes = [node.pos for node in annotated_nodes if node.label == label]
     poses = get_label_positions(best_model, label)
 
-    pr = get_precision_recall(filtered_nodes, poses)
-
-    #writer.writerow([image_file, method, model_category, actual_category, label, precision, recall])
-    #csv_file.flush()
-
-    if (method,label,model_category,actual_category) in experiment_dict:
-        total = experiment_dict[method,label,model_category,actual_category]
-        print(total)
-        print(pr)
-        print("-")
-        experiment_dict[method,label,model_category,actual_category] = tuple(sum(x) for x in zip(total,pr))
-
-        print(experiment_dict[method,label,model_category,actual_category])
-        print("")
-    else:
-        experiment_dict[method,label,model_category,actual_category] = pr
-
+    key = (method,label,model_category,actual_category)
+    data = get_classification_metrics(filtered_nodes, poses)
+    update_dictionary(key, data, experiment_dict)
 
         
 def write_label_experiment(csv_file, experiment_dict):
     writer = csv.writer(csv_file, delimiter=",")
 
     for key,data in experiment_dict.items():
-        method,label,model_category,actual_category = key
-        precision,recall = data
+        headers = list(key)
+        tp,fp,fn = data
 
-        writer.writerow([method,model_category,actual_category,label,precision/10,recall/10])
+        precision = tp/fp
+        recall = tp/fn
+
+        writer.writerow(headers + [precision, recall])
         csv_file.flush()
         
-
-
-

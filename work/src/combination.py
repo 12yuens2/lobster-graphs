@@ -65,24 +65,16 @@ def get_unique_labels(subgraphs):
 
     return list(set(labels))
     
-LABEL_THRESHOLD = 0.06
-HISTOGRAM_THRESHOLD = 0.5
+#LABEL_THRESHOLD = 0.06
+#HISTOGRAM_THRESHOLD = 0.5
 PERMUTATION_SIZE = 3
 #category = sys.argv[1]
 
-identification_file = open("identification.csv", "w")
-identification_file.write("Image,Method,Model,Category,Precision,Recall\n")
-identification_file.flush()
+LABEL_THRESHOLD = int(sys.argv[1])
+HISTOGRAM_THRESHOLD = int(sys.argv[2])
 
-labelling_file = open("labelling.csv", "w")
-labelling_file.write("Image,Method,Model,Category,Label,Precision,Recall\n")
-labelling_file.flush()
-
+ident_dict = {}
 label_dict = {}
-
-#if not (category == "juvenile" or category == "mature"):
-#    print("Category " + category + " not recognised!")
-#    exit(1)
 
 for category in ["mature", "juvenile"]:
     print("Running pipeline on " + category + " model.")
@@ -104,36 +96,46 @@ for category in ["mature", "juvenile"]:
         # Get subgraph permutations
         permutations = cm.get_permutations(combinations, PERMUTATION_SIZE)
 
-        print("Got " + str(len(kps)) + " keypoints.")
-        print(str(len(permutations)) + " permutations of size " + str(PERMUTATION_SIZE))
+        #print("Got " + str(len(kps)) + " keypoints.")
+        #print(str(len(permutations)) + " permutations of size " + str(PERMUTATION_SIZE))
 
-        print("Writing graphs to file...")
-        cw.permutations_as_query(permutations, PERMUTATION_SIZE, "../queries/query")
+        #print("Writing graphs to file...")
+        cw.permutations_as_query(permutations, PERMUTATION_SIZE, "/tmp/query")
 
         matches = cm.run_matching(category, permutations)
 
         # Do different methods to get triplets
-        #best_kp = cm.bf_keypoints(kps, matches, node_distributions, edge_distributions)
         best_model = cm.bf_model(model_dict(), matches, node_distributions, edge_distributions)
         best_graph = cm.bf_graph(model_graph(), matches, node_distributions, edge_distributions)
 
+        #print("model:" + str(len(best_model)))
+        #print("graph:" + str(len(best_graph)))
 
-        #print("kp: " + str(len(best_kp)))
-        print("model:" + str(len(best_model)))
-        print("graph:" + str(len(best_graph)))
+        ce.experiment_identification(image_file, "model", category, best_model, ident_dict)
+        ce.experiment_identification(image_file, "graph", category, best_graph, ident_dict)
 
-        ce.experiment_file(image_file, category, best_model, best_graph, identification_file)
         for label in get_unique_labels(best_model):
             ce.experiment_label(image_file, "model", category, label, best_model, label_dict)
 
         for label in get_unique_labels(best_graph):
             ce.experiment_label(image_file, "graph", category, label, best_graph, label_dict)
 
-        cw.write_triplets(best_model, image_file, "imgs/method-model/" + category + "/")
-        cw.write_triplets(best_graph, image_file, "imgs/method-graph/" + category + "/")
-        cw.write_keypoints(image_file, kps)
 
-        print("------------------------------")
+        # Write images with keypoints drawn
+        #cw.write_triplets(best_model, image_file, "imgs/method-model/" + category + "/")
+        #cw.write_triplets(best_graph, image_file, "imgs/method-graph/" + category + "/")
+        #cw.write_keypoints(image_file, kps)
 
+        #print("------------------------------")
+
+
+identification_file = open("data/identificationL" + str(LABEL_THRESHOLD) + "H" + str(HISTOGRAM_THRESHOLD) + ".csv", "w")
+identification_file.write("Image,Method,Model,Category,Precision,Recall\n")
+identification_file.flush()
+
+labelling_file = open("data/labellingL" + str(LABEL_THRESHOLD) + "H" + str(HISTOGRAM_THRESHOLD) + ".csv", "w")
+labelling_file.write("Image,Method,Model,Category,Label,Precision,Recall\n")
+labelling_file.flush()
 
 ce.write_label_experiment(labelling_file, label_dict)
+ce.write_label_experiment(identification_file, ident_dict)
