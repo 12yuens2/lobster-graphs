@@ -61,7 +61,7 @@ def get_precision_recall(annotated_poses, model_poses):
     return (precision,recall)
 
 
-def get_classification_metrics(annotated_poses, model_poses):
+def get_classification_metrics(annotated_poses, poses):
     tp = len(set(annotated_poses).intersection(poses))
     fp = len(poses)
     fn = len(annotated_poses)

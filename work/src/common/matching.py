@@ -2,6 +2,7 @@ import itertools
 import subprocess
 import os
 import ast
+import time
 
 import common.graph as cg
 import common.probability as cp
@@ -112,10 +113,12 @@ def run_matching(category: str,
     path = "~/Documents/cs4099/work"
     
     # Match with graphgrep
-    #print("Start initial matching...")
-    subprocess.run(["cd /tmp && " + path + "/ggsxe", "-f", "-gfu", path + "/" + category + ".gfu", "--multi", "/tmp/query.querygfu"], stdout=FNULL)
+    print("Start initial matching...")
+    subprocess.run(["cd /tmp && " + path + "/ggsxe -f -gfu " + path + "/" + category + ".gfu --multi /tmp/query.querygfu"], stdout=FNULL, shell=True)
     #print("Finish matching")
 
+    time.sleep(10)
+    
     # Get good matches from graphgrep output
     good_matches: List[Tuple[KeyLabel, ...]] = list(set(get_matches(permutations, "graphs/complete/" + category + "/")))
     #print("Get " + str(len(good_matches)) + " matches")

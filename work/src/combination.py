@@ -11,6 +11,7 @@ import common.write as cw
 import common.graph as cg
 import common.experiment as ce
 
+from decimal import Decimal
 
 from typing import List, Tuple, Dict, Any
 from classes.matching import LabelData, KeyLabel
@@ -70,8 +71,8 @@ def get_unique_labels(subgraphs):
 PERMUTATION_SIZE = 3
 #category = sys.argv[1]
 
-LABEL_THRESHOLD = int(sys.argv[1])
-HISTOGRAM_THRESHOLD = int(sys.argv[2])
+LABEL_THRESHOLD = round(Decimal(float(sys.argv[1])),2)
+HISTOGRAM_THRESHOLD = round(Decimal(float(sys.argv[2])),1)
 
 ident_dict = {}
 label_dict = {}
