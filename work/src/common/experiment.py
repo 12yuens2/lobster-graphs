@@ -48,8 +48,8 @@ def get_precision(annotated_poses, model_poses):
 def get_recall(annotated_poses, model_poses):
     tp = len(set(annotated_poses).intersection(model_poses))
 
-    if len(annotated_poses) == 0:
-        return 0
+    if len(annotated_poses) == 0 or tp == 0:
+        return len(annotated_poses)
     
     return tp / len(annotated_poses)
 
@@ -98,7 +98,7 @@ def experiment_label(image_file, method, model_category, label, best_model, expe
     update_dictionary(key, data, experiment_dict)
 
         
-def write_label_experiment(csv_file, experiment_dict):
+def write_experiment(csv_file, experiment_dict):
     writer = csv.writer(csv_file, delimiter=",")
 
     for key,data in experiment_dict.items():

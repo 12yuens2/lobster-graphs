@@ -55,7 +55,7 @@ def model_dict():
 def remove_old_queries():
     print("Removing old queries...")
     for f in [f for f in os.listdir("../queries/")]:
-        os.remove("../queries/" + f) 
+        os.remove("../queries/" + f)
 
 def get_unique_labels(subgraphs):
     labels = []
@@ -106,6 +106,7 @@ for category in ["mature", "juvenile"]:
         matches = cm.run_matching(category, permutations)
 
         # Do different methods to get triplets
+        #best_kp = cm.bf_keypoints(kps, matches, node_distributions, edge_distributions)
         best_model = cm.bf_model(model_dict(), matches, node_distributions, edge_distributions)
         best_graph = cm.bf_graph(model_graph(), matches, node_distributions, edge_distributions)
 
@@ -123,20 +124,23 @@ for category in ["mature", "juvenile"]:
 
 
         # Write images with keypoints drawn
-        #cw.write_triplets(best_model, image_file, "imgs/method-model/" + category + "/")
-        #cw.write_triplets(best_graph, image_file, "imgs/method-graph/" + category + "/")
+        #cw.write_triplets(best_kp, image_file, "imgs/test/kp")
+        #cw.write_triplets(best_model, image_file, "imgs/test/label")
+        #cw.write_triplets(best_graph, image_file, "imgs/test/graph")
         #cw.write_keypoints(image_file, kps)
 
         #print("------------------------------")
 
 
+
+# Save run data in file
 identification_file = open("data/identificationL" + str(LABEL_THRESHOLD) + "H" + str(HISTOGRAM_THRESHOLD) + ".csv", "w")
 identification_file.write("Image,Method,Model,Category,Precision,Recall\n")
 identification_file.flush()
 
 labelling_file = open("data/labellingL" + str(LABEL_THRESHOLD) + "H" + str(HISTOGRAM_THRESHOLD) + ".csv", "w")
-labelling_file.write("Image,Method,Model,Category,Label,Precision,Recall\n")
+labelling_file.write("Image,Method,Label,Model,Category,Precision,Recall\n")
 labelling_file.flush()
 
-ce.write_label_experiment(labelling_file, label_dict)
-ce.write_label_experiment(identification_file, ident_dict)
+ce.write_experiment(labelling_file, label_dict)
+ce.write_experiment(identification_file, ident_dict)

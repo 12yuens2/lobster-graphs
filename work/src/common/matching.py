@@ -110,14 +110,14 @@ def get_db_graph(graph_id: int, graphs_path: str) -> Graph:
 
 def run_matching(category: str,
                  permutations: List[Tuple[KeyLabel, ...]]) -> List[Tuple[KeyLabel, ...]]:
-    path = "~/Documents/cs4099/work"
+    path = "/cs/home/sy35/Documents/cs4099/work"
     
     # Match with graphgrep
     print("Start initial matching...")
-    subprocess.run(["cd /tmp && " + path + "/ggsxe -f -gfu " + path + "/" + category + ".gfu --multi /tmp/query.querygfu"], stdout=FNULL, shell=True)
+    subprocess.run(["cd /tmp && ./ggsxe -f -gfu " + path + "/" + category + ".gfu --multi /tmp/query.querygfu"], stdout=FNULL, shell=True)
     #print("Finish matching")
 
-    time.sleep(10)
+    time.sleep(30)
     
     # Get good matches from graphgrep output
     good_matches: List[Tuple[KeyLabel, ...]] = list(set(get_matches(permutations, "graphs/complete/" + category + "/")))

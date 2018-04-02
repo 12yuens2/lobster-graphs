@@ -9,17 +9,13 @@ FNULL = open(os.devnull, "w")
 
 def get_active_hosts():
     hosts = ["pc3-0"+str(host_id)+"-l.cs.st-andrews.ac.uk" for host_id in range(10,70)]
-    #hosts += ["pc2-0"+str(host_id)+"-l.cs.st-andrews.ac.uk" for host_id in range(30,99)]
-    #hosts += ["pc2-"+str(host_id)+"-l.cs.st-andrews.ac.uk" for host_id in range(100,150)]
+    hosts += ["pc2-0"+str(host_id)+"-l.cs.st-andrews.ac.uk" for host_id in range(30,99)]
 
-
-    print("Pinging hosts...")
     activehosts = []
     for hostname in hosts:
-        print("Pinging " + hostname)
         try:
             process1 = subprocess.run(["ping", "-c", "1", "-w", "1", hostname], stdout=FNULL)
-            process2 = subprocess.run(["ssh", hostname, "pwd"], stdout=FNULL, timeout=1)
+            process2 = subprocess.run(["ssh", hostname, "pwd"], stdout=FNULL, timeout=3)
 
             if process1.returncode == 0 and process2.returncode == 0:
                 activehosts.append(hostname)
@@ -42,9 +38,9 @@ activehosts = get_active_hosts()
 
 processes = {}
 i = 0 
-for label_threshold in np.arange(0.03, 0.1, 0.01):
-    for hist_threshold in np.arange(0.3, 1, 0.1):
-        print("Running experiment on " + activehosts[i])
+for label_threshold in np.arange(0.2, 0.3, 0.01):
+    for hist_threshold in np.arange(0.1, 0.5, 0.1):
+        print("Running experiment " + str(i) + " on " + activehosts[i])
         p = subprocess.Popen(ssh_process(activehosts[i], label_threshold, hist_threshold), stdout=FNULL)
         processes[activehosts[i],label_threshold,hist_threshold] = p
 
@@ -53,7 +49,7 @@ for label_threshold in np.arange(0.03, 0.1, 0.01):
 
 for k,v in processes.items():
     try:
-        processes[k] = v.wait(timeout=18000) # timeout = 5hours
+        processes[k] = v.wait(timeout=10800) # timeout = 3hours
     except subprocess.TimeoutExpired:
         processes[k] = 1
 

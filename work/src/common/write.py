@@ -9,7 +9,7 @@ from classes.matching import KeyLabel
 from classes.graphs import Graph
 
 # Path for lobster images to match on
-PATH = "imgs/lobsters/"
+PATH = "/cs/home/sy35/Documents/cs4099/work/src/imgs/lobsters/"
 
 # Write permutations as .querygfu
 def permutations_as_query(permutations: List[Tuple[KeyLabel, ...]],
