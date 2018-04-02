@@ -1,97 +1,200 @@
 \section{Results}\label{sec:results}
 \newcommand{\resultspath}{tex/results}
+
+\newcommand{\pridentplot}[5]{
+\addplot+[only marks, fill opacity=0.2, 
+	discard if not={Method}{#1}, 
+	discard if not={Model}{#2}, 
+	discard if not={Category}{#3},
+	discard if not={HistThreshold}{#4}
+] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
+\addlegendentry{#5}
+}
+
+\newcommand{\prlabelplot}[6] {
+\addplot+[only marks, fill opacity=0.2,
+	discard if not={Method}{#1},
+	discard if not={Model}{#2},
+	discard if not={Category}{#3},
+	discard if not={HistThreshold}{#4},
+	discard if not={Label}{#5}
+] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-labelling.csv};
+\addlegendentry{#6}
+}
+
+% Tikz graph for identification
+% #1 - Histogram threshold
+% #2 - Model used (mature/junveile)
+\newcommand{\pridentgraph}[3]{\begin{tikzpicture}[scale=0.7]
+\begin{axis}[
+	title = {\textbf{Histogram threshold of #2}},
+	legend pos=outer north east,
+	legend entries={
+		Graph method on mature lobsters;,
+		Label method on mature lobsters;,
+		Graph method on juvenile lobsters;,
+		Label method on juvenile lobsters
+	},
+	legend to name=#3,
+	xlabel={Recall},
+	xmin=0,xmax=1,
+	ylabel={Precision},
+	ymin=0,ymax=1
+]
+
+\pridentplot{graph}{#1}{mature}{#2}{Graph method on mature lobsters}
+\pridentplot{model}{#1}{mature}{#2}{Label method on mature lobsters}
+\pridentplot{graph}{#1}{juvenile}{#2}{Graph method on juvenile lobsters}
+\pridentplot{model}{#1}{juvenile}{#2}{Label method on juvenile lobsters}
+
+\end{axis}
+\end{tikzpicture}
+}
+
+% Tikz graph for labelling
+% #1 - Histogram threshold
+% #2 - Model used (mature/juvenile)
+% #3 - Label
+\newcommand{\prlabelgraph}[4]{
+\begin{tikzpicture}[scale=0.7]
+\begin{axis}[
+	title = {\textbf{Histogram threshold of #2}},
+	legend pos=outer north east,
+	legend entries={
+		Graph method on mature lobsters;,
+		Label method on mature lobsters;,
+		Graph method on juvenile lobsters;,
+		Label method on juvenile lobsters
+	},
+	legend to name=#4,
+	xlabel={Recall},
+	xmin=0,xmax=1,
+	ylabel={Precision},
+	ymin=0,ymax=1
+]
+
+\prlabelplot{graph}{#1}{mature}{#2}{#3}{Graph method on mature lobsters}
+\prlabelplot{model}{#1}{mature}{#2}{#3}{Label method on mature lobsters}
+\prlabelplot{graph}{#1}{juvenile}{#2}{#3}{Graph method on juvenile lobsters}
+\prlabelplot{model}{#1}{juvenile}{#2}{#3}{Label method on juvenile lobsters}
+
+\end{axis}
+\end{tikzpicture}
+}
+
+\newcommand{\fourplot}[3]{
+\begin{minipage}{0.45\textwidth}
+	#1{#2}{0.3}{#3}
+\end{minipage}
+%
+\begin{minipage}{0.45\textwidth}
+	#1{#2}{0.5}{#3}
+\end{minipage}
+\\
+\begin{minipage}{0.45\textwidth}
+	#1{#2}{0.7}{#3}
+\end{minipage}
+%
+\begin{minipage}{0.45\textwidth}
+	#1{#2}{0.9}{#3}
+\end{minipage}
+}
+
+\newcommand{\fourplotlabel}[4]{
+\begin{minipage}{0.45\textwidth}
+	#1{#2}{0.3}{#3}{#4}
+\end{minipage}
+%
+\begin{minipage}{0.45\textwidth}
+	#1{#2}{0.5}{#3}{#4}
+\end{minipage}
+\\
+\begin{minipage}{0.45\textwidth}
+	#1{#2}{0.7}{#3}{#4}
+\end{minipage}
+%
+\begin{minipage}{0.45\textwidth}
+	#1{#2}{0.9}{#3}{#4}
+\end{minipage}
+}
+
+
 To evaluate how well this method of recreating lobster graphs performs, precision and recall metrics are used. The evaluation is split into two evaluations, one for the performance of identifying correct keypoints and the second for the performance of keypoint labelling. The evaluations are split up into two parts because defining false positives and false negatives when evaluating both aspects together is a difficult problem. For example, if a keypoint has been incorrectly identified, then how is the labelling of the keypoint dealt with? The label cannot be correct, but only because the keypoint itself is wrong and there is not defined correct label for them. 
 
 \subsection{Keypoint identification}
 First, the precision and recall metrics were calculated for keypoint identification to see how many keypoints from the annotated images could be re-identified in the final graph. The labels of each keypoint and the edges between them are not taken into account for these results. 
 
+\begin{equation}
+\text{Precision} = \frac{\text{Correctly detected keypoints}}{\text{Total keypoints detected}}
+\end{equation}
+
+\begin{equation}
+\text{Recall} = \frac{\text{Correctly detected keypoints}}{\text{Total keypoints in annotation}}
+\end{equation}
+
+\begin{itemize}
+\item True positive - Correctly detected keypoints
+\item False positive - Incorrectly detected keypoints
+\item False negative - Annotated keypoints that were not detected
+\item True negative - 
+\end{itemize}
+
+
+
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}
-\begin{axis}[
-	title = {\textbf{Overall precision/recall using Mature model}},
-	legend pos=outer north east,
-	xlabel={Recall},
-	ylabel={Precision}
-]
-
-\addplot+[only marks, fill opacity=0.2, 
-	discard if not={Method}{graph}, 
-	discard if not={Model}{mature}, 
-	discard if not={Category}{mature}
-] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
-\addlegendentry{Graph method on mature lobsters}
-
-\addplot+[only marks, fill opacity=0.2, 
-	discard if not={Method}{model}, 
-	discard if not={Model}{mature}, 
-	discard if not={Category}{mature}
-] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
-\addlegendentry{Model method on mature lobsters}
-
-\addplot+[only marks, fill opacity=0.2, 
-	discard if not={Method}{graph}, 
-	discard if not={Model}{mature}, 
-	discard if not={Category}{juvenile}
-] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
-\addlegendentry{Graph method on juvenile lobsters}
-
-\addplot+[only marks, fill opacity=0.2, 
-	discard if not={Method}{model}, 
-	discard if not={Model}{mature}, 
-	discard if not={Category}{juvenile}
-] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
-\addlegendentry{Model method on juvenile lobsters}
-
-\end{axis}
-\end{tikzpicture}
-\caption{Precision Recall for different graph building methods}
+\fourplot{\pridentgraph}{mature}{legend:prident}
+\ref{legend:prident}
+\caption{Precision/recall graphs with the mature model with varying label thresholds.}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}
-\begin{axis}[
-	title = {\textbf{Overall precision/recall using Juvenile model}},
-	legend pos=outer north east,
-	xlabel={Recall},
-	ylabel={Precision}
-]
-
-\addplot+[only marks, fill opacity=0.2, 
-	discard if not={Method}{graph}, 
-	discard if not={Model}{juvenile}, 
-	discard if not={Category}{mature}
-] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
-\addlegendentry{Graph method on mature lobsters}
-
-\addplot+[only marks, fill opacity=0.2, 
-	discard if not={Method}{model}, 
-	discard if not={Model}{juvenile}, 
-	discard if not={Category}{mature}
-] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
-\addlegendentry{Model method on mature lobsters}
-
-\addplot+[only marks, fill opacity=0.2, 
-	discard if not={Method}{graph}, 
-	discard if not={Model}{juvenile}, 
-	discard if not={Category}{juvenile}
-] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
-\addlegendentry{Graph method on juvenile lobsters}
-
-\addplot+[only marks, fill opacity=0.2, 
-	discard if not={Method}{model}, 
-	discard if not={Model}{juvenile}, 
-	discard if not={Category}{juvenile}
-] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
-\addlegendentry{Model method on juvenile lobsters}
-
-\end{axis}
-\end{tikzpicture}
-\caption{Precision Recall for different graph building methods}
+\fourplot{\pridentgraph}{juvenile}{legend:prident}
+\ref{legend:prident}
+\caption{Precision/recall graphs with the juvenile model with varying label thresholds.}
 \end{figure}
 
 \subsection{Keypoint labelling}
+
+
+\begin{itemize}
+\item True positive - Correctly labelled keypoints
+\item False positive - Incorrectly labelled keypoints
+\item False negative - Missed labels, eg if 2 claws and only 1 was found/labelled
+\item True negative - 
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\fourplotlabel{\prlabelgraph}{juvenile}{claw}{legend:prlabel}
+\ref{legend:prlabel}
+\caption{Precision/recall graphs with the juvenile model for label ``claw". }
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\fourplotlabel{\prlabelgraph}{juvenile}{arm}{legend:prlabel}
+\ref{legend:prlabel}
+\caption{Precision/recall with juvenile model for label ``arm"}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\fourplotlabel{\prlabelgraph}{juvenile}{tail}{legend:prlabel}
+\ref{legend:prlabel}
+\caption{Precision/recall with juvenile model for label ``tail"}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\fourplotlabel{\prlabelgraph}{juvenile}{tail}{legend:prlabel}
+\ref{legend:prlabel}
+\caption{Precision/recall with juvenile model for label ``head"}
+\end{figure}
+
+Problem with recall for labelling is false negatives very low as only 1 or 2 labels are in annotated set. 
+
 
 \subsection{Classification}
 
