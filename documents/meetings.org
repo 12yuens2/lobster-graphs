@@ -297,6 +297,92 @@ Report:
 
 - Draft
 
+
+*** Meeting
+- Precision/recall on all dataset
+- The thing that varies are the thresholds
+
+- Explain why images where graph could not be built
+
+
+** Week 8 
+*** Questions
+**** Submission
+- images too large to submit
+- code/readme 
+
+**** Results
+- 
+
+**** Report design
+- how to take word count
+  - detex
+  - words in pdf document
+
+
+**** Other
+- poster
+
+
+*** Meeting report 
+**** General
+- Citations use \cite{a,b} rather than \cite{a} \cite{b}
+
+**** Abstract
+- Abstract say what the results actually were 
+
+**** Context survey
+- Previous work
+  - do not say adapting the previous work
+  - just using his dataset
+
+**** SE-process ()
+- Python performance important but not for scripting aspect
+- Not performance is not important as a whole
+
+- Looked into nauty, why not used
+
+
+- Things in se process like testing, version control, environment, python types
+- Because not actual process in this section
+
+**** Methodology
+- Keypoint labelled using baysian model rather than using Bayes' theorem
+
+- Renamed "keypoint extraction" to higher level title because it more than just extraction in this step
+
+- Group pipeline into subsections, eg keypoint filtering 
+
+- SImply demonstrated why corner detectors not work, not going into too much detail (we were not surprised it doesn't work)
+
+***** Keypoint filtering
+- Define term before being used, eg octaves mentioned before being defined
+
+- Keypoints not ``noisy", define noisy as the keypoint not being relevant
+
+- colour histogram issue but address that it will be dealt with later with the graph models.
+
+***** Node labelling
+Simply summary sentence at the beginning before going into detail.
+- Unsustainable rewording
+
+probability product equation is naive bayes classifier
+- add maths to this subsection
+
+
+
+**** Results put same as evaluation
+Mention other evaluation that will compared against
+
+- Explain precision/recall may not be best metrics
+- no threshold that can change to vary precision/recall as based on ranking
+- no inherrent trade off between them
+- thresholds that were varied are based on filtering/labelling not which final graph to be matched
+- Give F1 score for best precision/recall as table
+- can report for each body part or each model/method
+
+mature/juvenile classification evaluation
+
 * Notes
 
 ** Graph matching notes
