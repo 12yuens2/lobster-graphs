@@ -41,20 +41,26 @@
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{deepred}{rgb}{0.6,0,0}
 
 \lstset{frame=tb,
   numbers=left,
   stepnumber=1,
-  language=Java,
+  language=Python,
   aboveskip=3mm,
   belowskip=3mm,
+  emph={List,Tuple,Dict},
+  emphstyle=\color{deepred},
+  numberstyle=\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
   showstringspaces=false,
   columns=flexible,
   basicstyle={\small\ttfamily},
   breaklines=true,
   breakatwhitespace=true,
-  tabsize=2,
-  moredelim=**[is][\color{red}]{@}{@},
+  tabsize=2
 }
 
 \setlength{\grammarindent}{12em}
@@ -62,6 +68,7 @@
 % Plots
 \usepackage{pgfplots}
 \usepackage{pgfplotstable}
+\pgfplotsset{filter discard warning=false}
 \pgfplotsset{
     discard if/.style 2 args={
         x filter/.append code={
@@ -101,6 +108,7 @@
 % New line macro
 \newcommand{\n}[0]{\\[\baselineskip]}
 \newcommand{\imgpath}{}
+\newcommand{\ignore}[1]{}
 
 
 % Single image in figure

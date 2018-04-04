@@ -25,7 +25,8 @@
 % Tikz graph for identification
 % #1 - Histogram threshold
 % #2 - Model used (mature/junveile)
-\newcommand{\pridentgraph}[3]{\begin{tikzpicture}[scale=0.7]
+\newcommand{\pridentgraph}[3]{
+\begin{tikzpicture}[scale=0.7]
 \begin{axis}[
 	title = {\textbf{Histogram threshold of #2}},
 	legend pos=outer north east,
@@ -165,33 +166,35 @@ First, the precision and recall metrics were calculated for keypoint identificat
 \item True negative - 
 \end{itemize}
 
-\begin{figure}[H]
-\centering
-\fourplotlabel{\prlabelgraph}{juvenile}{claw}{legend:prlabel}
-\ref{legend:prlabel}
-\caption{Precision/recall graphs with the juvenile model for label ``claw". }
-\end{figure}
 
-\begin{figure}[H]
-\centering
-\fourplotlabel{\prlabelgraph}{juvenile}{arm}{legend:prlabel}
-\ref{legend:prlabel}
-\caption{Precision/recall with juvenile model for label ``arm"}
-\end{figure}
 
-\begin{figure}[H]
-\centering
-\fourplotlabel{\prlabelgraph}{juvenile}{tail}{legend:prlabel}
-\ref{legend:prlabel}
-\caption{Precision/recall with juvenile model for label ``tail"}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\fourplotlabel{\prlabelgraph}{juvenile}{tail}{legend:prlabel}
-\ref{legend:prlabel}
-\caption{Precision/recall with juvenile model for label ``head"}
-\end{figure}
+%\begin{figure}[H]
+%\centering
+%\fourplotlabel{\prlabelgraph}{juvenile}{claw}{legend:prlabel}
+%\ref{legend:prlabel}
+%\caption{Precision/recall graphs with the juvenile model for label ``claw". }
+%\end{figure}
+%
+%\begin{figure}[H]
+%\centering
+%\fourplotlabel{\prlabelgraph}{juvenile}{arm}{legend:prlabel}
+%\ref{legend:prlabel}
+%\caption{Precision/recall with juvenile model for label ``arm"}
+%\end{figure}
+%
+%\begin{figure}[H]
+%\centering
+%\fourplotlabel{\prlabelgraph}{juvenile}{tail}{legend:prlabel}
+%\ref{legend:prlabel}
+%\caption{Precision/recall with juvenile model for label ``tail"}
+%\end{figure}
+%
+%\begin{figure}[H]
+%\centering
+%\fourplotlabel{\prlabelgraph}{juvenile}{tail}{legend:prlabel}
+%\ref{legend:prlabel}
+%\caption{Precision/recall with juvenile model for label ``head"}
+%\end{figure}
 
 Problem with recall for labelling is false negatives very low as only 1 or 2 labels are in annotated set. 
 
