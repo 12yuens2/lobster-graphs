@@ -120,26 +120,19 @@
 }
 
 
-To evaluate how well this method of recreating lobster graphs performs, precision and recall metrics are used. The evaluation is split into two evaluations, one for the performance of identifying correct keypoints and the second for the performance of keypoint labelling. The evaluations are split up into two parts because defining false positives and false negatives when evaluating both aspects together is a difficult problem. For example, if a keypoint has been incorrectly identified, then how is the labelling of the keypoint dealt with? The label cannot be correct, but only because the keypoint itself is wrong and there is not defined correct label for them. 
+To evaluate how well this method of recreating lobster graphs performs, precision and recall metrics were initially used. The goal of using precision and recall is too see what kind of trade-off there is between the relevant keypoints detected in all detected keypoints (precision) and the relevant keypoints detected in all relevant keypoints (recall). Next, the F1 score is computed to get the harmonic mean of precision and recall. This allows the best labelling and colour histogram thresholds to be found. Finally, by applying a (metric TODO) on the models, images from the rest of the dataset are classified as either mature or juvenile and the results compared to Abdallah's results \cite{lobster-thesis}.
+\n
 
-\subsection{Keypoint identification}
-First, the precision and recall metrics were calculated for keypoint identification to see how many keypoints from the annotated images could be re-identified in the final graph. The labels of each keypoint and the edges between them are not taken into account for these results. 
+\subsection{Precision and recall}
+The evaluation for precision and recall is split into two evaluations, one for the performance of identifying correct keypoints and the second for the performance of keypoint labelling. The evaluations are split up into two parts because defining false positives and false negatives when evaluating both aspects together is a difficult problem, the key issue being an overlap between false positives and false negatives for correctly detected but mislabelled keypoints. For example, if a keypoint has been correctly identified and labelled as a \textit{claw} but is actually an \textit{arm}, then it should be a false positive because the labelling is incorrect. However, it should also be a false negative because correct \textit{arm} labelling was missed. Because of these difficult definitions, it made sense to split the precision and recall evaluation into two separate parts where the false positives and false negatives could be clearly defined. 
 
-\begin{equation}
-\text{Precision} = \frac{\text{Correctly detected keypoints}}{\text{Total keypoints detected}}
-\end{equation}
-
-\begin{equation}
-\text{Recall} = \frac{\text{Correctly detected keypoints}}{\text{Total keypoints in annotation}}
-\end{equation}
-
-\begin{itemize}
-\item True positive - Correctly detected keypoints
-\item False positive - Incorrectly detected keypoints
-\item False negative - Annotated keypoints that were not detected
-\item True negative - 
-\end{itemize}
-
+\subsubsection{Keypoint identification}
+First, the precision and recall metrics were calculated for keypoint identification to see how many keypoints from the annotated images could be re-identified in the final graph. The labels of each keypoint and the edges between them are not taken into account for these results. The precision and recall for this evaluation is defined as follows:
+\begin{align}
+\text{Precision} &= \frac{\text{Correctly detected keypoints}}{\text{Correctly detected keypoints} + \text{Incorrectly detected keypoints}} 
+\\[10pt]
+\text{Recall} &= \frac{\text{Correctly detected keypoints}}{\text{Correctly detected keypoints} + \text{Missed keypoints in annotation}}
+\end{align}
 
 
 \begin{figure}[H]

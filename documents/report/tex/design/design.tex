@@ -3,19 +3,21 @@
 \vspace{1cm}
 
 \subsection{Overview}
-Figure \ref{fig:overview} shows the key steps of the overall method used to go from an image of a lobster to a labelled graph of the lobster. In the initial stages, keypoints are extracted and filtered from the image through the use of various OpenCV algorithms and techniques such as SIFT for keypoint detection and colour histograms for keypoint filtering. The remaining set of keypoints are then labelled using Bayes' theorem and all permutations of possible subgraphs are created. Next, the subgraphs are matched using GraphGrep \cite{graphgrep} and finally all matches combined using probability models to get the final lobster graph. 
+Figure \ref{fig:overview} shows the key steps of the overall method used to go from an image of a lobster to a labelled graph of the lobster. In the initial stages, keypoints are extracted and filtered from the image through the use of various OpenCV algorithms and techniques such as SIFT for keypoint detection and colour histograms for keypoint filtering. The remaining set of keypoints are then labelled using a probabilistic model and all permutations of possible subgraphs are created. 
 \begin{figure}[H]
 \centering
 \begin{subfigure}{\textwidth}
 \centering
 \begin{tikzpicture}
 \node (raw) [data] {Lobster image};
-\node (extraction) [process, right of=raw, xshift=2cm] {Keypoint extraction};
-\node (creation) [process, right of=extraction, xshift=2cm] {Subgraph creation};
+\node (detection) [process, right of=raw, xshift=2cm] {Keypoint detection};
+\node (filter) [process, right of=detection, xshift=2cm] {Keypoint filtering};
+\node (creation) [process, right of=filter, xshift=2cm] {Subgraph creation};
 \node (subgraph) [data, right of=creation, xshift=2cm] {Lobster subgraphs};
 
-\draw [arrow] (raw) -- (extraction);
-\draw [arrow] (extraction) -- (creation);
+\draw [arrow] (raw) -- (detection);
+\draw [arrow] (detection) -- (filter);
+\draw [arrow] (filter) -- (creation);
 \draw [arrow] (creation) -- (subgraph);
 
 \end{tikzpicture}
@@ -28,7 +30,7 @@ Figure \ref{fig:overview} shows the key steps of the overall method used to go f
 \begin{tikzpicture}
 \node (subgraph) [data] {Lobster subgraphs};
 \node (graphgrep) [process, right of=subgraph, xshift=2cm] {Subgraph matching};
-\node (model) [process, right of=graphgrep, xshift=2cm] {Build complete graph (TODO name)};
+\node (model) [process, right of=graphgrep, xshift=2cm] {Graph building};
 \node (graph) [data, right of=model, xshift=2cm] {Matched lobster graph};
 
 \draw [arrow] (subgraph) -- (graphgrep);
@@ -37,81 +39,17 @@ Figure \ref{fig:overview} shows the key steps of the overall method used to go f
 \end{tikzpicture}
 \caption{Process of taking the labelled subgraphs to creating a full lobster graph.}
 \end{subfigure}
-\caption{Flow chart of the whole matching process from getting keypoints to creation of the lobster graphs.}
+\caption{Flow chart of the whole matching process from getting keypoints to creation of the lobster graphs. The yellow steps in the pipeline represent processes and red steps represent inputs and outputs.}
 \label{fig:overview}
 \end{figure}
 \noindent
-A subset of the dataset was taken to create a database of manually annotated attributed lobster graphs. This dataset is important for many aspects of the overall method as it is the set of complete graphs for subgraph matching. Further, the attributes such as node labels, node sizes and edge weights contribute as a basis for the probability models used in both subgraph creation and rebuilding a complete lobster graph. 
+The second stage of taking a large set of subgraphs and matching them to rebuild the complete lobster graph consists of the following two main steps:
+\begin{enumerate}
+\item Run GraphGrep to find all subgraphs of valid configurations against the database of complete lobster graphs. 
+\item Use the probability of each remaining subgraph to piece together the complete lobster graph.
+\end{enumerate}
+Finally, to make this all work, a subset of the dataset was taken to create a database of manually annotated attributed lobster graphs. This dataset is important for many aspects of the overall method as it is the set of complete graphs for subgraph matching. Further, the attributes such as node labels, node sizes and edge weights contribute as a basis for the probability models used in both subgraph creation and rebuilding a complete lobster graph. 
 
-\subsection{Keypoint detection}
-First, to identify important parts from our lobster images, keypoints or areas of interest must be identified. OpenCV provides a host of different algorithms for feature detection such as Harris and Shi-Tomasi corner detectors and SIFT, SURF, ORB keypoint detectors \cite{opencv-tut1}. All these algorithms were tried and tested on a small subset of the dataset to see if any would provide both useful and consistent features that can be used. 
-
-\begin{figure}[H]
-%\centering
-	\begin{subfigure}{0.45\textwidth}
-	\includegraphics[width=\linewidth, keepaspectratio]{\imgpath/img-harris.png}
-	\caption{Harris corner detection}
-	\end{subfigure}
-	\hspace*{\fill}
-	\begin{subfigure}{0.45\textwidth}
-	\includegraphics[width=\linewidth, keepaspectratio]{\imgpath/img-shi-tomasi.png}
-	\caption{Shi-Tomasi corner detection}
-	\end{subfigure}
-	
-	\vspace{0.5cm}
-	
-	\begin{subfigure}{0.45\textwidth}
-	\includegraphics[width=\linewidth, keepaspectratio]{\imgpath/img-sift.png}
-	\caption{SIFT keypoint detection}
-	\end{subfigure}
-	\hspace*{\fill}
-	\begin{subfigure}{0.45\textwidth}
-	\includegraphics[width=\linewidth, keepaspectratio]{\imgpath/img-surf.png}
-	\caption{SURF keypoint detection}
-	\end{subfigure}
-	
-\caption{Comparison of different feature detection algorithms. The images have been scaled down after applying the detection to more clearly show the keypoints. Further comparison of the different detection algorithms on more images can be found in appendix \ref{apdx:cv-algos}}
-\end{figure}
-\begin{figure}[H]
-%\centering
-	\begin{subfigure}{0.45\textwidth}
-	\includegraphics[width=\linewidth, keepaspectratio]{\imgpath/img-harris2.png}
-	\caption{Harris corner detection}
-	\end{subfigure}
-	\hspace*{\fill}
-	\begin{subfigure}{0.45\textwidth}
-	\includegraphics[width=\linewidth, keepaspectratio]{\imgpath/img-shi-tomasi2.png}
-	\caption{Shi-Tomasi corner detection}
-	\end{subfigure}
-	
-	\vspace{0.5cm}
-	
-	\begin{subfigure}{0.45\textwidth}
-	\includegraphics[width=\linewidth, keepaspectratio]{\imgpath/img-sift2.png}
-	\caption{SIFT keypoint detection}
-	\end{subfigure}
-	\hspace*{\fill}
-	\begin{subfigure}{0.45\textwidth}
-	\includegraphics[width=\linewidth, keepaspectratio]{\imgpath/img-surf2.png}
-	\caption{SURF keypoint detection}
-	\end{subfigure}
-	
-\caption{Comparison of different feature detection algorithms on an image with more noise.}
-\label{fig:kp-comparison-noise}
-\end{figure}
-\noindent
-From visually seeing the effects of each algorithm, it can be seen that the corner detectors do not work very well for our purpose. The shape of the lobster is not fully detected reliably. For images with a noisier background, much of the background such as slabs with sharp contrasting corners are also detected, as shown in figure \ref{fig:kp-comparison-noise}. Furthermore, although corner detectors have applications in image matching \cite{corner-detection}, our goal from feature detection is to be able to extract graph like objects or features to apply graph matching on and so corner detection is unsuitable as we are not looking to match the different images to each other directly. 
-
-The keypoint detectors are able to provide better results for our objective, as we can see keypoints of important body parts being identified, such as the body, tail and claws. These keypoints are further able to be consistently identified from multiple images, showing that use of these algorithms are promising for automatically detecting the various parts of the lobster for construction of a graph. There is still a lot of irrelevant keypoints detected due to feature points in the backgrounds around the lobster, but we shall see later in section \ref{sec:kp-filter} that different methods can be applied to filter out unwanted keypoints. It is also non-trivial to create a graph from an outline of corners to represent the shape of a lobster, whereas the keypoints naturally translate well as nodes of a graph, with edges connecting them to form the shape and pose of a lobster. Because of these reasons, the keypoint detection algorithms in SIFT, SURF and ORB were further investigated while the corner detectors were discarded.
-
-\begin{figure}[H]
-\centering
-TODO  fig of keypoint detector algorithm comparison
-\caption{Comparison of different keypoint detection algorithms on multiple lobster images. See comparison of more images in appendix \ref{apdx:cv-algos}}
-\end{figure}
-\noindent
-
-Between the different keypoint detection algorithms, SIFT was chosen as it gave the most consistent results and the kind of useful keypoints that are needed.
 
 \subsection{Annotation of dataset}
 The dataset provided by \cite{lobster-thesis} was tagged with information on each image such as the lobster's sex, length of the carapace and width of the tail. To be able to apply the probability models to the dataset and match to complete lobster graphs, the dataset had to be further annotated as attributed graphs. This was initially done and prototyped using Gephi to explore different graph configurations, but only with dummy values for the edge weights and size of the nodes. Later, with the introduction of applying OpenCV keypoint detection algorithms, the annotations were amended with the detected keypoints to include the real node sizes and edge lengths.
@@ -146,6 +84,79 @@ After the use of computer vision algorithms was explored, the annotated step was
 \imagefig{1\textwidth}{\imgpath/annotated.JPG}{Example of annotated lobster image with nodes and edges of the graph perfectly labelled.}
 \noindent
 Because the process of manual annotation could have human errors, the final completed annotations are drawn as nodes and edges on top of the raw image again to visually check for mistakes made during the annotation of edges and removal of other keypoints.
+
+
+\subsection{Keypoint detection}
+First, to identify important parts from our lobster images, keypoints or areas of interest must be identified. OpenCV provides a host of different algorithms for feature detection such as Harris and Shi-Tomasi corner detectors and SIFT, SURF, ORB keypoint detectors \cite{opencv-tut1}. All these algorithms were tried and tested on a small subset of the dataset to see if any would provide both useful and consistent features that can be used. 
+
+\begin{figure}[H]
+%\centering
+	\begin{subfigure}{0.45\textwidth}
+	\includegraphics[width=\linewidth, keepaspectratio]{\imgpath/img-harris.png}
+	\caption{Harris corner detection}
+	\end{subfigure}
+	\hspace*{\fill}
+	\begin{subfigure}{0.45\textwidth}
+	\includegraphics[width=\linewidth, keepaspectratio]{\imgpath/img-shi-tomasi.png}
+	\caption{Shi-Tomasi corner detection}
+	\end{subfigure}
+	
+	\vspace{0.5cm}
+	
+	\begin{subfigure}{0.45\textwidth}
+	\includegraphics[width=\linewidth, keepaspectratio]{\imgpath/img-sift.png}
+	\caption{SIFT keypoint detection}
+	\end{subfigure}
+	\hspace*{\fill}
+	\begin{subfigure}{0.45\textwidth}
+	\includegraphics[width=\linewidth, keepaspectratio]{\imgpath/img-surf.png}
+	\caption{SURF keypoint detection}
+	\end{subfigure}
+	
+\caption{Comparison of different feature detection algorithms. The images have been scaled down after applying the detection to more clearly show the keypoints. Further comparison of the different detection algorithms on more images can be found in appendix \ref{apdx:cv-algos}}
+\label{fig:kp-comparison}
+\end{figure}
+\begin{figure}[H]
+%\centering
+	\begin{subfigure}{0.45\textwidth}
+	\includegraphics[width=\linewidth, keepaspectratio]{\imgpath/img-harris2.png}
+	\caption{Harris corner detection}
+	\end{subfigure}
+	\hspace*{\fill}
+	\begin{subfigure}{0.45\textwidth}
+	\includegraphics[width=\linewidth, keepaspectratio]{\imgpath/img-shi-tomasi2.png}
+	\caption{Shi-Tomasi corner detection}
+	\end{subfigure}
+	
+	\vspace{0.5cm}
+	
+	\begin{subfigure}{0.45\textwidth}
+	\includegraphics[width=\linewidth, keepaspectratio]{\imgpath/img-sift2.png}
+	\caption{SIFT keypoint detection}
+	\end{subfigure}
+	\hspace*{\fill}
+	\begin{subfigure}{0.45\textwidth}
+	\includegraphics[width=\linewidth, keepaspectratio]{\imgpath/img-surf2.png}
+	\caption{SURF keypoint detection}
+	\end{subfigure}
+	
+\caption{Comparison of different feature detection algorithms on an image with more noise.}
+\label{fig:kp-comparison-noise}
+\end{figure}
+\noindent
+From visually seeing the effects of each algorithm, it can be seen that the corner detectors do not work very well for our purpose. This is to be expected, as they are meant to detect corners and not feature points. Although corner detectors have applications in image matching \cite{corner-detection}, our goal from feature detection is to be able to extract graph like objects or features to apply graph matching on and so corner detection is unsuitable as we are not looking to match the different images to each other directly and the comparisons in figure \ref{fig:kp-comparison-noise} and \ref{fig:kp-comparison} demonstrate why.
+
+The keypoint detectors are able to provide better results for our objective, as we can see keypoints of important body parts being identified, such as the body, tail and claws. These keypoints are further able to be consistently identified from multiple images, showing that use of these algorithms are promising for automatically detecting the various parts of the lobster for construction of a graph. There is still a lot of irrelevant keypoints detected due to feature points in the backgrounds around the lobster, but we shall see later in section \ref{sec:kp-filter} that different methods can be applied to filter out unwanted keypoints. It is also non-trivial to create a graph from an outline of corners to represent the shape of a lobster, whereas the keypoints naturally translate well as nodes of a graph, with edges connecting them to form the shape and pose of a lobster. Because of these reasons, the keypoint detection algorithms in SIFT, SURF and ORB were further investigated while the corner detectors were discarded.
+
+\begin{figure}[H]
+\centering
+TODO  fig of keypoint detector algorithm comparison
+\caption{Comparison of different keypoint detection algorithms on multiple lobster images. See comparison of more images in appendix \ref{apdx:cv-algos}}
+\end{figure}
+\noindent
+
+Between the different keypoint detection algorithms, SIFT was chosen as it gave the most consistent results and the kind of useful keypoints that are needed.
+
 
 \subsection{Keypoint filtering}\label{sec:kp-filter}
 From just running a SIFT detector on the lobster images, it can be seen that there are a lot of small keypoints that are unimportant for our purposes. There are also many keypoints around the lobster that we would like to filter out, as we want all our keypoints to be on the lobster. Initially, the classic vision approach for feature matching using the keypoint descriptors \cite{sift} was tried, but the results obtained were surprisingly poor. Because of this, a more novel approach was taken for filtering. The small keypoints are filtered out by specifying an octave where all keypoints coming from that octave or above are kept. Finally, remaining keypoints that are not on the lobster are filtered with a colour histogram method where the colour histograms of the keypoints are compared and any below a certain difference threshold are filtered away.
@@ -218,7 +229,7 @@ With a set of keypoints extracted and filtered from the image, the next step was
 
 \subsubsection{Node labelling}\label{sec:probabilistic-model}
 A simple probabilistic model was used to determine how to label the keypoints through the use of Bayes' Theorem. For each keypoint, a probability is assigned for each label and a threshold applied to remove label probabilities that are too low.
-\begin{equation}
+\begin{equation}\label{eq:bayes-labelling}
 P(\text{label}\ |\ \text{size}) = \frac{P(\text{size}\ |\ \text{label}) P(\text{label})} {P(\text{size})}
 \end{equation}
 The three probabilities $P(\text{size} | \text{label})$, $P(\text{label})$, $P(\text{size})$ are defined as follows:
@@ -268,13 +279,8 @@ A large $k$ would make the matching step easier as a larger subgraph conveys mor
 A subgraph size of 3 was chosen in the end as it was a strong middle ground between retaining enough information for effective subgraph matching and not causing a large number of permutations to match. A size of 2 is ineffective for matching, it leads to too many successful matches because it is easy to find subgraphs of two nodes and one connecting edge as long as the labels are correct. However using 4 nodes as the subgraph led to too many permutations being produced, leading to a slow process in matching. This is why subgraphs of size 3 were chosen.
 
 
-\subsection{Graph matching}
-The crucial step of taking a large set of subgraphs and matching them to rebuild the complete lobster graph consists of two main steps:
-\begin{enumerate}
-\item Run GraphGrep to find all subgraphs of valid configurations against the database of complete lobster graphs. 
-\item Use the probability of each remaining subgraph to piece together the complete lobster graph.
-\end{enumerate}
-\subsubsection{Subgraph matching}
+
+\subsection{Subgraph matching}
 All subgraph permutations created are written as a query for GraphGrep to match. The reason for this matching step is to filter out subgraph configurations that are not  possible based on the annotated dataset. Any invalid configurations will not have appeared in the database of complete lobster graphs and therefore will not be matched. A single subgraph can match to multiple database graphs and can also match multiple times to a single database graph. This does not matter as extra matches are redundant information. 
 \begin{figure}[H]
 \centering
@@ -296,38 +302,43 @@ All subgraph permutations created are written as a query for GraphGrep to match.
 
 The output of running GraphGrep gives a list of graph ids of the subgraphs and database graphs that were matched. Any subgraph that appears in the list is taken as a matched permutation. After, there is a further step where the lengths of the edges between each node is taken into account. This acts as a late filter step for keypoints that may not be on the lobster, not allowing graph configurations where the points are too far apart to make sense. For example if the distance between an \textit{arm} node and \textit{claw} node is the same as the distance between a \textit{body} and \textit{tail}, the \textit{arm}/\textit{claw} permutation will be discarded. This is helpful in discarding keypoints that are far away from the lobster, for example on the edges of the background. Furthermore, this filters out subgraphs where the labelling was valid, but the distances between the nodes were not, which acts as a premature step to remove mislabelled subgraphs, for example if the tail or back was labelled as a claw and connected to a correctly labelled arm. 
 
-\subsubsection{Subgraph rebuilding}\label{sec:graph-creation}
+\subsection{Graph building}\label{sec:graph-creation}
 The final stage of the whole matching process is to take the pool of valid, matched and labelled subgraphs and piece together the complete lobster graph. Often there are many more subgraphs than are needed to rebuild the graph, so the best subgraphs and configurations should be chosen. To choose whether a subgraph was better than another, a na\"{i}ve Bayes probability model is used. The probability of each subgraph is calculated as the product of the probability of each node labelling and probability of each edge. 
 \begin{equation}
-P(\text{subgraph}) = \prod_{i=0} P(\text{node}_{i}) \times \prod_{j=0} P(\text{edge}_{j})
+P(\text{subgraph}) = \prod_{i=0}^n P(\text{node}_{i}) \cdot \prod_{j=0}^m P(\text{edge}_{j})
 \end{equation}
-where
+where $n$ is the number of nodes and $m$ is the number of edges in the subgraph. The probability of each node labelling is already defined as it was used to assign the labels during the creation of the subgraph. It is the same as explained for equation \ref{eq:bayes-labelling}.
+\begin{equation}
+P(\text{node}) = P(\text{node.label}\ |\ \text{node.size})
+\end{equation}
+The probability of the edges is computed using Bayes' Theorem with a probability distribution for each type of edge based on the nodes it connects and its length. 
 \begin{align}
-P(\text{node}) &= P(\text{node.label}\ |\ \text{node.size}) \\
-P(\text{edge}) &= P(\text{edge.length}\ |\ \text{edge.n1} == x \wedge \text{edge.n2} == y)
+\begin{split}
+P(\text{edge}) &= P(\text{edge.length}\ |\ n_{1} \wedge n_{2}) \\
+ &= \frac{P(n_{1} \wedge n_{2}\ |\ \text{edge.length}) \cdot P(\text{edge.length})}{P(n_{1}) \cdot P(n_{2})}
+\end{split}
 \end{align}
-The probability of each node labelling is already defined as it was used to assign the labels during the creation of the subgraph. The probability of the edges is computed using Bayes' Theorem with a probability distribution for each type of edge based on the nodes it connects. To prevent floating point issues during implementation, the sum of logs is used rather than the product of the probabilities. 
+Each type of edge is uniquely defined by the two nodes it connects and so the probability of the edge takes that into account. To prevent floating point issues during implementation, the sum of logs is used rather than the product of the probabilities. 
 \n
 As stated before, a single keypoint can also be contained in multiple subgraphs. These cases have to be treated carefully as it is valid for those more than one of those multiple subgraphs to appear in the final lobster graph. An easy example of this is a body keypoint which has multiple subgraphs. One subgraph could contain the tail and back while another contains the arm and claw. In this case they are both valid because they could both be part of the final graph. Because of this, subgraphs in the pool cannot be discarded simply because they contain the same keypoint and label as another. Further, it is inevitable that multiple subgraphs with the same keypoint are used to be able to build a graph that is fully connected, otherwise additional rules will be need to define how two subgraphs should be connected.
 \n
 With these considerations in mind, three different methods were used to build up the lobster graph from subgraphs, one of which gave poor results and was not used in the final evaluation. 
 \begin{figure}[H]
 \centering
-	\begin{subfigure}{0.31\textwidth}
-	
+	\begin{subfigure}{0.32\textwidth}
+	\includegraphics[width=\textwidth, keepaspectratio]{\imgpath/kp-method.JPG}
 	\caption{Keypoint method}	
 	\end{subfigure}
 	\hspace*{\fill}
-	\begin{subfigure}{0.31\textwidth}
-	
+	\begin{subfigure}{0.32\textwidth}
+	\includegraphics[width=\textwidth, keepaspectratio]{\imgpath/label-method.JPG}
 	\caption{Label method}
 	\end{subfigure}
 	\hspace*{\fill}
-	\begin{subfigure}{0.31\textwidth}
-	
+	\begin{subfigure}{0.32\textwidth}
+	\includegraphics[width=\textwidth, keepaspectratio]{\imgpath/graph-method.JPG}
 	\caption{Graph method}
 	\end{subfigure}
-TODO images of different methods applied
 \caption{Comparison of the three different methods for rebuilding the complete lobster graph from matched subgraphs.}
 \end{figure}
 \noindent
