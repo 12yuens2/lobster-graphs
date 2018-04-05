@@ -366,6 +366,7 @@ Report:
 Simply summary sentence at the beginning before going into detail.
 - Unsustainable rewording
 
+***** Subgraph rebuilding
 probability product equation is naive bayes classifier
 - add maths to this subsection
 
