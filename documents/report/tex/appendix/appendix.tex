@@ -5,18 +5,31 @@
 \input{tex/appendix/cv-algorithms}
 
 
-\section{Results of all keypoint labelling precision/recall}
+\section{Precision and recall results for keypoint labelling}
 
+% #1 - Model
+% #2 - Label
+\newcommand{\apdxprfig}[2]{
 \begin{figure}[H]
 \centering
-Claw labelling TODO
+\fourplotlabel{\prlabelgraph}{#1}{#2}{legend:prlabel}
+\ref{legend:prlabel}
+\caption{Precision-recall graphs with the #1 model for label \textit{#2}.}
 \end{figure}
+}
 
-\begin{figure}[H]
-\centering
-Head labelling TODO
-\end{figure}
 
+\apdxprfig{mature}{arm}
+\apdxprfig{juvenile}{arm}
+
+\apdxprfig{mature}{head}
+\apdxprfig{juvenile}{head}
+
+\apdxprfig{mature}{body}
+\apdxprfig{juvenile}{body}
+
+\apdxprfig{mature}{tail}
+\apdxprfig{juvenile}{tail}
 
 %\input{tex/appendix/labelling-results}
 

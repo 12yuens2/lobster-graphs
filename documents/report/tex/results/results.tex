@@ -1,15 +1,7 @@
 \section{Results}\label{sec:results}
 \newcommand{\resultspath}{tex/results}
 
-\newcommand{\pridentplot}[5]{
-\addplot+[only marks, fill opacity=0.2, 
-	discard if not={Method}{#1}, 
-	discard if not={Model}{#2}, 
-	discard if not={Category}{#3},
-	discard if not={HistThreshold}{#4}
-] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
-\addlegendentry{#5}
-}
+
 
 \newcommand{\prlabelplot}[6] {
 \addplot+[only marks, fill opacity=0.2,
@@ -22,35 +14,6 @@
 \addlegendentry{#6}
 }
 
-% Tikz graph for identification
-% #1 - Histogram threshold
-% #2 - Model used (mature/junveile)
-\newcommand{\pridentgraph}[3]{
-\begin{tikzpicture}[scale=0.7]
-\begin{axis}[
-	title = {\textbf{Histogram threshold of #2}},
-	legend pos=outer north east,
-	legend entries={
-		Graph method on mature lobsters;,
-		Label method on mature lobsters;,
-		Graph method on juvenile lobsters;,
-		Label method on juvenile lobsters
-	},
-	legend to name=#3,
-	xlabel={Recall},
-	xmin=0,xmax=1,
-	ylabel={Precision},
-	ymin=0,ymax=1
-]
-
-\pridentplot{graph}{#1}{mature}{#2}{Graph method on mature lobsters}
-\pridentplot{model}{#1}{mature}{#2}{Label method on mature lobsters}
-\pridentplot{graph}{#1}{juvenile}{#2}{Graph method on juvenile lobsters}
-\pridentplot{model}{#1}{juvenile}{#2}{Label method on juvenile lobsters}
-
-\end{axis}
-\end{tikzpicture}
-}
 
 % Tikz graph for labelling
 % #1 - Histogram threshold
@@ -74,13 +37,70 @@
 	ymin=0,ymax=1
 ]
 
-\prlabelplot{graph}{#1}{mature}{#2}{#3}{Graph method on mature lobsters}
-\prlabelplot{model}{#1}{mature}{#2}{#3}{Label method on mature lobsters}
-\prlabelplot{graph}{#1}{juvenile}{#2}{#3}{Graph method on juvenile lobsters}
-\prlabelplot{model}{#1}{juvenile}{#2}{#3}{Label method on juvenile lobsters}
+\prlabelplot{graph}{#1}{mature}{#2}{#3}{Graph method, mature lobsters}
+\prlabelplot{model}{#1}{mature}{#2}{#3}{Label method, mature lobsters}
+\prlabelplot{graph}{#1}{juvenile}{#2}{#3}{Graph method, juvenile lobsters}
+\prlabelplot{model}{#1}{juvenile}{#2}{#3}{Label method, juvenile lobsters}
 
 \end{axis}
 \end{tikzpicture}
+}
+
+
+\newcommand{\foneidentplot}[5] {
+\addplot+[
+	discard if not={Method}{#1},
+	discard if not={Model}{#2},
+	discard if not={Category}{#3},
+	discard if not={HistThreshold}{#4}
+] table [x=LabelThreshold, y=F1, col sep=comma] {\resultspath/kp-identification.csv};
+\addlegendentry{#5}
+}
+
+\newcommand{\foneidentgraph}[3]{
+\begin{tikzpicture}[scale=0.7]
+\begin{axis}[
+	title = {\textbf{Histogram threshold of #2}},
+	legend pos=outer north east,
+	legend entries={
+		Graph method on mature lobsters;,
+		Label method on mature lobsters;,
+		Graph method on juvenile lobsters;,
+		Label method on juvenile lobsters
+	},
+	legend to name=#3,
+	xlabel={Label threshold},
+	xmin=0,xmax=1,
+	xmode=log,
+	ylabel={F1 score},
+	ymin=0,ymax=1
+]
+
+\foneidentplot{graph}{#1}{mature}{#2}{Graph method, mature lobsters}
+\foneidentplot{model}{#1}{mature}{#2}{Label method, mature lobsters}
+\foneidentplot{graph}{#1}{juvenile}{#2}{Graph method, juvenile lobsters}
+\foneidentplot{model}{#1}{juvenile}{#2}{Label method, juvenile lobsters}
+\end{axis}
+\end{tikzpicture}
+}
+
+
+\newcommand{\fourplotall}[4] {
+\begin{minipage}{0.45\textwidth}
+	#1
+\end{minipage}
+%
+\begin{minipage}{0.45\textwidth}
+	#2
+\end{minipage}
+\\
+\begin{minipage}{0.45\textwidth}
+	#3
+\end{minipage}
+%
+\begin{minipage}{0.45\textwidth}
+	#4
+\end{minipage}
 }
 
 \newcommand{\fourplot}[3]{
@@ -122,9 +142,16 @@
 
 To evaluate how well this method of recreating lobster graphs performs, precision and recall metrics were initially used. The goal of using precision and recall is too see what kind of trade-off there is between the relevant keypoints detected in all detected keypoints (precision) and the relevant keypoints detected in all relevant keypoints (recall). Next, the F1 score is computed to get the harmonic mean of precision and recall. This allows the best labelling and colour histogram thresholds to be found. Finally, by applying a (metric TODO) on the models, images from the rest of the dataset are classified as either mature or juvenile and the results compared to Abdallah's results \cite{lobster-thesis}.
 \n
+They are also a two other parameters that are explored in parallel with the evaluation metrics:
+\begin{enumerate}
+\item As explained in section \ref{sec:graph-creation}, three methods were investigated for rebuilding the matched subgraphs into the final lobster graph. Although the keypoint method was not evaluated due to its shortcomings, the label and graph methods are both used during the evaluation to test which is more effective.
+\item In section \ref{sec:annotation}, it was described how the additional annotation of attribute graphs to the lobster images were split into mature and juvenile categories based on the original dataset. Different probabilistic models can be created based on the two sets of annotations and their performance on both mature and juvenile lobsters can be compared. It is also interesting to see if any model performs better with a particular method or for a particular label. 
+\end{enumerate}
 
 \subsection{Precision and recall}
-The evaluation for precision and recall is split into two evaluations, one for the performance of identifying correct keypoints and the second for the performance of keypoint labelling. The evaluations are split up into two parts because defining false positives and false negatives when evaluating both aspects together is a difficult problem, the key issue being an overlap between false positives and false negatives for correctly detected but mislabelled keypoints. For example, if a keypoint has been correctly identified and labelled as a \textit{claw} but is actually an \textit{arm}, then it should be a false positive because the labelling is incorrect. However, it should also be a false negative because correct \textit{arm} labelling was missed. Because of these difficult definitions, it made sense to split the precision and recall evaluation into two separate parts where the false positives and false negatives could be clearly defined. 
+The evaluation for precision and recall is split into two evaluations, one for the performance of identifying correct keypoints and the second for the performance of keypoint labelling. The evaluations are split up into two parts because defining false positives and false negatives when evaluating both aspects together is a difficult problem, the key issue being an overlap between false positives and false negatives for correctly detected but mislabelled keypoints. For example, if a keypoint has been correctly identified and labelled as a \textit{claw} but is actually an \textit{arm}, then it should be a false positive because the labelling is incorrect. However, it should also be a false negative because correct \textit{arm} labelling was missed. Because of these difficult definitions, it made sense to split the precision and recall evaluation into two separate parts where the false positives and false negatives could be clearly defined.
+\n
+In order to create a precision-recall curve, the probability threshold for labelling keypoints and the threshold for colour histogram filtering is incrementally changed. This shows how the two thresholds affect the precision and recall of the lobster graphs created. Note that results for very low thresholds were not obtained due to the large time taken because of the combinatorial explosion.
 
 \subsubsection{Keypoint identification}
 First, the precision and recall metrics were calculated for keypoint identification to see how many keypoints from the annotated images could be re-identified in the final graph. The labels of each keypoint and the edges between them are not taken into account for these results. The precision and recall for this evaluation is defined as follows:
@@ -134,39 +161,93 @@ First, the precision and recall metrics were calculated for keypoint identificat
 \text{Recall} &= \frac{\text{Correctly detected keypoints}}{\text{Correctly detected keypoints} + \text{Missed keypoints in annotation}}
 \end{align}
 
+\newcommand{\pridentplot}[5]{
+\addplot+[mark=none, fill opacity=0.2, 
+	discard if not={Method}{#1}, 
+	discard if not={Model}{#2}, 
+	discard if not={Category}{#3},
+	discard if not={HistThreshold}{#4}
+] table [x=Recall, y=Precision, col sep=comma] {\resultspath/kp-identification.csv};
+\addlegendentry{#5}
+}
+% Tikz graph for identification
+% #1 - Histogram threshold
+% #2 - Model used (mature/junveile)
+\newcommand{\pridentgraph}[3]{
+\begin{tikzpicture}[scale=0.7]
+\begin{axis}[
+	title = {\textbf{Histogram threshold of #2}},
+	legend pos=south east,
+	enlargelimits=true,
+	xlabel={Recall},
+	xmin=0,xmax=1,
+	ylabel={Precision},
+	ymin=0,ymax=1
+]
+
+\pridentplot{graph}{#1}{mature}{#2}{Graph method, mature lobsters}
+\pridentplot{model}{#1}{mature}{#2}{Label method, mature lobsters}
+\pridentplot{graph}{#1}{juvenile}{#2}{Graph method, juvenile lobsters}
+\pridentplot{model}{#1}{juvenile}{#2}{Label method, juvenile lobsters}
+
+\end{axis}
+\end{tikzpicture}
+}
+
 
 \begin{figure}[H]
 \centering
 \fourplot{\pridentgraph}{mature}{legend:prident}
-\ref{legend:prident}
 \caption{Precision/recall graphs with the mature model with varying label thresholds.}
+\label{fig:pridentmat}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \fourplot{\pridentgraph}{juvenile}{legend:prident}
-\ref{legend:prident}
 \caption{Precision/recall graphs with the juvenile model with varying label thresholds.}
+\label{fig:pridentjuv}
 \end{figure}
+\noindent
+It can be seen from figure \ref{fig:pridentjuv} and \ref{fig:pridentmat} that despite the label and histogram thresholds being varied, there is not a clear precision-recall curve that shows the trade-off between the two metrics. The change in the labelling threshold clearly affects the recall, but precision seems independent of both the recall and thresholds as it says relatively the same as recall improves dramatically. This suggests there is either no inherent trade-off between precision and recall in this problem, or the threshold that is being changed is not suitable to the metrics. 
+\n
+The label and histogram filtering thresholds that were varied may not be very suitable as they only indirectly affect the final graph that is built. The two thresholds changes what labels and keypoints are kept in the stages leading up to the creation of the final graph, for example a high label threshold would mean less subgraphs to explore as less labels could be applied. However it is the probabilistic model of choosing subgraphs which ultimately affects the lobster graph that is created. The issue here is there is no threshold that can be applied to this probabilistic model, as the most probable subgraphs are chosen incrementally. For this reason, looking at the precision and recall metrics is not the most suitable to evaluate performance. 
+\n
+Another interesting thing to note here is the difference between using a mature lobster model (figure \ref{fig:pridentmat}) and using a juvenile lobster model (figure \ref{fig:pridentjuv}). There is a clear difference in both precision and recall when applying the juvenile model to the two categories of images, however, the difference is less obvious when using the mature model. This may come from the increased variance in the mature lobster images for sizes of keypoints and length of edges, whereas the juvenile lobster images are more consistent. 
 
-\subsection{Keypoint labelling}
+\subsubsection{Keypoint labelling}
+For the evaluation of keypoint labelling, the precision-recall calculations are altered slightly as the labels on the detected keypoints matter here, rather than the detection itself. Additionally, the evaluation can be focused on each specific label (claw, tail, etc.) to see if there are any strengths of weaknesses for specific body parts.
 
+\begin{align}
+\text{Precision} &= \frac{\text{Correctly labelled keypoints}}{\text{Correctly labelled keypoints} + \text{Incorrectly labelled keypoints}}
+\\[10pt]
+\text{Recall} &= \frac{\text{Correctly labelled keypoints}}{\text{Correctly labelled keypoints} + \text{Missed labels in annotation}}
+\end{align}
 
 \begin{itemize}
-\item True positive - Correctly labelled keypoints
-\item False positive - Incorrectly labelled keypoints
-\item False negative - Missed labels, eg if 2 claws and only 1 was found/labelled
-\item True negative - 
+\item False negative - Missed labels, eg if 2 claws and only 1 was found/labelled TODO remove
 \end{itemize}
 
 
 
-%\begin{figure}[H]
-%\centering
-%\fourplotlabel{\prlabelgraph}{juvenile}{claw}{legend:prlabel}
-%\ref{legend:prlabel}
-%\caption{Precision/recall graphs with the juvenile model for label ``claw". }
-%\end{figure}
+\begin{figure}[H]
+\centering
+\fourplotlabel{\prlabelgraph}{mature}{claw}{legend:prlabel}
+\ref{legend:prlabel}
+\caption{Precision/recall graphs with the mature model for label \textit{claw}.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\fourplotlabel{\prlabelgraph}{juvenile}{claw}{legend:prlabel}
+\ref{legend:prlabel}
+\caption{Precision/recall graphs with the juvenile model for label \textit{claw}. Further graphs of all other labels can be found in appendix TODO}
+\end{figure}
+\noindent
+The precision-recall graphs for labels confirm that precision and recall are not very suitable metrics due to the lack of a good threshold to alter. There seems to be something missing in the curves, as the linear relationship from varying label thresholds and different methods and models 
+\n
+
+
 %
 %\begin{figure}[H]
 %\centering
@@ -192,5 +273,138 @@ First, the precision and recall metrics were calculated for keypoint identificat
 Problem with recall for labelling is false negatives very low as only 1 or 2 labels are in annotated set. 
 
 
-\subsection{Classification}
+\subsection{F1 score}
+Although precision and recall did not give much insight into the models and methods used, the metrics can still be used to empirically find the best labelling and histogram filtering thresholds that should be used for classification. The F1 score can be used as a weighted average of precision and recall where both contribute equally. The best thresholds are therefore the ones where the F1 score is the highest. The F1 score also gives a reasonable look into which models and methods are the most effective. The identification and labelling evaluations continue to be kept separate for the same reason as before. 
+\subsubsection{Keypoint identification}
 
+\begin{figure}[H]
+\centering
+\fourplot{\foneidentgraph}{mature}{legend:foneident}
+\\
+\ref{legend:foneident}
+\caption{F1 score for varying thresholds with the mature model.}
+\label{fig:fonemature}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\fourplot{\foneidentgraph}{juvenile}{legend:foneident}
+\\
+\ref{legend:foneident}
+\caption{F1 score for varying thresholds with the juvenile model.}
+\label{fig:fonejuvenile}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{| c | c | c | c | c | c |}
+\hline
+\textbf{Method} & \textbf{Model} & \textbf{Category} & \textbf{Label threshold} & \textbf{Histogram threshold} & \textbf{F1 score} \\ 
+\hline
+Graph & Juvenile & Juvenile & 0.03 & 0.3-0.9 & 0.880 \\
+\hline
+Label & Juvenile & Juvenile & 0.03 & 0.3-0.7 & 0.844 \\
+\hline
+Label & Mature & Juvenile & 0.07 & 0.5-0.7 & 0.765 \\
+\hline
+Label & Mature & Mature & 0.05 & 0.3 & 0.726 \\
+\hline
+Graph & Mature & Juvenile & 0.08 & 0.5-0.7 & 0.718 \\
+\hline
+Graph & Mature & Mature & 0.06-0.05 & 0.3 & 0.694 \\
+\hline
+Label & Juvenile & Mature & 0.03 & 0.3-0.7 & 0.487 \\
+\hline
+Graph & Juvenile & Mature & 0.05 & 0.3-0.7 & 0.434 \\
+\hline
+\end{tabular}
+\caption{Best F1 score and thresholds for different combinations of methods and models.}
+\end{table}
+\noindent
+In general, it is shown clearly that the label threshold has a substantial impact on performance. As the label threshold increases, the F1 score decreases because it becomes less probable for any particular label to be applied to a keypoint. The decreased number of labelled keypoints then cause less subgraphs to be matched and so reduces the number of final keypoints. Moreover, at high label thresholds, it becomes more likely that a keypoint will not be labelled at all and so additional relevant information is lost. 
+\n
+The graphs of figure \ref{fig:fonemature} and \ref{fig:fonejuvenile} further demonstrate juvenile lobsters being better detected in general, regardless of the model or method used, when compared to mature lobsters. 
+\subsubsection{Keypoint labelling}
+
+\newcommand{\fonelabelplot}[6] {
+\addplot+[
+	discard if not={Method}{#1},
+	discard if not={Model}{#2},
+	discard if not={Category}{#3},
+	discard if not={HistThreshold}{#4},
+	discard if not={Label}{#5}
+] table [x=LabelThreshold, y=F1, col sep=comma] {\resultspath/kp-labelling.csv};
+\addlegendentry{#6}
+}
+
+\newcommand{\fonelabelgraph}[4]{
+\begin{tikzpicture}[scale=0.75]
+\begin{axis}[
+	title = {\textbf{Histogram threshold of #2}},
+	legend pos=outer north east,
+	legend entries={
+		Graph method on mature lobsters;,
+		Label method on mature lobsters;,
+		Graph method on juvenile lobsters;,
+		Label method on juvenile lobsters
+	},
+	legend to name=#4,
+	xlabel={Label threshold},
+	xmin=0,xmax=1,
+	%xmode=log,
+	ylabel={F1 score},
+	ymin=0,ymax=1
+]
+
+\fonelabelplot{graph}{#1}{mature}{#2}{#3}{Graph method on mature lobsters}
+\fonelabelplot{model}{#1}{mature}{#2}{#3}{Label method on mature lobsters}
+\fonelabelplot{graph}{#1}{juvenile}{#2}{#3}{Graph method on juvenile lobsters}
+\fonelabelplot{model}{#1}{juvenile}{#2}{#3}{Label method on juvenile lobsters}
+\end{axis}
+\end{tikzpicture}
+}
+
+
+
+\begin{figure}[H]
+\fourplotlabel{\fonelabelgraph}{mature}{tail}{legend:fone-label}
+\caption{Mature model, tail label}
+\end{figure}
+
+\begin{figure}[H]
+\fourplotlabel{\fonelabelgraph}{juvenile}{tail}{legend:fone-label}
+\caption{Juvenile model, tail label}
+\end{figure}
+
+\begin{figure}[H]
+\fourplotlabel{\fonelabelgraph}{mature}{body}{legend:fone-label}
+\caption{Mature model, body label}
+\end{figure}
+
+\begin{figure}[H]
+\fourplotlabel{\fonelabelgraph}{juvenile}{body}{legend:fone-label}
+\caption{Juvenile model, body label}
+\end{figure}
+
+\begin{figure}[H]
+\fourplotlabel{\fonelabelgraph}{mature}{head}{legend:fone-label}
+\caption{Mature model, head label}
+\end{figure}
+
+\begin{figure}[H]
+\fourplotlabel{\fonelabelgraph}{juvenile}{head}{legend:fone-label}
+\caption{Juvenile model, head label}
+\end{figure}
+
+\begin{figure}[H]
+\fourplotlabel{\fonelabelgraph}{mature}{claw}{legend:fone-label}
+\caption{Mature model, claw label}
+\end{figure}
+
+\begin{figure}[H]
+\fourplotlabel{\fonelabelgraph}{juvenile}{claw}{legend:fone-label}
+\caption{Juvenile model, claw label}
+\end{figure}
+
+\subsection{Classification}
+From the results of precision, recall and F1 score, it was shown that there was a much clearer performance difference applying the juvenile model to mature and juvenile lobsters. Further juvenile lobsters still had high F1 scores even when applied to mature lobsters. For this reason, only the juvenile model is used to classify the unseen images of the dataset. 

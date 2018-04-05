@@ -8,7 +8,7 @@ TODO
 \subsection{Background}
 The fishing industry plays a large role in the Scottish economy. Many rules and regulations have been put into place to improve the management of inshore fisheries in Scotland for sustainable fishing. The minimum landing size is an example of a simple regulation to protect breeding stock, not allowing any catches below the minimum size to be landed. This insures a proportion of the animal population continues to grow and reproduce \cite{masts-report} and is used particularly for inshore shellfisheries. Lobsters are an example of a family of crustaceans affected by the application of this regulation. 
 \n
-Typically, the catches have to be sorted and measured manually in order to adhere to regulations on minimum landing size. Illegal and unwanted products are then discarded back to the sea. Rochet \cite{discard} notes that discarding continues to be an important problem in world fisheries as discarded products often do not survive. This defeats the purpose of the regulation to preserve breeding stock and further hurts the industry as discarded products are lost without economic gain. 
+Typically, catches have to be sorted and measured manually in order to adhere to regulations on minimum landing size. Illegal and unwanted products are then discarded back to the sea. Rochet \cite{discard} notes that discarding continues to be an important problem in world fisheries as discarded products often do not survive. This defeats the purpose of the regulation to preserve breeding stock and further hurts the industry as discarded products are lost without economic gain. 
 \n
 There has been some research in the area of applying computer vision techniques to automatically identify and detect species of fish \cite{iobserver, fish-detection} and research into automatic measurement of fish size \cite{fish-size, fish-size2} which can be applied to reduce discarding. Much work is focused on fish due to the impractical nature of manual observation and measurement. Though there is little work that focuses on using such techniques for lobsters.
 
@@ -21,11 +21,13 @@ Below the primary and secondary objectives of the project are listed.
 \item Automatically detect interest points from images
 \item Evaluate this method of graph matching on lobsters against the existing dataset
 \end{itemize}
-All primary objectives were met, resulting in a complete method that could take an image of a lobster from the dataset and create a graph that detects and labels the different body parts of the lobster. The accuracy of the method is then analysed and evaluated.
+All primary objectives were met, resulting in a complete method that can take an image of a lobster from the dataset and create a graph that detects and labels the different body parts of the lobster. The accuracy of the method is then analysed and evaluated.
  
 \subsubsection{Secondary objectives}
 \begin{itemize}
 \item Extending existing or coming up with new algorithms for creating lobster graphs from images, knowing what we've learned so far.
-\item Apply this technique on more complex images with noise such as natural lobsters  in their environment
+\item Apply this technique on more complex images with noise such as natural lobsters in their environment
 \item Apply this technique for video/real time instead of images to give properties and information on the lobster in real time. 
 \end{itemize}
+Some of the secondary objectives were touched upon and investigated during the design and implementation of this project and the primary objectives, though none were explicitly explored. The final method developed is a new and novel way to create a graph representation of a lobster from an image and the ability to deal with noisy backgrounds was both noted and dealt with as an issue in the filtering (section \ref{sec:kp-filtering}) and combination (section \ref{sec:graph-creation}) stages respectively. 
+
