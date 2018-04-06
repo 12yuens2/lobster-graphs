@@ -1,4 +1,4 @@
-\section{Results}\label{sec:results}
+\section{Results and evaluation}\label{sec:results}
 \newcommand{\resultspath}{tex/results}
 
 
@@ -138,7 +138,21 @@
 	#1{#2}{0.9}{#3}{#4}
 \end{minipage}
 }
+The developed models and methods 
 
+\begin{figure}[H]
+
+	\begin{subfigure}{0.45\textwidth}
+	
+	\caption{Example of good match}
+	\end{subfigure}
+	\hspace*{\fill}
+	\begin{subfigure}{0.45\textwidth}
+	
+	\caption{Example of bad match}
+	\end{subfigure}
+\caption{Example of matches}
+\end{figure}
 
 To evaluate how well this method of recreating lobster graphs performs, precision and recall metrics were initially used. The goal of using precision and recall is too see what kind of trade-off there is between the relevant keypoints detected in all detected keypoints (precision) and the relevant keypoints detected in all relevant keypoints (recall). Next, the F1 score is computed to get the harmonic mean of precision and recall. This allows the best labelling and colour histogram thresholds to be found. Finally, by applying a (metric TODO) on the models, images from the rest of the dataset are classified as either mature or juvenile and the results compared to Abdallah's results \cite{lobster-thesis}.
 \n
@@ -244,7 +258,7 @@ For the evaluation of keypoint labelling, the precision-recall calculations are 
 \caption{Precision/recall graphs with the juvenile model for label \textit{claw}. Further graphs of all other labels can be found in appendix TODO}
 \end{figure}
 \noindent
-The precision-recall graphs for labels confirm that precision and recall are not very suitable metrics due to the lack of a good threshold to alter. There seems to be something missing in the curves, as the linear relationship from varying label thresholds and different methods and models 
+The precision-recall graphs for labels confirm that precision and recall are not very suitable metrics due to the lack of a good threshold to alter. There seems to be something missing in the curves, as the linear relationship from varying label thresholds and different methods and models is not expected from a precision-recall curve. Potentially each point in the graphs represent a separate precision-recall curve, but we are unable to find the threshold to vary that gives the trade-off and the rest of the curve. 
 \n
 
 
@@ -366,45 +380,45 @@ The graphs of figure \ref{fig:fonemature} and \ref{fig:fonejuvenile} further dem
 
 
 
-\begin{figure}[H]
-\fourplotlabel{\fonelabelgraph}{mature}{tail}{legend:fone-label}
-\caption{Mature model, tail label}
-\end{figure}
-
-\begin{figure}[H]
-\fourplotlabel{\fonelabelgraph}{juvenile}{tail}{legend:fone-label}
-\caption{Juvenile model, tail label}
-\end{figure}
-
-\begin{figure}[H]
-\fourplotlabel{\fonelabelgraph}{mature}{body}{legend:fone-label}
-\caption{Mature model, body label}
-\end{figure}
-
-\begin{figure}[H]
-\fourplotlabel{\fonelabelgraph}{juvenile}{body}{legend:fone-label}
-\caption{Juvenile model, body label}
-\end{figure}
-
-\begin{figure}[H]
-\fourplotlabel{\fonelabelgraph}{mature}{head}{legend:fone-label}
-\caption{Mature model, head label}
-\end{figure}
-
-\begin{figure}[H]
-\fourplotlabel{\fonelabelgraph}{juvenile}{head}{legend:fone-label}
-\caption{Juvenile model, head label}
-\end{figure}
-
-\begin{figure}[H]
-\fourplotlabel{\fonelabelgraph}{mature}{claw}{legend:fone-label}
-\caption{Mature model, claw label}
-\end{figure}
-
-\begin{figure}[H]
-\fourplotlabel{\fonelabelgraph}{juvenile}{claw}{legend:fone-label}
-\caption{Juvenile model, claw label}
-\end{figure}
+%\begin{figure}[H]
+%\fourplotlabel{\fonelabelgraph}{mature}{tail}{legend:fone-label}
+%\caption{Mature model, tail label}
+%\end{figure}
+%
+%\begin{figure}[H]
+%\fourplotlabel{\fonelabelgraph}{juvenile}{tail}{legend:fone-label}
+%\caption{Juvenile model, tail label}
+%\end{figure}
+%
+%\begin{figure}[H]
+%\fourplotlabel{\fonelabelgraph}{mature}{body}{legend:fone-label}
+%\caption{Mature model, body label}
+%\end{figure}
+%
+%\begin{figure}[H]
+%\fourplotlabel{\fonelabelgraph}{juvenile}{body}{legend:fone-label}
+%\caption{Juvenile model, body label}
+%\end{figure}
+%
+%\begin{figure}[H]
+%\fourplotlabel{\fonelabelgraph}{mature}{head}{legend:fone-label}
+%\caption{Mature model, head label}
+%\end{figure}
+%
+%\begin{figure}[H]
+%\fourplotlabel{\fonelabelgraph}{juvenile}{head}{legend:fone-label}
+%\caption{Juvenile model, head label}
+%\end{figure}
+%
+%\begin{figure}[H]
+%\fourplotlabel{\fonelabelgraph}{mature}{claw}{legend:fone-label}
+%\caption{Mature model, claw label}
+%\end{figure}
+%
+%\begin{figure}[H]
+%\fourplotlabel{\fonelabelgraph}{juvenile}{claw}{legend:fone-label}
+%\caption{Juvenile model, claw label}
+%\end{figure}
 
 \subsection{Classification}
 From the results of precision, recall and F1 score, it was shown that there was a much clearer performance difference applying the juvenile model to mature and juvenile lobsters. Further juvenile lobsters still had high F1 scores even when applied to mature lobsters. For this reason, only the juvenile model is used to classify the unseen images of the dataset. 
