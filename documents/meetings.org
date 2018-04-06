@@ -384,6 +384,26 @@ Mention other evaluation that will compared against
 
 mature/juvenile classification evaluation
 
+
+*** Meeting questions
+
+**** Report
+
+***** Context survey
+- Move background from introduction?
+- More on background papers like fish species detection?
+- More on background for fishing/minimum landing size regulations?
+
+***** Software engineering process
+- Better title?
+
+
+**** Other
+- Poster
+***** Submission
+- Include libraries used source/executable?
+
+
 * Notes
 
 ** Graph matching notes
