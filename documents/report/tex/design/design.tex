@@ -60,13 +60,14 @@ Figure \ref{fig:overview} shows the key steps of the overall method used to go f
 \label{fig:overview}
 \end{figure}
 \noindent
-In the initial stages, keypoints are extracted and filtered from the image through the use of various OpenCV algorithms and techniques such as SIFT for keypoint detection and colour histograms for keypoint filtering. The remaining set of keypoints are then labelled using a probabilistic model and all permutations of possible subgraphs are created. 
+In the initial stages, keypoints are detected and filtered from the image through the use of various OpenCV algorithms and techniques such as SIFT for keypoint detection and colour histograms for keypoint filtering. The remaining set of keypoints are then labelled using a probabilistic model and all permutations of possible subgraphs are created. 
 \n
 The second stage of taking a large set of subgraphs and matching them to rebuild the complete lobster graph consists of the following two main steps:
 \begin{enumerate}
-\item Run GraphGrep to find all subgraphs of valid configurations against the database of complete lobster graphs. 
+\item Run GraphGrep to find all subgraphs of valid configurations against a database of complete lobster graphs. 
 \item Use a probabilistic model to rebuild the matched subgraphs into the complete lobster graph.
 \end{enumerate}
+The final product of the whole process is a labelled graph which represents the lobster matched in the given image. Note that it is assumed the image given is one that contains a lobster, as object detection - detecting if there is or is not a lobster in the image - is not in the scope of this project.
 
 
 \subsection{Annotation of dataset}\label{sec:annotation}
@@ -82,27 +83,29 @@ The dataset provided by \cite{lobster-thesis} was tagged with information for ea
 	\begin{subfigure}{0.31\textwidth}
 		\includegraphics[width=1\textwidth]{\imgpath/1380-1.png}
 		\caption{Simple representation}
+                \label{fig:gephi-simple}
 	\end{subfigure}
 	\hspace*{\fill}
 	\begin{subfigure}{0.31\textwidth}
 		\includegraphics[width=1\textwidth]{\imgpath/1380-2.png}
 		\caption{More complex representation}
+                \label{fig:gephi-complex}
 	\end{subfigure}
 \caption{Examples of different configurations of lobster graphs that were explored using Gephi on the same lobster image.}
 \end{figure}
 \noindent
 In the initial lobster graph prototyping done with Gephi, different configurations and representations were explored to see how more or less information from the lobster graphs could influence the matching process. At this stage, the use of OpenCV keypoint detectors were not yet used, as the goal was to prototype the graphs and probability models for matching. 
 \n
-TODO why chose the representation that we did
+In the end, simpler representations such as the one in figure \ref{fig:gephi-simple} were chosen because the simplicity allowed for more robust probability models. TODO
 \n
-After the use of computer vision algorithms was explored, the annotated step was revisited to update the graphs to correspond to keypoints that could be detected in the images. This improved the annotated dataset by adding real data for the size of nodes and lengths of edges which would be used. The annotations are all stored as \texttt{.gdf} graph files named after the images to be used later. This annotation took a few steps to complete:
+After the use of computer vision algorithms was explored, the annotated step was revisited to update the graphs to correspond to keypoints that could be detected in the images. This improved the annotated dataset by adding real data for the size of nodes and lengths of edges which would be used. Further images in the dataset where some keypoints could not be detected can be taken into account so the ground truths developed are accurate to features that can be detected, rather than ideal features. The annotations are all stored as \texttt{.gdf} graph files named after the images to be used later. This annotation took a few steps to complete:
 \begin{enumerate}
-\item Run SIFT to detect all keypoints on the image, then output all the keypoints as nodes in \texttt{.gdf} format.
+\item Run keypoint detection to detect all keypoints on the image, then output all the keypoints as nodes in \texttt{.gdf} format.
 \item By looking at the corresponding images, manually annotate the edge connections between relevant keypoints and remove all other keypoints.
-\item Translate the annotated graphs in \texttt{.gdf} format to \texttt{.gfu} format for graph matching tools to use. The \texttt{.gdf} graph formats are still kept as they are used for the probabilistic models.
+\item Translate the annotated graphs in \texttt{.gdf} format to \texttt{.gfu} format for graph matching tools to use. The \texttt{.gdf} graph formats are still kept to be used for the probabilistic models.
 \end{enumerate}
 
-\imagefig{1\textwidth}{\imgpath/annotated.JPG}{Example of annotated lobster image with nodes and edges of the graph perfectly labelled using keypoint detectors.}
+\imagefig{1\textwidth}{\imgpath/annotated.JPG}{Example of annotated lobster image with nodes and edges of the graph perfectly labelled using keypoints from detectors.}
 \noindent
 Additionally, the annotations were split between mature lobsters and juvenile lobsters. This was done as juvenile lobsters are smaller and the sizes of the nodes matter in later probabilistic models. The images from Abdallah's dataset were all taken from a tripod at the same distance, so the difference in size between the lobsters in the image reflects their actual size. Moreover, separate mature and juvenile models can be developed from the two categorised annotations. It would then be expected that the mature model matches better to mature lobsters and the juvenile model matches better to juvenile lobsters. 
 \n
@@ -177,47 +180,34 @@ The keypoint detectors are able to provide better results for our objective, as 
 {\imgpath/sift1398.JPG}{}
 {\imgpath/sift1507.JPG}{}
 {\imgpath/sift4805.JPG}{}
-	
-	
-\vspace{0.5cm}
+\caption{SIFT on different images}
+\end{figure}	
 
-	\begin{subfigure}{0.31\textwidth}
 
-	\end{subfigure}
-	\hspace*{\fill}
-	\begin{subfigure}{0.31\textwidth}
-
-	\end{subfigure}
-	\hspace*{\fill}
-	\begin{subfigure}{0.31\textwidth}
-
-	\end{subfigure}
-	
-\vspace{0.5cm}
-
-	\begin{subfigure}{0.31\textwidth}
-
-	\end{subfigure}
-	\hspace*{\fill}
-	\begin{subfigure}{0.31\textwidth}
-
-	\end{subfigure}
-	\hspace*{\fill}
-	\begin{subfigure}{0.31\textwidth}
-
-	\end{subfigure}
-
-\caption{Comparison of different keypoint detection algorithms on multiple lobster images. See comparison of more images in appendix \ref{apdx:cv-algos}}
+\begin{figure}[H]
+  \threefig
+  {\imgpath/surf1398.JPG}{}
+  {\imgpath/surf1507.JPG}{}
+  {\imgpath/surf4805.JPG}{}
+\caption{SURF on different images}
 \end{figure}
-\noindent
 
-Between the different keypoint detection algorithms, SIFT was chosen as it gave the most consistent results and the kind of useful keypoints that are needed.
+
+\begin{figure}[H]
+  \threefig
+  {\imgpath/orb1398.JPG}{}
+  {\imgpath/orb1507.JPG}{}
+  {\imgpath/orb4805.JPG}{}
+\caption{ORB on different images}
+\end{figure}
+
+The three different keypoints detectors each detected different features in the images. ORB was able to detect many edges and legs for the lobster, but did not consistently detect features such as the claws or tail. Many of the features it finds are focused on areas near the head or sides rather than near the body of the lobster. In comparison, SIFT and SURF are able to find the more relevant body parts more consistently, but the trade off is a lot of small irrelevant keypoints are also detected. SURF still detects a lot of edges and legs like ORB, which is less useful, while SIFT is able to detect keypoints on top of lobsters, especially getting larger body and tail keypoints clearly. Between the different keypoint detection algorithms, SIFT was chosen as it gave consistent results for many images and gave the kind of useful keypoints that are needed and very applicable to mapping a graph structure on top of the image compared to the other two detection algorithms.
 
 
 \subsection{Keypoint filtering}\label{sec:kp-filter}
 From just running a SIFT detector on the lobster images, it can be seen that there are a lot of small keypoints that are unimportant for our purposes. There are also many keypoints around the lobster that we would like to filter out, as we want all our keypoints to be on the lobster. First, the smaller keypoints that are irrelevant have to be filtered away. Both the size of the keypoints and SIFT octaves were looked at for this step. Next, the typical computer vision approach for feature matching using the keypoint descriptors \cite{sift} was tried, but the results obtained were surprisingly poor. Because of this, a more novel approach was taken to filter out remaining keypoints that are not on the lobster using a colour histogram method where the colour histograms of the keypoints are compared and any below a certain difference threshold are filtered away.
 
-\subsubsection{Octave filtering}
+\subsubsection{Size and octave filtering}
 The method of filtering by the actual size of the keypoints was first looked at before looking at octaves. It was found to be less robust and less general than using octave levels. There are a few issues involved in using size of the keypoint for filtering, namely how to choose a suitable threshold. The size threshold must be constant across all images, otherwise the method will not be able to generalise to unseen images. The size of the keypoints is directly related to the size of the original image, so any size filter threshold must be calculated based on the size of the image. This is not an issue, as a constant size threshold can be relative to the size of the image. However, with different sizes of lobsters, an aggressive threshold may remove important keypoints that we wanted to keep. Conversely a more conservative threshold would not remove enough keypoints and cause a large combinatorial explosion, a problem explained later in section \ref{sec:probabilistic-model} that we wish to avoid. This makes it difficult to set a good threshold as it would have to be arbitrarily defined and based solely on manual inspection of the images and keypoints sizes of the dataset. Furthermore, this seems to be quite a crude method with little support in existing research and doesn't take advantage of any properties in the SIFT algorithm. 
 
 Octaves in SIFT are created by continually blurring an image. The idea behind this is to emulate looking at the image from different distances to get a varied set of keypoints. This means different features may be found at different octave levels. The high resolution of the images in our dataset causes many small keypoints to be found in the first few octave levels. These keypoints show many details that are irrelevant as we are concerned with the overall pose and size of the lobster.
@@ -245,7 +235,7 @@ In computer vision, keypoint descriptors obtained from detectors like SIFT and S
 \caption{Process in calculated keypoint descriptors, taken from \cite{fish-classification}}
 \end{figure}
 \noindent
-This is exactly what we want, as we wish to extract the different features of a lobster (tail, claws, head). Because we do not have a dataset for individual parts, to test if this method is viable, a specific keypoint was chosen and its descriptor calculated. Next, additional images were processed where the keypoints whose descriptors have the closest to the descriptor calculated previously are kept. Distance here is defined as difference norm of the two descriptors, as they are represented as vectors. It was ensured in these tests that the detection on the additional images tested contained keypoints of the chosen feature. For example, if the \textit{tail} feature is chosen, the descriptor for the tail keypoint is calculated for one image and used for comparison. The keypoint is identified by hand at this stage. Then images of other lobsters are processed where every keypoint descriptor is calculated and matched to the tail descriptor from the first image. This allows us to see the few best keypoints that were matched for new images based on the descriptor from one image. All keypoints of the additional images were printed to make sure a tail keypoint was detected and the goal is for the descriptor matching to automatically find that keypoint.
+This is exactly the kind of comparison metric needed, as we wish to extract the different features of a lobster (tail, claws, head) and be able to label them distinctly. Because we do not have a dataset for individual parts, to test if this method is viable, a specific keypoint was chosen and its descriptor calculated. Next, additional images were processed where the keypoints whose descriptors have the closest to the descriptor calculated previously are kept. Distance here is defined as difference norm of the two descriptors, as they are represented as vectors. It was ensured in these tests that the detection on the additional images tested contained keypoints of the chosen feature. For example, if the \textit{tail} feature is chosen, the descriptor for the tail keypoint is calculated for one image and used for comparison. The keypoint is identified by hand at this stage. Then images of other lobsters are processed where every keypoint descriptor is calculated and matched to the tail descriptor from the first image. This allows us to see the few best keypoints that were matched for new images based on the descriptor from one image. All keypoints of the additional images were printed to make sure a tail keypoint was detected and the goal is for the descriptor matching to automatically find that keypoint.
 
 %it made more sense to do the opposite of matching. Instead of using the distance between descriptors to match a detected keypoint with a known keypoint, the distance can be used as filter out keypoints that do not match closely to known ones. This distance can then be used as a threshold to filter more or less keypoints away. 
 %\n
@@ -253,24 +243,24 @@ This is exactly what we want, as we wish to extract the different features of a 
 
 \begin{figure}[H]
 \centering
-	\begin{subfigure}{0.4\textwidth}
+	\begin{subfigure}{0.45\textwidth}
 	\includegraphics[width=1\textwidth]{\imgpath/tail-des.png}
 	\caption{Starting image where the \textit{tail} descriptor is taken.}
 	\end{subfigure}
 \hspace*{\fill}
-	\begin{subfigure}{0.4\textwidth}
+	\begin{subfigure}{0.45\textwidth}
 	\includegraphics[width=1\textwidth]{\imgpath/1424.JPG}
 	\caption{Image 1424}
 	\end{subfigure}
 
 \vspace{0.5cm}
 
-	\begin{subfigure}{0.4\textwidth}
+	\begin{subfigure}{0.45\textwidth}
 	\includegraphics[width=1\textwidth]{\imgpath/4844.JPG}
 	\caption{Image 4844}
 	\end{subfigure}
 \hspace*{\fill}
-	\begin{subfigure}{0.4\textwidth}
+	\begin{subfigure}{0.45\textwidth}
 	\includegraphics[width=1\textwidth]{\imgpath/4785.JPG}
 	\caption{Image 4785}
 	\end{subfigure}
@@ -279,8 +269,7 @@ This is exactly what we want, as we wish to extract the different features of a 
 \label{fig:kpdescriptor}
 \end{figure}
 \noindent
-Figure \ref{fig:kpdescriptor} shows that the use of keypoint descriptors as a means of matching or filtering was not very reliable. After the tail descriptor was calculated, three other images are tested. Only one of the three could correctly detect the tail again, but it is not even the best matched keypoint. As the traditional method of descriptors proved unreliable for our means, a slightly more novel method was needed to filter out keypoints for labelling.
-
+Figure \ref{fig:kpdescriptor} shows that the use of keypoint descriptors as a means of matching or filtering was not very reliable. After the tail descriptor was calculated, three other images are tested. Only one of the three could correctly detect the tail again, but it is not even the best matched keypoint. As the traditional method of descriptors proved unreliable for our means, a slightly more novel method was needed to filter out and choose keypoints for labelling.
 
 
 
