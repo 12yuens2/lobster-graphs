@@ -22,7 +22,7 @@ The concept of combining local invariant features (keypoints) and graph matching
 \n
 In the paper, the goal of graph matching was to match images of the same muzzle as a means of identification (like human fingerprints). This is similar to classic computer vision matching with k-nearest neighbours matching between keypoints to match objects in a scene. The paper shows how graph matching with attributed graphs can take advantage of the associated attributes in each node and edge to represent the relationship between two features. Aspects of this are used in the final stages of graph creation (section \ref{sec:graph-creation}) when building the full lobster graph from a pool of smaller labelled subgraphs. 
 
-\subsection{Graph matching problem}
+\subsection{Graph matching problem}\label{sec:lit-graph}
 The graph matching, or subgraph isomorphism problem is where, given two undirected graphs $G_1$ and $G_2$, it must be determined whether the graph $G_1$ contains a subgraph that is isomorphic to $G_2$ \cite{subgraph}. Cook showed in his paper that subgraph isomorphism was NP-complete with a reduction to the 3-SAT problem. This problem applies to the project from the use of subgraph matching to determine if a labelled subgraph is contained in a larger complete graph of a lobster. 
 \begin{figure}[H]
 \centering
