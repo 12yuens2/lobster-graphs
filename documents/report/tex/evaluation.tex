@@ -1,1 +1,31 @@
-\section{Evaluation}
+\section{Evaluation}\label{sec:evaluation}
+
+\subsection{Objectives}
+The project met all of the primary objectives set out in the beginning and explored certain secondary objectives during the design and implementation. 
+\subsubsection{Primary objectives}
+\textbf{Explore and create suitable graph representations for lobsters:} \\
+At the beginning of the project, Gephi was used to create different configurations of lobster graphs. The configurations were tested and prototyped against the probability model used in the labelling and matching stages to determine suitable representations. Additionally, when keypoint detectors were introduced, the graph representations were solidified by the creation of annotated attributed graphs that corresponded directly to keypoints that were detected. 
+\n
+\textbf{Match lobster subgraphs with complete graphs using existing software:} \\
+Three software tools were investigated to match example subgraphs with complete graphs. They were examined for their suitability and ease of use for the project. The more powerful tool (nauty) was discovered to be more difficult and less suitable for the problem that needed to be solved. The final tool that was chosen (GraphGrep) was able to take a list of query subgraphs and return a list of matched results based on a database of pre-defined complete graphs. 
+\n
+\textbf{Automatically detect interest points from images:} \\
+The use of different computer vision algorithms for corner and interest point detection was explored and compared. The corner detectors were not appropriate for the problem as expected, while the point detectors were able to give meaningful results. All the points detected are then passed through two different filters and a probabilistic model to be labelled after body parts such as claw, tail and head. 
+\n
+\textbf{Evaluate this method of graph matching on lobsters against existing dataset:} \\
+After being able to produce a matched graph from an image, the performance was measured by calculating metrics such as precision, recall and F1 score. These scores were analysed and compared to the results that accompanied the original dataset to show how this method improved upon the previous work done. 
+
+
+\subsubsection{Secondary objectives}
+\textbf{Extend existing or come up with new algorithms for creating lobster graphs from images:} \\
+The entire methodology to go from an image of a lobster to the complete graph is a new approach which combines many existing algorithms and methods together. Although no new algorithm was used in each stage, the resultant methodology is a novel technique combining computer vision, graph matching and probabilistic models to create an attributed lobster graph from images of lobsters.
+\n
+\textbf{Apply this technique on more complex images with noise such as natural lobsters in their environment:} \\
+The application of the technique used in this project on noisy background was explored when investigating the use of colour histograms as a keypoint filter. Further, the use of probabilistic models negated issues with noise as irrelevant keypoints are less likely to be matched. However, a complete evaluation of the methods used in this project on noisy backgrounds was not fully realised. 
+\n
+\textbf{Apply this technique for video instead of images to give properties and information on the lobster in real time:} \\
+The use of methods in this project for real time video were not explored due to both time constraints of the project. This leaves scope for further work to be done in this area, which would result in a more concrete software artefact based on this research that can have significant real world applications.  
+
+\subsection{Related work}
+
+\subsection{Comparison to similar work}

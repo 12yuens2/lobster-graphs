@@ -13,21 +13,30 @@ Typically, catches have to be sorted and measured manually in order to adhere to
 There has been some research in the area of applying computer vision techniques to automatically identify and detect species of fish \cite{iobserver, fish-detection, fish-classification} and research into automatic measurement of fish size \cite{fish-size, fish-size2} which can be applied to reduce discarding. Much work is focused on fish due to the impractical nature of manual observation and measurement. Though there is little work that focuses on using such techniques for lobsters.
 
 \subsection{Objectives}
-Below the primary and secondary objectives of the project are listed.
+Primary and secondary objectives of the project are listed below.
 \subsubsection{Primary objectives}
 \begin{itemize}
 \item Explore and create suitable graph representations for lobsters
-\item Measure similarity of lobster graphs with existing software
+\item Match lobster subgraphs with complete graphs using existing software
 \item Automatically detect interest points from images
 \item Evaluate this method of graph matching on lobsters against the existing dataset
 \end{itemize}
-All primary objectives were met, resulting in a complete method that can take an image of a lobster from the dataset and create a graph that detects and labels the different body parts of the lobster. The accuracy of the method is then analysed and evaluated.
+The objectives are vastly unchanged from the beginning of the project, but the objective \textit{match lobster subgraphs with complete graphs using existing software} has been changed from the original to better reflect what was done. Originally, the objective was to \textit{measure similarity of lobster graphs with existing software}. During the development of the project, this objective moved from the direction of using graph similarity to using subgraph isomorphism as a means of matching. Hence the original objective was changed to match the change in direction. 
+\n
+All primary objectives were met, resulting in a complete method which is able to take an image of a lobster from the dataset and:
+\begin{itemize}
+\item Detect interest points
+\item Label interest points as lobster body parts
+\item Create a graph representation from the detected points and labels
+\item Match the graph representation to ideal models for evaluation
+\end{itemize} 
+The accuracy of the method is then analysed and evaluated. 
  
 \subsubsection{Secondary objectives}
 \begin{itemize}
-\item Extending existing or coming up with new algorithms for creating lobster graphs from images, knowing what we've learned so far.
+\item Extend existing or come up with new algorithms for creating lobster graphs from images
 \item Apply this technique on more complex images with noise such as natural lobsters in their environment
-\item Apply this technique for video/real time instead of images to give properties and information on the lobster in real time. 
+\item Apply this technique for video instead of images to give properties and information on the lobster in real time. 
 \end{itemize}
-Some of the secondary objectives were touched upon and investigated during the design and implementation of this project and the primary objectives, though none were explicitly explored. The final method developed is a new and novel way to create a graph representation of a lobster from an image and the ability to deal with noisy backgrounds was both noted and dealt with as an issue in the filtering (section \ref{sec:kp-filtering}) and combination (section \ref{sec:graph-creation}) stages respectively. 
+Certain secondary objectives were touched upon and investigated during the design and implementation of this project and the primary objectives, though none were explicitly explored. The ability to deal with noisy backgrounds was both noted and dealt with as an issue in the filtering (section \ref{sec:kp-filtering}) and combination (section \ref{sec:graph-creation}) stages respectively. The final method developed is a novel way to create a graph representation of a lobster from an image, combining a number of existing algorithms. 
 

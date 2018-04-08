@@ -1,1 +1,26 @@
 \section{Conclusion}
+\newcommand{\comment}[1]{}
+
+\subsection{Discussion}
+% REAL LIFE APPLICATIONS
+
+\subsection{Future work}
+\subsubsection{Other measurements}
+There are a few other measurements that could have been made and evaluated using the graph output after matching. Most notably, the size of the lobster can be estimated by converting the size of the labelled keypoints to an actual size in metric units. The methodology used provides support for further work in this area, as SIFT is scale invariant, so image sizes are not an issue as long as they are mapped accordingly to actual sizes. These measurements would allow further classification evaluations to be completed such as sex categorisation based on the width of the abdomen and carapace \cite{lobster-video} as well as a more comprehensive mature/juvenile categorisation using the carapace length. Furthermore, details involving the lengths and distances between different body parts using the weighted edges can be used to explore if other elements such as health or age correlate to different sizes of lobsters. This can help facilitate further research in marine biology as features are able to be automatically detected, allowing for more efficient research. 
+
+\comment{
+%Result of matching process gives lobster graph
+%- attributes of graph used for matching but not used for measurement
+- Size of nodes and length of edges can be used to estimate actual size of lobster, given calculations with resolution of image
+}
+\subsubsection{Real time}
+A secondary objective that was not explored in this project is the application of the methodology to real time video rather than just images. Achieving speed up to allow for processing the lobster graph matching problem in real time allows for greater real world applications involving live cameras on fishing vessels. For example, the use of cameras aboard fishing vessels has already been explored in \cite{lobster-video}, though manual work was used to process the video feed. An extension to this project to allow for real time feedback based on matching results could help greatly. Currently, the time taken to go from an image to a matched graph takes up to a few seconds per image, with lower thresholds taking even longer. To apply this to video with real time feedback, more work will need to be done on optimising the probabilistic model, especially when it comes to the creation of permutations before matching. An example of an optimisation that could be done is the observation that each subgraph permutation must contain a node labelled body due to the the lobster graph representation. Small optimisations such as this can go a long way to improving the methods in this project to allow for the process to be done in real time. 
+\comment{
+Apply this approach to real time
+- Need more optimisation on permutations to allow computation fast enough for real time
+- Apply to videos so the approach can have real use case using live cameras
+}
+
+\subsection{Summary}
+In conclusion, this project looks into a graph matching approach to detect and label individual body parts of a lobster. The body parts of the lobster are represented by a set of vertices and connected by weighted edges to represent the length. 
+

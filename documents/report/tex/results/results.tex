@@ -1,4 +1,4 @@
-\section{Results and evaluation}\label{sec:results}
+\section{Results and analysis}\label{sec:results}
 \newcommand{\resultspath}{tex/results}
 
 \newcommand{\prlabelplot}[6] {
@@ -46,7 +46,7 @@
 
 
 \newcommand{\foneidentplot}[5] {
-\addplot+[
+\addplot+[mark=none,
 	discard if not={Method}{#1},
 	discard if not={Model}{#2},
 	discard if not={Category}{#3},
@@ -150,12 +150,11 @@
 }
 
 
-The developed models and methods are able to take images from the dataset and match an attributed graph to it. The graph contains labels for each node that specifies the body part identified and edges that connect each node. Evaluation on the performance of the developed models and methods First, a qualitative evaluation on the results of the matched images and graphs is done to show the effectiveness of the matching visually. Then a quantitative analysis using different metrics carried out to evaluate how well the methods used in this project is able to perform against previous methods.
-
-\subsection{Experimental methodology}
-For quantifying the results, precision and recall metrics were initially used. The goal of using precision and recall is too see what kind of trade-off there is between the relevant keypoints detected in all detected keypoints (precision) and the relevant keypoints detected in all relevant keypoints (recall). The F1 score is then computed to get the harmonic mean of precision and recall. This allows the best labelling and colour histogram thresholds to be found. Finally, by applying a (metric TODO) on the models, images from the rest of the dataset are classified as either mature or juvenile and the results compared to Abdallah's results \cite{lobster-thesis}.
+The developed models and methods are able to take images from the dataset and match an attributed graph to it. The graph contains labels for each node that specifies the body part identified and edges that connect each node. Performance of the developed models and methods is then measured to give numeric results. First, a qualitative evaluation on the results of the matched images and graphs is done to show the effectiveness of the matching visually. Then a quantitative analysis using different metrics carried out to evaluate how well the methods used in this project is able to perform against previous methods. The quantitative values measured are later compared to Abdallah's results in section \ref{sec:evaluation}. It would be expected for the method developed in this project to give better results. 
+\subsection{Experimental design}
+For quantifying the results, precision and recall metrics were initially used. The goal of using precision and recall is too see what kind of trade-off there is between the relevant keypoints detected in all detected keypoints (precision) and the relevant keypoints detected in all relevant keypoints (recall). The F1 score is then computed to get the harmonic mean of precision and recall. This allows the best labelling and colour histogram thresholds to be found. Finally, by applying a combination of probability and graph edit distance on the models, images from the rest of the dataset are classified as either mature or juvenile.
 \n
-They are also a two other parameters that are explored in parallel with the evaluation metrics:
+They are also two other parameters that are explored in parallel with the evaluation metrics:
 \begin{enumerate}
 \item As explained in section \ref{sec:graph-creation}, three methods were investigated for rebuilding the matched subgraphs into the final lobster graph. Although the keypoint method was not evaluated due to its shortcomings, the label and graph methods are both used during the evaluation to test which is more effective.
 \item In section \ref{sec:annotation}, it was described how the additional annotation of attribute graphs to the lobster images were split into mature and juvenile categories based on the original dataset. The probabilistic models are based on the two sets of annotations and their performance on both mature and juvenile lobsters can be compared. It is also interesting to see if any model performs better with a particular method or for a particular label. 
@@ -165,20 +164,28 @@ To calculate the precision and recall, the ground truth of the correct lobster g
 All measurements needed for evaluation are deterministic, the probabilities and keypoints detected may change based on thresholds, but will not change between runs. As such, only one run of any of the experiments is needed to get the results needed.
 
 \subsection{Qualitative analysis}
-A brief qualitative evaluation of the output graph drawn on top of the images is explored here to visually TODO
+A brief qualitative evaluation of the output graph drawn on top of the images is explored here to get a visual glimpse of how the developed algorithm works.
 \begin{figure}[H]
-
 	\begin{subfigure}{0.45\textwidth}
-	
+	\includegraphics[width=1\textwidth, keepaspectratio]{\resultspath/good-match.JPG}
 	\caption{Example of good match}
 	\end{subfigure}
 	\hspace*{\fill}
 	\begin{subfigure}{0.45\textwidth}
-	
-	\caption{Example of bad match}
+	\includegraphics[width=1\textwidth, keepaspectratio]{\resultspath/bad-match.JPG}
+	\label{fig:poor-match}
+	\caption{Example of poor match}
 	\end{subfigure}
-\caption{Example of matches}
+\caption{Example of final graph matches. In the case of the poor match, a juvenile model was used on an image of a mature lobster, leading to incorrect labelling despite reasonable keypoint detection.}
 \end{figure}
+\noindent
+It can be seen that when the algorithm works, the graph is matched very well to each body part on the lobster, with the nodes properly connected. Further, the keypoints are all labelled correctly and only one claw keypoint was missing. In the case where the matching was poor, the labels were often incorrect, parts of the graph are missing (no claws) and irrelevant keypoints are detected and labelled. There are three main reasons for this:
+\begin{itemize}
+\item The keypoint was not detected, so it could not have been matched or labelled
+\item Thresholds on labelling and histograms filtered out relevant keypoints
+\item Probabilistic model filtered out correct subgraph configurations 
+\end{itemize}
+Octave filtering is unlikely to remove relevant keypoints because it only removes keypoints that are too small to be suitable. The latter two reasons are more likely than the keypoint not being detected at all because SIFT is able to detect an abundance of keypoints as demonstrated in section \ref{sec:kp-detection}. The other two cases happen more often when the incorrect model is used, for example a juvenile model used on a mature lobster as in figure \ref{fig:poor-match}. The sizes of nodes and lengths of edges are different for the two models and so mislabelling happens more often. Mislabelling can then cause a knock on effect which affects the matching step.
 
 \subsection{Precision and recall}
 The evaluation for precision and recall is split into two evaluations, one for the performance of identifying correct keypoints and the second for the performance of keypoint labelling. The evaluations are split up into two parts because defining false positives and false negatives when evaluating both aspects together is a difficult problem, the key issue being an overlap between false positives and false negatives for correctly detected but mislabelled keypoints. For example, if a keypoint has been correctly identified and labelled as a \textit{claw} but is actually an \textit{arm}, then it should be a false positive because the labelling is incorrect. However, it should also be a false negative because correct \textit{arm} labelling was missed. Because of these difficult definitions, it made sense to split the precision and recall evaluation into two separate parts where the false positives and false negatives could be clearly defined.
@@ -271,10 +278,7 @@ Incorrectly labelled keypoints are either ones where the keypoint was wrong, so 
 \caption{Precision/recall graphs with the juvenile model for label \textit{claw}. Further graphs of all other labels can be found in appendix TODO}
 \end{figure}
 \noindent
-The precision-recall graphs for labels confirm that precision and recall are not very suitable metrics due to the lack of a good threshold to alter. There seems to be something missing in the curves, as the linear relationship from varying label thresholds and different methods and models is not expected from a precision-recall curve. Potentially each point in the graphs represent a separate precision-recall curve, but we are unable to find the threshold to vary that gives the trade-off and the rest of the curve. 
-\n
-
-
+The precision-recall graphs for labels confirm that precision and recall are not very suitable metrics due to the lack of a good threshold to alter. There seems to be something missing in the curves, as the linear relationship from varying label thresholds and different methods and models is not expected from a precision-recall curve. Potentially each point in the graphs represent a separate precision-recall curve, but we are unable to find the threshold to vary that gives the trade-off and the rest of the curve.
 %
 %\begin{figure}[H]
 %\centering
@@ -299,7 +303,7 @@ The precision-recall graphs for labels confirm that precision and recall are not
 
 
 \subsection{F1 score}
-Although precision and recall did not give much insight into the models and methods used, the metrics can still be used to empirically find the best labelling and histogram filtering thresholds that should be used for classification. The F1 score can be used as a weighted average of precision and recall where both contribute equally. The best thresholds are therefore the ones where the F1 score is the highest. The F1 score also gives a reasonable look into which models and methods are the most effective. The identification and labelling evaluations continue to be kept separate for the same reason as before. 
+Although precision and recall did not give much insight into the models and methods used, the metrics can still be used to empirically find the best labelling and histogram filtering thresholds that should be used for classification. The F1 score can be used as a weighted average of precision and recall where both contribute equally. The scores ranges from 0 to 1, where 1 means perfect precision and recall. The best thresholds are therefore the ones where the F1 score is the highest. The F1 score also gives a reasonable look into which models and methods are the most effective. The identification and labelling evaluations continue to be kept separate for the same reason as before. 
 \subsubsection{Keypoint identification}
 
 \begin{figure}[H]
@@ -357,9 +361,51 @@ Of the two explanations, the latter seems more possible. As demonstrated in sect
 \n
 The graphs of figure \ref{fig:fonemature} and \ref{fig:fonejuvenile} further demonstrate juvenile lobsters being better detected in general, regardless of the model or method used, when compared to mature lobsters. 
 \subsubsection{Keypoint labelling}
+The F1 score is also looked into for the labelling to see if any particular labels perform better. This would be interesting to see if certain labels are detected with higher certainty compared to others, showing the strengths and weaknesses for each method and model.
 
+\begin{table}[H]
+\centering
+\begin{tabular}{| c | c |}
+\hline
+\textbf{Label} & \textbf{F1 score} \\
+\hline
+Body & 0.99 \\
+Tail & 0.70 \\
+Head & 0.58 \\
+Arm & 0.57 \\
+Claw & 0.45 \\
+Back & 0.34 \\
+\hline
+\end{tabular}
+\caption{Average F1 score for each label, averaged over all over parameters}
+\label{tbl:avg-allf1}
+\end{table}
+\noindent
+The average F1 score for all labels can be seen in table \ref{tbl:avg-allf1}. The average is used to show which labels can be detected and labelled correctly the most regardless of the methods or thresholds. The body keypoint is found very reliably, almost 100\% of the time. Because subgraphs of 3 nodes were chosen as the intermediate between matching and rebuilding the complete graph, finding the body keypoints is very important as every 3 node subgraph must contain a body. In cases where the body is not detected, no final graph can be created as no subgraphs will be matched.
+\n
+The tail label can also be found reasonably and this can be expected as it is a very distinct feature on the lobster. The ability to discover the tail node is key for tail width measurement, which can be important depending on what features of the lobster need to be measured. Interestingly, the arms and claws are not as easily found despite also being distinct features. This could be due to other irrelevant keypoints found on the lobster that match the same size and distance of the claws and arms to the body, causing incorrect matches. 
+
+\begin{table}[H]
+\centering
+\begin{tabular}{| c | c | c | c |}
+\hline
+\textbf{Label} & \textbf{F1 score} & \textbf{Label threshold} & \textbf{Histogram threshold} \\
+\hline
+Body & 1.0 & 0.3-0.1 & 0.3-0.9 \\
+Tail & 0.94 & 0.35 & 0.3-0.9 \\
+Head & 0.75 & 0.55 & 0.9 \\
+Arm & 0.66 & 0.6 & 0.3 \\
+Back & 0.5 & 0.27-0.29 & 0.3-0.9 \\
+Claw & 0.49 & 0.45 & 0.3 \\
+\hline
+\end{tabular}
+\caption{Best F1 score for each label, averaged over all methods, models and categories to show the best thresholds that can be used for each label.}
+\label{tbl:avg-f1}
+\end{table}
+
+ 
 \newcommand{\fonelabelplot}[6] {
-\addplot+[
+\addplot+[mark=none,
 	discard if not={Method}{#1},
 	discard if not={Model}{#2},
 	discard if not={Category}{#3},
@@ -398,77 +444,44 @@ The graphs of figure \ref{fig:fonemature} and \ref{fig:fonejuvenile} further dem
 
 \begin{figure}[H]
 \centering
-\fourplotlabel{\fonelabelgraph}{mature}{claw}{legend:fone-label}
-\caption{Mature lobster model on the claw label}
+\fourplotlabel{\fonelabelgraph}{juvenile}{arm}{legend:fone-label}
+\ref{legend:fone-label}
+\caption{Juvenile lobster model on the arm label}
+\label{fig:fone-juv-arm}
 \end{figure}
-
 
 \begin{figure}[H]
 \centering
-\fourplotlabel{\fonelabelgraph}{juvenile}{claw}{legend:fone-label}
-\caption{Juvenile lobster model on the claw label}
+\fourplotlabel{\fonelabelgraph}{juvenile}{head}{legend:fone-label}
+\ref{legend:fone-label}
+\caption{Juvenile model, head label}
+\label{fig:fone-juv-head}
 \end{figure}
+\noindent
+The range of thresholds shown in table \ref{tbl:avg-f1} and the varying performance of different methods shown in figures \ref{fig:fone-juv-arm} and \ref{fig:fone-juv-head} indicates that different labels are affected by different thresholds and methods. For example, the model used for the arm label has little effect on its F1 score as there is lots of overlap between the mature and juvenile models. However, the model used for the head label has a much larger effect, where the correct model (juvenile model on juvenile lobster) massively outperforms itself against incorrect lobster categories. Further, unlike the F1 scores for keypoint identification, it is not clear that lowering the label threshold lowers the score. The complicated issue with the combination of all the different parameters is interesting for further exploration, especially for labels with lower average F1 score such as the claw or arm. 
 
 
-
-%\begin{figure}[H]
-%\fourplotlabel{\fonelabelgraph}{mature}{tail}{legend:fone-label}
-%\caption{Mature model, tail label}
-%\end{figure}
-%
-%\begin{figure}[H]
-%\fourplotlabel{\fonelabelgraph}{juvenile}{tail}{legend:fone-label}
-%\caption{Juvenile model, tail label}
-%\end{figure}
-%
-%\begin{figure}[H]
-%\fourplotlabel{\fonelabelgraph}{mature}{body}{legend:fone-label}
-%\caption{Mature model, body label}
-%\end{figure}
-%
-%\begin{figure}[H]
-%\fourplotlabel{\fonelabelgraph}{juvenile}{body}{legend:fone-label}
-%\caption{Juvenile model, body label}
-%\end{figure}
-%
-%\begin{figure}[H]
-%\fourplotlabel{\fonelabelgraph}{mature}{head}{legend:fone-label}
-%\caption{Mature model, head label}
-%\end{figure}
-%
-%\begin{figure}[H]
-%\fourplotlabel{\fonelabelgraph}{juvenile}{head}{legend:fone-label}
-%\caption{Juvenile model, head label}
-%\end{figure}
-%
-%\begin{figure}[H]
-%\fourplotlabel{\fonelabelgraph}{mature}{claw}{legend:fone-label}
-%\caption{Mature model, claw label}
-%\end{figure}
-%
-%\begin{figure}[H]
-%\fourplotlabel{\fonelabelgraph}{juvenile}{claw}{legend:fone-label}
-%\caption{Juvenile model, claw label}
-%\end{figure}
 
 \subsection{Classification}
 As both a mature and juvenile model are developed to match to the lobster images, how well each model matched to the lobster in the image can be used for classification. For example, if the image contained a mature lobster, then the mature model would be expected to be better matched compared to the juvenile model. 
 \n
 As a probabilistic model was developed and used for the creation and matching steps to produce the final matched lobster graph, the use of probabilities is again explored for classification. To use probabilities for classification, the product of the probabilities for each node and edge can be calculated as was done in section \ref{sec:graph-creation}. This would give two probabilities, one for each graph created by the mature and juvenile models. However, in cases where nodes and edges were not identified, the probability of the graph would increase because the probabilities are multiplied. This is the opposite of what is desired, as missing nodes and edges should incur heavy penalties. Furthermore, there is no easy way give a penalty to missing nodes and edges without being too arbitrary. Therefore, using just the probabilities is not a very suitable way to define the two classifications.
 \n
-With the two final graphs of mature and juvenile lobsters, a graph similarity score can be computed. The graph edit distance is typically used as a distance measure between two graphs. It is defined as the weight sum of the cost of edits such as node insertion or edge deletion required to convert one graph to the other. The maximum common subgraph as described in section \ref{sec:lit-graph} is another concept that can be applied. The larger the maximum common subgraph between the matched graph and ideal graph, the better the match. In \cite{graph-edit}, Bunke proved that by using a particular cost function, the computation for the graph edit distance is equivalent to the maximum common subgraph problem. 
+With the two final graphs of mature and juvenile lobsters, a graph similarity score can be computed. The graph edit distance is typically used as a distance measure between two graphs. It is defined as the weight sum of the cost of edits such as node insertion or edge deletion required to convert one graph to the other. The maximum common subgraph as described in section \ref{sec:lit-graph} is another concept that can be applied. The larger the maximum common subgraph between the matched graph and ideal graph, the better the match. In \cite{graph-edit}, Bunke proved that by using a particular cost function, the computation for the graph edit distance is equivalent to the maximum common subgraph problem. The problem with using edit distance metrics is that it does not take into account errors in labelling and matching. In other words, a matched lobster graph can have a very small distance metric to the ideal lobster graph because most of the body parts and edges were identified, however the body parts could be mislabelled and the edit distance would not be able to allow for this issue. 
+\n
+As such, a combination of the probability and graph edit distance must be used to determine how well a detected graph matches to an ideal graph to classify images without ground truths. 
 
 \subsubsection{Validation}
 
-From the results of precision, recall and F1 score, it was shown that there was a much clearer performance difference applying the juvenile model to mature and juvenile lobsters. Further juvenile lobsters still had high F1 scores even when applied to mature lobsters. For this reason, the classification results TODO.
-
-
+From the results of precision, recall and F1 score, it was shown that there was a much clearer performance difference applying the juvenile model to mature and juvenile lobsters. Further, juvenile lobsters still had high F1 scores even when applied to mature lobsters. For this reason, the classification results TODO.
+\n
+To show why graph edit distance alone is not strong enough a metric for classification, a validation test with the annotated dataset is run. The classification is determined by calculating the edit distance from the matched lobster graph and the ideal lobster graph where all body parts are found and identified. The cost functions for the edit distance are defined following Bunke's paper \cite{graph-edit}. Both mature and juvenile models are used and the model with the lower edit distance is chosen as the classification. It is unclassified if the two edit distances are equal. 
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}
 \begin{axis}[
     ybar,
-    title={Classification},
+    title={\textbf{Classification using graph edit distance}},
     bar width=2em,
     enlarge x limits=0.4,
     legend style={
@@ -490,12 +503,14 @@ From the results of precision, recall and F1 score, it was shown that there was 
 \addlegendentry{Unclassified}
 \end{axis}
 \end{tikzpicture}
+\caption{Overall classification rate for using graph edit distance to determine classification}
 \end{figure}
+\noindent
 
 \begin{figure}[H]
 \centering
-\begin{minipage}{0.45\textwidth}
-\begin{tikzpicture}[scale=0.8]
+\begin{minipage}{0.48\textwidth}
+\begin{tikzpicture}[scale=0.85]
 \begin{axis}[
     ybar,
     title={\textbf{Classification for juvenile lobsters}},
@@ -522,8 +537,8 @@ From the results of precision, recall and F1 score, it was shown that there was 
 \end{tikzpicture}
 \end{minipage}
 \hspace*{\fill}
-\begin{minipage}{0.45\textwidth}
-\begin{tikzpicture}[scale=0.8]
+\begin{minipage}{0.48\textwidth}
+\begin{tikzpicture}[scale=0.85]
 \begin{axis}[
     ybar,
     title={\textbf{Classification for mature lobsters}},
@@ -549,10 +564,12 @@ From the results of precision, recall and F1 score, it was shown that there was 
 \end{axis}
 \end{tikzpicture}
 \end{minipage}
-
-\subsection{Testing the models}
-
-
+\caption{More detailed classification results on the specific lobster categories.}
 \end{figure}
+
+
+
+
+%\subsection{Testing the models}
 
 

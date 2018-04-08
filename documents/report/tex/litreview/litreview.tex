@@ -8,11 +8,13 @@ The methods used in Abdallah's work were simple in that to be able to segment th
 
 \subsection{Related work}
 
+\subsubsection{Fish classification}
+
 \subsubsection{Human pose recognition}
 The use of graphs in human pose estimation has been studied in the past
-\cite{human-pose, human-skeleton} where labelled nodes that represent important features such as hands and heads are used to build skeleton models.
+\cite{human-pose, human-skeleton} where labelled nodes representing important features such as limbs or head are used to build skeleton models.
 \n
-Some of the methodology used in human pose estimation can be applied to our lobster matching problem. In particular, the paper on human pose estimation using a topological graph database by Tanaka et al. \cite{human-pose} uses a graph matching technique with an attributed graph to match skeletons to corresponding human postures. In their paper, example skeletons with different human topologies are developed into attributed graphs with manually assigned body part labels and stored in a model graph database. Any input skeletons can then also be converted to an attributed graph and matched with the examples in the database. Because their method of subgraph matching produces multiple results, further filters were needed to reduce the remaining graphs to one correct match. 
+Some of the methodology used in human pose estimation can be applied to our lobster matching problem. In particular, the paper on human pose estimation using a topological graph database by Tanaka et al. \cite{human-pose} uses a graph matching technique with an attributed graph to match skeletons to corresponding human postures. In their paper, example skeletons with different human topologies are developed into attributed graphs with manually assigned body part labels and stored in a model graph database. Any input skeletons can then also be converted to an attributed graph and matched with the examples in the database. Since their method of subgraph matching produces multiple results, further filters were required to reduce the remaining graphs to one correct match. 
 \imagefig{0.6\textwidth}{\imgpath/human-pose.png}{Body part identification algorithm using a model graph database (MGDB). Reproduced from \cite{human-pose}.}
 \noindent
 The aspect of having labelled attributed graphs of human skeletons extends well to labelled graphs of lobsters. In the methodology of this project - which is explained in section \ref{sec:design} - some parts of Tanaka's method were followed. Most notably, the use of example lobster graphs stored in a database for input subgraphs to match to as an initial filter and the application of further techniques from the matched results to arrive at the final lobster graph were all inspired by Tanaka's paper.
