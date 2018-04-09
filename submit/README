@@ -1,0 +1,18 @@
+User manual
+-----------
+
+For further details on each python script, refer to notes.org in source directory.
+
+
+1. Set up a typical virtual environment with `virtualenv env/` and activate with `source env/bin/activate`
+2. Install required packages with `pip install -r requirements.txt`
+3. Run the various python scripts in `src/` as explained in notes.org with `python [script].py`
+4. Please note, running the full matching requires the executable `ggsxe` which can be found on https://cs.nyu.edu/shasha/papers/graphgrep/ copied to the temporary location `\tmp`
+
+
+Data
+----
+
+csv - contains csv results used in evaluation
+graphs - contains the graph .gfu files used for GraphGrep as well as annotated .gdf files for the probability models
+hists - contains saved colour histograms for comparing keypoints
