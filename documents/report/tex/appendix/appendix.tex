@@ -2,7 +2,53 @@
 \counterwithin{figure}{section}
 \sectionfont{\Large}
 
-\input{tex/appendix/cv-algorithms}
+%\input{tex/appendix/cv-algorithms}
+
+\section{Keypoint detection on annotated dataset using different algorithms}\label{apdx:kp-detection}
+\renewcommand{\imgpath}{tex/appendix/imgs}
+
+\newcommand{\cvfig}[1]{
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.31\textwidth}
+\includegraphics[width=\textwidth, keepaspectratio]{\imgpath/sift#1.JPG}
+\caption{SIFT}
+\end{subfigure}
+\hspace*{\fill}
+\begin{subfigure}{0.31\textwidth}
+\includegraphics[width=\textwidth, keepaspectratio]{\imgpath/surf#1.JPG}
+\caption{SURF}
+\end{subfigure}
+\hspace*{\fill}
+\begin{subfigure}{0.31\textwidth}
+\includegraphics[width=\textwidth, keepaspectratio]{\imgpath/orb#1.JPG}
+\caption{ORB}
+\end{subfigure}
+\caption{Detection algorithms on image #1}
+\end{figure}
+}
+
+\cvfig{1380}
+\cvfig{1398}
+\cvfig{1424}
+\cvfig{1487}
+\cvfig{1507}
+\cvfig{1516}
+\cvfig{4721}
+\cvfig{4728}
+\cvfig{4737}
+\cvfig{4772}
+\cvfig{4785}
+\cvfig{4799}
+\cvfig{4805}
+\cvfig{4825}
+\cvfig{4836}
+\cvfig{4844}
+\cvfig{5252}
+\cvfig{5298}
+\cvfig{5348}
+\cvfig{5414}
+
 
 
 \section{Precision and recall results for keypoint labelling}
@@ -22,14 +68,14 @@
 \apdxprfig{mature}{arm}
 \apdxprfig{juvenile}{arm}
 
-\apdxprfig{mature}{head}
-\apdxprfig{juvenile}{head}
+%\apdxprfig{mature}{head}
+%\apdxprfig{juvenile}{head}
 
-\apdxprfig{mature}{body}
-\apdxprfig{juvenile}{body}
+%\apdxprfig{mature}{body}
+%\apdxprfig{juvenile}{body}
 
-\apdxprfig{mature}{tail}
-\apdxprfig{juvenile}{tail}
+%\apdxprfig{mature}{tail}
+%\apdxprfig{juvenile}{tail}
 
 
 %

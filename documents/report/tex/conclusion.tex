@@ -3,24 +3,18 @@
 
 \subsection{Discussion}
 % REAL LIFE APPLICATIONS
-
+This project has studied the usage of attributed graphs for lobster body part detection and lobster categorisation. The ability to categorise lobsters automatically is important to help fisheries and scientists gather data for further study and management. 
+\n
+By using software techniques compared to traditional manual methods, the effort required is reduced, greatly enhancing efficiency. Nevertheless, errors and accuracy issues can occur. Most importantly, if the body keypoint is unable to be identified from the image, the remaining graph matching process is unable to be built. Thus, more robust methods for graph matching have to be designed to get around this difficult problem. Furthermore, the variety of methods and thresholds can each have different applications, as different combinations work better in different cases. For example, low label thresholds give strong performance for keypoint identification, but higher thresholds are needed for specific labelling like the head and arm labels. Even when a complete graph is matched to the image of a lobster, as the F1 score suggests, it is typically far from being completely accurate. Different use cases for the graph matching approach studied would care about different aspects of the accuracy. For example, if the total length of the lobster is required, only the head, body and tail keypoints are relevant as the length can be calculated by the distance between these keypoints. The methods and models can then be adjusted based on these needs, though further study would be required to deduce exactly how the methods and thresholds should be adjusted. 
+\n
+It would be interesting to see the application of graph matching on other creatures and species. As it as seen successful application for humans \cite{human-pose, human-skeleton} and now for lobsters, it is highly likely the approach can be applied towards other animals, especially those with distinct body features that can be captured from images. The advantage of using graph matching is the additional information due to the connections between nodes. The application of this approach on other animals would again come from any need to monitor or measure properties about them where the manual monitoring process is difficult. The graph matching approach would be able to give information on size in most cases if body parts or features can be found reliably. The ability to find any more data based solely from matched graphs is unlikely, but other techniques can be applied on specific nodes or edges after a graph matching step. 
 \subsection{Future work}
 \subsubsection{Other measurements}
 There are a few other measurements that could have been made and evaluated using the graph output after matching. Most notably, the size of the lobster can be estimated by converting the size of the labelled keypoints to an actual size in metric units. The methodology used provides support for further work in this area, as SIFT is scale invariant, so image sizes are not an issue as long as they are mapped accordingly to actual sizes. These measurements would allow further classification evaluations to be completed such as sex categorisation based on the width of the abdomen and carapace \cite{lobster-video} as well as a more comprehensive mature/juvenile categorisation using the carapace length. Furthermore, details involving the lengths and distances between different body parts using the weighted edges can be used to explore if other elements such as health or age correlate to different sizes of lobsters. This can help facilitate further research in marine biology as features are able to be automatically detected, allowing for more efficient research. 
 
-\comment{
-%Result of matching process gives lobster graph
-%- attributes of graph used for matching but not used for measurement
-- Size of nodes and length of edges can be used to estimate actual size of lobster, given calculations with resolution of image
-}
 \subsubsection{Real time}
 A secondary objective that was not explored in this project is the application of the methodology to real time video rather than just images. Achieving speed up to allow for processing the lobster graph matching problem in real time allows for greater real world applications involving live cameras on fishing vessels. For example, the use of cameras aboard fishing vessels has already been explored in \cite{lobster-video}, though manual work was used to process the video feed. An extension to this project to allow for real time feedback based on matching results could help greatly. Currently, the time taken to go from an image to a matched graph takes up to a few seconds per image, with lower thresholds taking even longer. To apply this to video with real time feedback, more work will need to be done on optimising the probabilistic model, especially when it comes to the creation of permutations before matching. An example of an optimisation that could be done is the observation that each subgraph permutation must contain a node labelled body due to the the lobster graph representation. Small optimisations such as this can go a long way to improving the methods in this project to allow for the process to be done in real time. 
-\comment{
-Apply this approach to real time
-- Need more optimisation on permutations to allow computation fast enough for real time
-- Apply to videos so the approach can have real use case using live cameras
-}
 
 \subsection{Summary}
-In conclusion, this project looks into a graph matching approach to detect and label individual body parts of a lobster. The body parts of the lobster are represented by a set of vertices and connected by weighted edges to represent the length. 
+In conclusion, this project looks into a graph matching approach to detect and label individual body parts of a lobster. Detect parts are then combined to build a complete lobster graph for evaluation. It was discovered that the approach was both feasible and accurate in most cases TODO. The techniques used in this study can be used in further research or industry application TODO. 
 
