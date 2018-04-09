@@ -271,7 +271,7 @@ Figure \ref{fig:kpdescriptor} shows that the use of keypoint descriptors as a me
 
 
 
-\subsubsection{Colour histogram filtering}
+\subsubsection{Colour histogram filtering}\label{sec:colour-histogram}
 After applying the octave filter, there still remained some irrelevant keypoints that needed to be removed. Most notably were the keypoints found on the white background of the images. There have been studies \cite{color-histogram, color-filter} that show applying a colour filter to eliminate unwanted feature points can be quite effective, especially if the background is very different from the target of the image. Following from this, colour histograms of each keypoints were calculated and compared to a set of pre-defined histograms. The difference between the histograms was compared and only keypoints whose difference was above a certain threshold were kept. 
 
 \begin{figure}[H]
