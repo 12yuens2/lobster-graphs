@@ -1,5 +1,13 @@
 \section{Evaluation}\label{sec:evaluation}
 
+
+\subsection{Related work}
+The precision and recall values cannot be easily compared to Abdallah's numbers \cite{lobster-thesis} as the precision and recall of the keypoint identification and labelling was tested in this project, rather than the different classifications in his work. In his analysis, the highest classification accuracy from all his methods was bootstrap aggregation using linear regression with an accuracy of 86.2\% while the lowest accuracy of his methods was a linear SVM using principal component analysis which got an accuracy of 76.5\%. 
+\n
+In this project, the overall accuracy of juvenile/mature category categorisation is only about 50\%. This is a low result, however, it is interesting to note that about 30\% of the classifications were unsuccessful. This shows the weakness of this approach coming from the inability to classify rather than the accuracy of the classification itself. The inability comes from when a graph could not be built out of the image. This can be due to the various thresholds and probabilities in the stages leading up to the graph creation filtering too many relevant keypoints or subgraphs away. It can also be due to issues in detection of the images as it more specifically affects the third set of images in the dataset. Additionally, if a larger attributed graph dataset could be built, more optimisations done to allow for more lenient thresholds and the percentage of unclassified images decreased, then the use of graph matching can be further explored with more promising results. Furthermore, it should be noted that the issue of being unable to classify the images comes mostly from mature lobsters.
+\n
+The category classification of juvenile lobsters is also surprisingly poor for a different reason: many juvenile lobsters are classified incorrectly as mature lobsters. This indicates a potentially different issue compared to the problem of unclassified mature lobsters. It is possible a larger annotated dataset can solve the issue, as an improved model for mature lobsters will lead to decreased incorrect juvenile classification. 
+
 \subsection{Objectives}
 The project met all of the primary objectives set out in the beginning and explored certain secondary objectives during the design and implementation. 
 \subsubsection{Primary objectives}
@@ -13,7 +21,7 @@ Three software tools were investigated to match example subgraphs with complete 
 The use of different computer vision algorithms for corner and interest point detection was explored and compared. The corner detectors were not appropriate for the problem as expected, while the point detectors were able to give meaningful results. All the points detected are then passed through two different filters and a probabilistic model to be labelled after body parts such as claw, tail and head. 
 \n
 \textbf{Evaluate this method of graph matching on lobsters against existing dataset:} \\
-After being able to produce a matched graph from an image, the performance was measured by calculating metrics such as precision, recall and F1 score. These scores were analysed and compared to the results that accompanied the original dataset to show how this method improved upon the previous work done. 
+After being able to produce a matched graph from an image, the performance was measured by calculating metrics such as precision, recall and F1 score. These scores were analysed to show the strength and weakness of different stages of the project's approach. Finally, classification accuracy was compared to the results that accompanied the original dataset to show how this method performs in comparison. Weakness were identified in specific aspects of the methods and models, which lets further work focus specifically in the areas of reducing unclassified mature lobster images and reducing incorrect classification of juvenile lobster images.
 
 
 \subsubsection{Secondary objectives}
@@ -25,7 +33,3 @@ The application of the technique used in this project on noisy background was ex
 \n
 \textbf{Apply this technique for video instead of images to give properties and information on the lobster in real time:} \\
 The use of methods in this project for real time video were not explored due to both time constraints of the project. This leaves scope for further work to be done in this area, which would result in a more concrete software artefact based on this research that can have significant real world applications.  
-
-\subsection{Related work}
-
-\subsection{Comparison to similar work}

@@ -51,7 +51,7 @@
 
 
 
-\section{Precision and recall results for keypoint labelling}
+\section{Precision and recall results for keypoint labelling}\label{apdx:prlabel}
 
 % #1 - Model
 % #2 - Label
@@ -65,50 +65,40 @@
 }
 
 
-\apdxprfig{mature}{arm}
-\apdxprfig{juvenile}{arm}
-
+%\apdxprfig{mature}{arm}
+%\apdxprfig{juvenile}{arm}
 %\apdxprfig{mature}{head}
 %\apdxprfig{juvenile}{head}
-
 %\apdxprfig{mature}{body}
 %\apdxprfig{juvenile}{body}
-
+%\apdxprfig{mature}{back}
+%\apdxprfig{juvenile}{back}
 %\apdxprfig{mature}{tail}
 %\apdxprfig{juvenile}{tail}
 
 
-%
-%\begin{figure}[H]
-%\fourplotlabel{\fonelabelgraph}{mature}{body}{legend:fone-label}
-%\caption{Mature model, body label}
-%\end{figure}
-%
-%\begin{figure}[H]
-%\fourplotlabel{\fonelabelgraph}{juvenile}{body}{legend:fone-label}
-%\caption{Juvenile model, body label}
-%\end{figure}
-%
-%\begin{figure}[H]
-%\fourplotlabel{\fonelabelgraph}{mature}{head}{legend:fone-label}
-%\caption{Mature model, head label}
-%\end{figure}
-%
-%\begin{figure}[H]
-%\fourplotlabel{\fonelabelgraph}{juvenile}{head}{legend:fone-label}
-%\caption{Juvenile model, head label}
-%\end{figure}
-%
-%\begin{figure}[H]
-%\fourplotlabel{\fonelabelgraph}{mature}{claw}{legend:fone-label}
-%\caption{Mature model, claw label}
-%\end{figure}
-%
-%\begin{figure}[H]
-%\fourplotlabel{\fonelabelgraph}{juvenile}{claw}{legend:fone-label}
-%\caption{Juvenile model, claw label}
-%\end{figure}
+\section{F1 score results for keypoint labelling}\label{apdx:fonelabel}
 
-%\input{tex/appendix/labelling-results}
+\newcommand{\fonekplabelfig}[2]{
+\begin{figure}[H]
+\centering
+\fourplotlabel{\fonelabelgraph}{#1}{#2}{legend:fone-label}
+\caption{F1 score graphs with #1 model for \textit{#2} label}
+\ref{legend:fone-label}
+\end{figure}
+}
+
+\fonekplabelfig{mature}{body}
+\fonekplabelfig{juvenile}{body}
+
+\fonekplabelfig{mature}{back}
+\fonekplabelfig{juvenile}{back}
+
+\fonekplabelfig{mature}{claw}
+\fonekplabelfig{juvenile}{claw}
+
+\fonekplabelfig{mature}{tail}
+\fonekplabelfig{juvenile}{tail}
+
 
 \end{appendices}

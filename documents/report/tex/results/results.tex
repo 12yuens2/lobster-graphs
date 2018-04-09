@@ -163,8 +163,8 @@ To calculate the precision and recall, the ground truth of the correct lobster g
 \n
 All measurements needed for evaluation are deterministic, the probabilities and keypoints detected may change based on thresholds, but will not change between runs. As such, only one run of any of the experiments is needed to get the results needed.
 
-\subsection{Qualitative analysis}
-A brief qualitative evaluation of the output graph drawn on top of the images is explored here to get a visual glimpse of how the developed algorithm works.
+\subsection{Brief qualitative analysis}
+A brief qualitative evaluation of the output graph drawn on top of the images is explored here to get a visual glimpse of how well the developed algorithm works.
 \begin{figure}[H]
 	\begin{subfigure}{0.45\textwidth}
 	\includegraphics[width=1\textwidth, keepaspectratio]{\resultspath/good-match.JPG}
@@ -185,7 +185,7 @@ It can be seen that when the algorithm works, the graph is matched very well to 
 \item Thresholds on labelling and histograms filtered out relevant keypoints
 \item Probabilistic model filtered out correct subgraph configurations 
 \end{itemize}
-Octave filtering is unlikely to remove relevant keypoints because it only removes keypoints that are too small to be suitable. The latter two reasons are more likely than the keypoint not being detected at all because SIFT is able to detect an abundance of keypoints as demonstrated in section \ref{sec:kp-detection}. The other two cases happen more often when the incorrect model is used, for example a juvenile model used on a mature lobster as in figure \ref{fig:poor-match}. The sizes of nodes and lengths of edges are different for the two models and so mislabelling happens more often. Mislabelling can then cause a knock on effect which affects the matching step.
+Octave filtering is unlikely to remove relevant keypoints because it only removes keypoints that are too small to be suitable. The latter two reasons are more likely than the keypoint not being detected at all because SIFT is able to detect an abundance of keypoints as demonstrated in section \ref{sec:kp-detection}. The other two cases happen more often when the incorrect model is used, for example a juvenile model used on a mature lobster as in figure \ref{fig:poor-match}. The sizes of nodes and lengths of edges are different for the two models and so mislabelling happens more often. Mislabelling can then cause a knock on effect which affects the matching step and thus the final lobster graph. 
 
 \subsection{Precision and recall}
 The evaluation for precision and recall was split into two evaluations, one for the performance of identifying correct keypoints and the second for the performance of keypoint labelling. The evaluations are split into two parts because defining false positives and false negatives when evaluating both aspects together is a difficult problem, the key issue being an overlap between false positives and false negatives for correctly detected but mislabelled keypoints. For example, if a keypoint has been correctly identified and labelled as a \textit{claw} but is actually an \textit{arm}, then it should be a false positive because the labelling is incorrect. However, it should also be a false negative because correct \textit{arm} labelling is missed. Because of these difficult definitions, it made sense to split the precision and recall evaluation into two separate parts where the false positives and false negatives could be clearly defined.
@@ -274,7 +274,7 @@ Incorrectly labelled keypoints are either ones where the keypoint was wrong, in 
 \centering
 \fourplotlabel{\prlabelgraph}{juvenile}{claw}{legend:prlabel}
 \ref{legend:prlabel}
-\caption{Precision/recall graphs with the juvenile model for label \textit{claw}. Further graphs of all other labels can be found in appendix TODO}
+\caption{Precision/recall graphs with the juvenile model for label \textit{claw}. Further graphs of all other labels can be found in appendix \ref{apdx:prlabel}}
 \end{figure}
 \noindent
 The precision-recall graphs for labels confirm that precision and recall are not very suitable metrics due to the lack of a good threshold to alter. There seems to be something missing in the curves, as the linear relationship from varying label thresholds and different methods and models is not expected from a precision-recall curve. Potentially each point in the graphs represent a separate precision-recall curve, but the threshold required to be varied that gives the trade-off and the rest of the curve could not be found.
@@ -358,7 +358,7 @@ The histogram threshold seems to have less of an impact as little difference can
 \end{enumerate}
 Of the two explanations, the latter seems more possible. As demonstrated in section \ref{sec:colour-histogram}, a colour histogram filter can still result in irrelevant keypoints being detected. As such, the lower threshold likely adds more keypoints to be matched, but the matching steps and the building of further probabilistic graphs are robust against such noise, which is why little difference can be seen between the different histogram thresholds. 
 \n
-The graphs of figure \ref{fig:fonemature} and \ref{fig:fonejuvenile} further demonstrate juvenile lobsters being better detected in general, regardless of the model or method used, when compared to mature lobsters. 
+The graphs of figure \ref{fig:fonemature} and \ref{fig:fonejuvenile} further demonstrate juvenile lobsters being better detected in general, regardless of the model or method used, when compared to mature lobsters. Moreover, a high F1 score greater than 0.8 can be obtained for keypoint identification, showing the strength and success of the approach in combining computer vision techniques with graph matching. 
 \subsubsection{Keypoint labelling}
 The F1 score is also looked into for the labelling to see if any particular labels perform better. This would be interesting to see if certain labels are detected with higher certainty compared to others, showing the strengths and weaknesses for each method and model.
 
@@ -468,19 +468,16 @@ As a probabilistic model was developed and used for the creation and matching st
 \n
 With the two final graphs of mature and juvenile lobsters, a graph similarity score can be computed. The graph edit distance is typically used as a distance measure between two graphs. It is defined as the weighted sum of the cost of edits such as node insertion or edge deletion required to convert one graph to the other. The maximum common subgraph as described in section \ref{sec:lit-graph} is another concept that can be applied. The larger the maximum common subgraph between the matched graph and ideal graph, the better the match. There are a variety of such algorithms for graph similarity and matching that could be further explored \cite{graph-similarity}. In \cite{graph-edit}, Bunke proved that by using a particular cost function, the computation for the graph edit distance is equivalent to the maximum common subgraph problem. The problem with using edit distance metrics is that it does not take into account errors in labelling and matching. In other words, a matched lobster graph can have a very small distance metric to the ideal lobster graph because most of the body parts and edges were identified, however the body parts could be mislabelled and the edit distance would not be able to allow for this issue. 
 \n
-As such, a combination of the probability and graph edit distance must be used to determine how well a detected graph matches to an ideal graph to classify images without ground truths. 
+As such, a combination of the probability and graph edit distance must be used to determine how well a detected graph matches to an ideal graph to classify images without ground truths. To take the graph edit distance into account with the probabilities, the final probability of the graph is divided by edit distance. Missed matches will increase the edit distance, so the increased probability due to missed matches is balanced with the additional edit distance. A constant multiplier is used to help with the balance of the equation, which was found experimentally.
 
 \subsubsection{Validation}
-
-From the results of precision, recall and F1 score, it was shown that there was a much clearer performance difference applying the juvenile model to mature and juvenile lobsters. Further, juvenile lobsters still had high F1 scores even when applied to mature lobsters. For this reason, the classification results TODO.
-\n
-To show why graph edit distance alone is not strong enough a metric for classification, a validation test with the annotated dataset is run. The classification is determined by calculating the edit distance from the matched lobster graph and the ideal lobster graph where all body parts are found and identified. The cost functions for the edit distance are defined following Bunke's paper \cite{graph-edit}. Both mature and juvenile models are used and the model with the lower edit distance is chosen as the classification. It is unclassified if the two edit distances are equal. 
+The classification is first tested on the annotated dataset to see how well it can perform. For unclassified cases, the lobster graph could not be created at all and so the image could not be classified.
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}
 \begin{axis}[
     ybar,
-    title={\textbf{Classification using graph edit distance}},
+    title={\textbf{Classification on annotated dataset}},
     bar width=2em,
     enlarge x limits=0.4,
     legend style={
@@ -492,17 +489,17 @@ To show why graph edit distance alone is not strong enough a metric for classifi
     xtick=data,
     ymajorgrids=true, 
 ]
-\addplot coordinates {(Graph method, 0.65) (Label method, 0.35)};
+\addplot coordinates {(Graph method, 0.7) (Label method, 0.55)};
 \addlegendentry{Correct}
 
-\addplot coordinates {(Graph method, 0.15) (Label method, 0.5)};
+\addplot coordinates {(Graph method, 0.15) (Label method, 0.3)};
 \addlegendentry{Incorrect}
 
-\addplot coordinates {(Graph method, 0.2) (Label method, 0.15)};
+\addplot coordinates {(Graph method, 0.15) (Label method, 0.15)};
 \addlegendentry{Unclassified}
 \end{axis}
 \end{tikzpicture}
-\caption{Overall classification rate for using graph edit distance to determine classification}
+\caption{Overall classification rate on annotated images}
 \end{figure}
 \noindent
 
@@ -524,13 +521,13 @@ To show why graph edit distance alone is not strong enough a metric for classifi
     xtick=data,
     ymajorgrids=true, 
 ]
-\addplot coordinates {(Graph method, 0.6) (Label method, 0.3)};
+\addplot coordinates {(Graph method, 0.8) (Label method, 0.6)};
 \addlegendentry{Correct}
 
-\addplot coordinates {(Graph method, 0.3) (Label method, 0.7)};
+\addplot coordinates {(Graph method, 0.2) (Label method, 0.4)};
 \addlegendentry{Incorrect}
 
-\addplot coordinates {(Graph method, 0.1) (Label method, 0)};
+\addplot coordinates {(Graph method, 0) (Label method, 0)};
 \addlegendentry{Unclassified}
 \end{axis}
 \end{tikzpicture}
@@ -552,10 +549,10 @@ To show why graph edit distance alone is not strong enough a metric for classifi
     xtick=data,
     ymajorgrids=true, 
 ]
-\addplot coordinates {(Graph method, 0.7) (Label method, 0.4)};
+\addplot coordinates {(Graph method, 0.6) (Label method, 0.5)};
 \addlegendentry{Correct}
 
-\addplot coordinates {(Graph method, 0) (Label method, 0.3)};
+\addplot coordinates {(Graph method, 0.1) (Label method, 0.2)};
 \addlegendentry{Incorrect}
 
 \addplot coordinates {(Graph method, 0.3) (Label method, 0.3)};
@@ -563,12 +560,103 @@ To show why graph edit distance alone is not strong enough a metric for classifi
 \end{axis}
 \end{tikzpicture}
 \end{minipage}
+\caption{More detailed classification results on annotated images on the specific lobster categories.}
+\end{figure}
+\noindent
+It can be seen that the graph method slightly outperforms the label method and gets few images incorrect. This makes sense as the graph method takes into account the node connections whereas the label method is only concerned with individual keypoint labels. Further, these results continue to support the finding that the juvenile model works better than the mature model. This is especially due to the images that are not classified in the mature model. This shows that the methods used can be quite accurate as long as the probability distributions in the models are consistent and the proper keypoints can be found and identified. The case for unclassified images comes the lack of graph that could be built, likely due to the lack of labelled keypoints. The weakness in the methods therefore comes from the detection and labelling, rather than the final graph building, as the graph method does not have a high misclassification rate. 
+
+\subsubsection{Testing}
+The same experiments are repeated for the rest of the dataset which has not been used up until this point. Note that there is a bias towards mature lobsters (67\%) compared to juvenile lobsters (33\%) in the full dataset.
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    title={\textbf{Classification on annotated dataset}},
+    bar width=2em,
+    enlarge x limits=0.4,
+    legend style={
+      at={(0.5,-0.15)},
+      anchor=north,legend columns=-1
+    },
+    ylabel={Classification rate},
+    symbolic x coords={Graph method,Label method},
+    xtick=data,
+    ymajorgrids=true, 
+]
+\addplot coordinates {(Graph method, 0.497) (Label method, 0.508)};
+\addlegendentry{Correct}
+
+\addplot coordinates {(Graph method, 0.183) (Label method, 0.172)};
+\addlegendentry{Incorrect}
+
+\addplot coordinates {(Graph method, 0.32) (Label method, 0.32)};
+\addlegendentry{Unclassified}
+\end{axis}
+\end{tikzpicture}
+\caption{Overall classification rate}
+\end{figure}
+\noindent
+The classification rates of the rest of the dataset show a different result compared to the rates on the small validation set. Both mature and juvenile lobsters have a relatively low classification rate of about 50\%. This was unexpected based on the validation results which especially show juvenile lobsters being have strong results. Further, there is very little difference between the graph and label methods which was not the case during validation. Interestingly, the reason for the poor classification is different for both categories. For juvenile lobsters, it is because a large number of images were classified incorrectly. On the other hand, for mature lobsters, a large percentage was unclassified while only a small percentage was classified incorrectly. This clearly shows how the images chosen for annotation throughout the project were biased to some extent, as the classification during validation got up to 80\% accuracy for juvenile lobsters. This suggests how a larger and varied annotated dataset is important for better consistency of results and perhaps better results overall. The pattern of high numbers of unclassified mature lobsters continues in the dataset and greatly affects the overall classification rate as over 30\% of all images could not be matched to a graph and therefore could not be classified.
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.48\textwidth}
+\begin{tikzpicture}[scale=0.85]
+\begin{axis}[
+    ybar,
+    title={\textbf{Classification for juvenile lobsters}},
+    bar width=2em,
+    enlarge x limits=0.4,
+    legend style={
+      at={(0.5,-0.15)},
+      anchor=north,legend columns=-1
+    },
+    ylabel={Classification rate},
+    symbolic x coords={Graph method,Label method},
+    xtick=data,
+    ymajorgrids=true, 
+]
+\addplot coordinates {(Graph method, 0.48) (Label method, 0.48)};
+\addlegendentry{Correct}
+
+\addplot coordinates {(Graph method, 0.42) (Label method, 0.42)};
+\addlegendentry{Incorrect}
+
+\addplot coordinates {(Graph method, 0.09) (Label method, 0.09)};
+\addlegendentry{Unclassified}
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
+\hspace*{\fill}
+\begin{minipage}{0.48\textwidth}
+\begin{tikzpicture}[scale=0.85]
+\begin{axis}[
+    ybar,
+    title={\textbf{Classification for mature lobsters}},
+    bar width=2em,
+    enlarge x limits=0.4,
+    legend style={
+      at={(0.5,-0.15)},
+      anchor=north,legend columns=-1
+    },
+    ylabel={Classification rate},
+    symbolic x coords={Graph method,Label method},
+    xtick=data,
+    ymajorgrids=true, 
+]
+\addplot coordinates {(Graph method, 0.51) (Label method, 0.52)};
+\addlegendentry{Correct}
+
+\addplot coordinates {(Graph method, 0.06) (Label method, 0.046)};
+\addlegendentry{Incorrect}
+
+\addplot coordinates {(Graph method, 0.42) (Label method, 0.42)};
+\addlegendentry{Unclassified}
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
 \caption{More detailed classification results on the specific lobster categories.}
 \end{figure}
-
-
-
-
-%\subsection{Testing the models}
-
+\noindent
+These results are important for finding the areas of weakness in this graph matching approach to correct them for any future work. Having the distinct difference of weaknesses between the juvenile and mature lobsters allows focused evaluation on why each category was stronger and weaker in different aspects.
 
