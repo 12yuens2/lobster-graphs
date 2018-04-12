@@ -20,6 +20,32 @@
 \definecolor{ETH10}{RGB}{130,190,30} % GREEN
 \definecolor{tlg}{RGB}{230,230,230}
 
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{filter discard warning=false}
+\pgfplotsset{
+    discard if/.style 2 args={
+        x filter/.append code={
+            \edef\tempa{\thisrow{#1}}
+            \edef\tempb{#2}
+            \ifx\tempa\tempb
+                \def\pgfmathresult{inf}
+            \fi
+        }
+    },
+    discard if not/.style 2 args={
+        x filter/.append code={
+            \edef\tempa{\thisrow{#1}}
+            \edef\tempb{#2}
+            \ifx\tempa\tempb
+            \else
+                \def\pgfmathresult{inf}
+            \fi
+        }
+    }
+}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %It seems many of the following entries do not control any visible Behaviour. All such entries are
 %set to red, so that they are easy to spot if they ever become visible
@@ -117,11 +143,141 @@
 	}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% POSTER SPECIFIC 
+
+%%%% DIAGRAMS
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows}
+
+\tikzstyle{data} = [rectangle, rounded corners, text width=3.5cm, minimum height=1cm,text centered, draw=black, fill=red!30]
+\tikzstyle{process} = [rectangle, text width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+
+
+
+%%%% GRAPHS
+% Line graphs
+\newcommand{\foneidentplot}[5] {
+\addplot+[mark=none,
+	discard if not={Method}{#1},
+	discard if not={Model}{#2},
+	discard if not={Category}{#3},
+	discard if not={HistThreshold}{#4}
+] table [x=LabelThreshold, y=F1, col sep=comma] {identification.csv};
+\addlegendentry{#5}
+}
+
+
+% #1 - Model
+% #2 - Histogram threshold
+% #3 - Legend label
+\newcommand{\foneidentgraph}[3]{
+\begin{tikzpicture}
+\begin{axis}[
+	title = {\textbf{F1 score with #1 model}},
+	legend pos=outer north east,
+	legend style={
+		column sep=1ex,
+		xshift=1cm
+	},
+	legend entries={
+		Graph method on mature lobsters;,
+		Label method on mature lobsters;,
+		Graph method on juvenile lobsters;,
+		Label method on juvenile lobsters
+	},
+	legend to name=#3,
+	legend columns=2,
+%	line width=2pt,
+	xlabel={Label threshold},
+	xmin=0,xmax=1,
+	xmode=log,
+	ylabel={F1 score},
+	ymin=0,ymax=1,
+	y label style={yshift={0.5cm}}
+]
+
+\foneidentplot{graph}{#1}{mature}{#2}{Graph method, mature lobsters}
+\foneidentplot{model}{#1}{mature}{#2}{Label method, mature lobsters}
+\foneidentplot{graph}{#1}{juvenile}{#2}{Graph method, juvenile lobsters}
+\foneidentplot{model}{#1}{juvenile}{#2}{Label method, juvenile lobsters}
+\end{axis}
+\end{tikzpicture}
+}
+
+
+
+% Bar graphs
+\newcommand{\doublebargraph}[1]{
+\begin{minipage}{0.48\textwidth}
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    title={\textbf{Classification for juvenile lobsters}},
+    bar width=1em,
+    enlarge x limits=0.4,
+    legend columns=-1,
+    legend entries = {
+	  Correct,
+	  Incorrect,
+	  Undetected    
+    },
+    legend style={
+	  column sep=1ex  
+    },
+    legend image post style={yshift=-0.05cm},
+    legend to name=#1,
+    ylabel={Classification rate},
+    y label style={yshift=0.5cm},
+    symbolic x coords={Graph method,Label method},
+    xtick=data,
+    ymajorgrids=true, 
+]
+\addplot coordinates {(Graph method, 0.48) (Label method, 0.48)};
+%\addlegendentry{Correct}
+
+\addplot coordinates {(Graph method, 0.42) (Label method, 0.42)};
+%\addlegendentry{Incorrect}
+
+\addplot coordinates {(Graph method, 0.09) (Label method, 0.09)};
+%\addlegendentry{Undetected}
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
+\hspace*{\fill}
+\begin{minipage}{0.48\textwidth}
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    title={\textbf{Classification for mature lobsters}},
+    bar width=1em,
+    enlarge x limits=0.4,
+    y label style={yshift=0.5cm},
+    ylabel={Classification rate},
+    symbolic x coords={Graph method,Label method},
+    xtick=data,
+    ymajorgrids=true, 
+]
+\addplot coordinates {(Graph method, 0.51) (Label method, 0.52)};
+%\addlegendentry{Correct}
+
+\addplot coordinates {(Graph method, 0.06) (Label method, 0.046)};
+%\addlegendentry{Incorrect}
+
+\addplot coordinates {(Graph method, 0.42) (Label method, 0.42)};
+%\addlegendentry{Undetected}
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Display a grid to help align images ... and it looks nice with this color scheme
 % \beamertemplategridbackground[1cm]
 
 %Some beamer customizations:
 \setbeamertemplate{bibliography item}[text]
-\setbeamertemplate{caption}[numbered]{}% Number float-like environments
+%\setbeamertemplate{caption}[numbered]{}% Number float-like environments
 
 \mode<all>
